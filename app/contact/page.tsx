@@ -1,3 +1,6 @@
+// Force dynamic rendering to ensure fresh data on Vercel
+export const dynamic = 'force-dynamic';
+
 import { MapPin, Phone, Mail, Clock, Send, ArrowRight, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

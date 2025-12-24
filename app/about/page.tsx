@@ -1,3 +1,6 @@
+// Force dynamic rendering to ensure fresh data on Vercel
+export const dynamic = 'force-dynamic';
+
 import { Target, Eye, Heart, GraduationCap, Award, Shield, Users, Zap } from 'lucide-react';
 import { getPageContent } from '@/app/actions/settings';
 

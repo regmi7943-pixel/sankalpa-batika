@@ -1,3 +1,6 @@
+// Force dynamic rendering to ensure fresh data on Vercel
+export const dynamic = 'force-dynamic';
+
 import { GraduationCap, CheckCircle, FileText, ChevronDown, HelpCircle, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getPageContent } from '@/app/actions/settings';

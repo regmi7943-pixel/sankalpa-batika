@@ -1,3 +1,6 @@
+// Force dynamic rendering to ensure fresh data on Vercel
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { getNotices } from '@/app/actions/notices';

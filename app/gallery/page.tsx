@@ -1,3 +1,6 @@
+// Force dynamic rendering to ensure fresh data on Vercel
+export const dynamic = 'force-dynamic';
+
 import { getGallery } from '@/app/actions/gallery';
 import { GalleryClient } from './gallery-client';
 import { ImageIcon } from 'lucide-react';

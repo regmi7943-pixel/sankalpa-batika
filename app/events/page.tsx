@@ -1,3 +1,6 @@
+// Force dynamic rendering to ensure fresh data on Vercel
+export const dynamic = 'force-dynamic';
+
 import { Card, CardContent } from '@/components/ui/card';
 import { getEvents } from '@/app/actions/events';
 import { Calendar, MapPin, Clock } from 'lucide-react';
