@@ -52,9 +52,12 @@ export function Navbar() {
                     <div className="flex justify-between items-center h-16">
                         {/* Logo */}
                         <Link href="/" className="flex items-center gap-3 group">
-                            <div className={`p-2 rounded-xl transition-all duration-300 ${isScrolled ? 'bg-blue-600' : 'bg-white/20'
-                                }`}>
-                                <GraduationCap className="h-7 w-7 text-white" />
+                            <div className="relative">
+                                <img
+                                    src="/logo.png"
+                                    alt="Sankalpa Vatika Logo"
+                                    className="h-10 w-10 md:h-12 md:w-12 object-contain group-hover:scale-105 transition-transform duration-300"
+                                />
                             </div>
                             <div>
                                 <span className={`font-bold text-lg tracking-tight transition-colors ${isScrolled ? 'text-foreground' : 'text-white'

@@ -38,9 +38,11 @@ export function Footer() {
                     {/* School Info */}
                     <div className="sm:col-span-2 lg:col-span-1">
                         <div className="flex items-center gap-3 mb-4 md:mb-6">
-                            <div className="bg-blue-600 p-2 rounded-xl">
-                                <GraduationCap className="h-6 w-6 md:h-8 md:w-8 text-white" />
-                            </div>
+                            <img
+                                src="/logo.png"
+                                alt="Sankalpa Vatika Logo"
+                                className="h-12 w-12 md:h-14 md:w-14 object-contain"
+                            />
                             <div>
                                 <h3 className="text-lg md:text-xl font-bold text-foreground">Sankalpa Vatika</h3>
                                 <p className="text-xs md:text-sm text-muted">Excellence in Education</p>

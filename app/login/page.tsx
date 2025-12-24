@@ -67,9 +67,11 @@ export default function LoginPage() {
                 {/* Logo Section */}
                 <div className="text-center mb-8">
                     <Link href="/" className="inline-flex flex-col items-center gap-4 group">
-                        <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4 rounded-2xl shadow-2xl shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-shadow">
-                            <GraduationCap className="h-10 w-10 text-white" />
-                        </div>
+                        <img
+                            src="/logo.png"
+                            alt="Sankalpa Vatika Logo"
+                            className="h-20 w-20 md:h-24 md:w-24 object-contain drop-shadow-2xl group-hover:scale-105 transition-transform"
+                        />
                         <div>
                             <h1 className="text-2xl font-bold text-white">Sankalpa Vatika</h1>
                             <p className="text-blue-200 text-sm">Admin Portal</p>

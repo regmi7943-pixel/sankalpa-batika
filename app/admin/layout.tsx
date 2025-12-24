@@ -68,10 +68,12 @@ export default function AdminLayout({
       `}>
                 {/* Logo */}
                 <div className="p-4 border-b border-border">
-                    <div className="flex items-center gap-2">
-                        <div className="bg-blue-600 p-1.5 rounded-lg">
-                            <GraduationCap className="h-5 w-5 text-white" />
-                        </div>
+                    <div className="flex items-center gap-3">
+                        <img
+                            src="/logo.png"
+                            alt="Logo"
+                            className="h-10 w-10 object-contain"
+                        />
                         <div>
                             <h1 className="font-bold text-foreground text-sm">Sankalpa Vatika</h1>
                             <p className="text-[10px] text-muted-foreground">Visual Editor</p>
