@@ -1,0 +1,254 @@
+'use client';
+
+import { useState } from 'react';
+import { GraduationCap, CheckCircle, FileText, ChevronDown, HelpCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+
+// Editable Text Component
+function EditableText({
+    value,
+    onChange,
+    className = '',
+    multiline = false,
+}: {
+    value: string;
+    onChange: (val: string) => void;
+    className?: string;
+    multiline?: boolean;
+}) {
+    const [isEditing, setIsEditing] = useState(false);
+    const [tempValue, setTempValue] = useState(value);
+
+    if (isEditing) {
+        if (multiline) {
+            return (
+                <textarea
+                    autoFocus
+                    value={tempValue}
+                    onChange={(e) => setTempValue(e.target.value)}
+                    onBlur={() => { onChange(tempValue); setIsEditing(false); }}
+                    onKeyDown={(e) => { if (e.key === 'Escape') { setTempValue(value); setIsEditing(false); } }}
+                    className={`${className} bg-blue-50 border-2 border-blue-400 rounded px-2 py-1 outline-none resize-none w-full`}
+                    rows={2}
+                />
+            );
+        }
+        return (
+            <input
+                autoFocus
+                type="text"
+                value={tempValue}
+                onChange={(e) => setTempValue(e.target.value)}
+                onBlur={() => { onChange(tempValue); setIsEditing(false); }}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter') { onChange(tempValue); setIsEditing(false); }
+                    if (e.key === 'Escape') { setTempValue(value); setIsEditing(false); }
+                }}
+                className={`${className} bg-blue-50 border-2 border-blue-400 rounded px-2 py-1 outline-none w-full`}
+            />
+        );
+    }
+
+    return (
+        <span
+            onClick={() => setIsEditing(true)}
+            className={`${className} cursor-pointer hover:bg-blue-100 hover:outline hover:outline-2 hover:outline-blue-400 hover:outline-dashed rounded px-1 -mx-1 transition-all inline-block`}
+            title="Click to edit"
+        >
+            {value}
+        </span>
+    );
+}
+
+export default function AdminAdmissionsPage() {
+    const [pageTitle, setPageTitle] = useState('Admissions');
+    const [pageSubtitle, setPageSubtitle] = useState('Begin your journey with Sankalpa Batika. We welcome students who are eager to learn and grow.');
+    const [sessionText, setSessionText] = useState('Admissions Open for 2025-26');
+
+    const [steps, setSteps] = useState([
+        { number: '01', title: 'Application', description: 'Fill out the online application form with required details.' },
+        { number: '02', title: 'Document Submission', description: 'Submit all required documents for verification.' },
+        { number: '03', title: 'Assessment', description: 'Students undergo a simple assessment or interaction.' },
+        { number: '04', title: 'Admission Confirmation', description: 'Complete fee payment and receive confirmation.' },
+    ]);
+
+    const [requirements, setRequirements] = useState([
+        'Birth Certificate (Original + Copy)',
+        'Previous School Report Card / Marksheet',
+        'Transfer Certificate (TC)',
+        'Character Certificate',
+        '4 Passport Size Photos',
+        'Parents\' Citizenship Copy',
+    ]);
+
+    const [faqs, setFaqs] = useState([
+        { question: 'What is the admission age for Nursery?', answer: 'Children must be at least 3 years old by the start of the academic session.', open: false },
+        { question: 'Is there an entrance test?', answer: 'For Nursery to Grade 1, we conduct a simple interaction. For Grade 2 and above, there is a basic written assessment.', open: false },
+        { question: 'What are the school timings?', answer: 'Our school operates from 9:00 AM to 4:00 PM, Sunday through Friday.', open: false },
+    ]);
+
+    return (
+        <div className="pt-20">
+            {/* Hero Section */}
+            <section className="bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 text-white py-24 relative overflow-hidden">
+                <div className="absolute inset-0 opacity-20">
+                    <div className="absolute bottom-0 right-0 w-96 h-96 bg-amber-400 rounded-full blur-3xl"></div>
+                </div>
+                <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
+                    <div className="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-400/30 rounded-full px-4 py-2 mb-6">
+                        <GraduationCap className="h-4 w-4 text-amber-400" />
+                        <EditableText value={sessionText} onChange={setSessionText} className="text-amber-200 text-sm font-medium" />
+                    </div>
+                    <h1 className="text-4xl md:text-5xl font-extrabold mb-6">
+                        <EditableText value={pageTitle} onChange={setPageTitle} />
+                    </h1>
+                    <p className="text-xl text-blue-100 max-w-2xl mx-auto">
+                        <EditableText value={pageSubtitle} onChange={setPageSubtitle} multiline />
+                    </p>
+                </div>
+            </section>
+
+            {/* Admission Steps */}
+            <section className="py-20 bg-white">
+                <div className="max-w-7xl mx-auto px-4">
+                    <div className="text-center mb-16">
+                        <span className="text-blue-600 font-semibold text-sm uppercase tracking-wider">How It Works</span>
+                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mt-2">Admission Process</h2>
+                        <div className="w-20 h-1 bg-gradient-to-r from-blue-500 to-amber-500 mx-auto mt-4 rounded"></div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {steps.map((step, i) => (
+                            <div key={i} className="relative p-6 bg-gray-50 rounded-2xl">
+                                <div className="text-5xl font-bold text-blue-100 mb-4">
+                                    <EditableText
+                                        value={step.number}
+                                        onChange={(val) => {
+                                            const newSteps = [...steps];
+                                            newSteps[i].number = val;
+                                            setSteps(newSteps);
+                                        }}
+                                    />
+                                </div>
+                                <h3 className="text-lg font-bold text-gray-900 mb-2">
+                                    <EditableText
+                                        value={step.title}
+                                        onChange={(val) => {
+                                            const newSteps = [...steps];
+                                            newSteps[i].title = val;
+                                            setSteps(newSteps);
+                                        }}
+                                    />
+                                </h3>
+                                <p className="text-gray-600 text-sm">
+                                    <EditableText
+                                        value={step.description}
+                                        onChange={(val) => {
+                                            const newSteps = [...steps];
+                                            newSteps[i].description = val;
+                                            setSteps(newSteps);
+                                        }}
+                                        multiline
+                                    />
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Required Documents */}
+            <section className="py-20 bg-gray-50">
+                <div className="max-w-4xl mx-auto px-4">
+                    <div className="text-center mb-16">
+                        <span className="text-blue-600 font-semibold text-sm uppercase tracking-wider">Prepare These</span>
+                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mt-2">Required Documents</h2>
+                        <div className="w-20 h-1 bg-gradient-to-r from-blue-500 to-amber-500 mx-auto mt-4 rounded"></div>
+                    </div>
+
+                    <div className="bg-white rounded-2xl shadow-lg p-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {requirements.map((req, i) => (
+                                <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                                    <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                                    <EditableText
+                                        value={req}
+                                        onChange={(val) => {
+                                            const newReqs = [...requirements];
+                                            newReqs[i] = val;
+                                            setRequirements(newReqs);
+                                        }}
+                                        className="text-gray-700"
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* FAQs */}
+            <section className="py-20 bg-white">
+                <div className="max-w-4xl mx-auto px-4">
+                    <div className="text-center mb-16">
+                        <span className="text-blue-600 font-semibold text-sm uppercase tracking-wider">Questions?</span>
+                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mt-2">Frequently Asked</h2>
+                        <div className="w-20 h-1 bg-gradient-to-r from-blue-500 to-amber-500 mx-auto mt-4 rounded"></div>
+                    </div>
+
+                    <div className="space-y-4">
+                        {faqs.map((faq, i) => (
+                            <div key={i} className="bg-gray-50 rounded-xl overflow-hidden">
+                                <button
+                                    onClick={() => {
+                                        const newFaqs = [...faqs];
+                                        newFaqs[i].open = !newFaqs[i].open;
+                                        setFaqs(newFaqs);
+                                    }}
+                                    className="w-full flex items-center justify-between p-5 text-left"
+                                >
+                                    <span className="font-semibold text-gray-900 flex items-center gap-2">
+                                        <HelpCircle className="h-5 w-5 text-blue-500" />
+                                        <EditableText
+                                            value={faq.question}
+                                            onChange={(val) => {
+                                                const newFaqs = [...faqs];
+                                                newFaqs[i].question = val;
+                                                setFaqs(newFaqs);
+                                            }}
+                                        />
+                                    </span>
+                                    <ChevronDown className={`h-5 w-5 text-gray-400 transition-transform ${faq.open ? 'rotate-180' : ''}`} />
+                                </button>
+                                {faq.open && (
+                                    <div className="px-5 pb-5 text-gray-600">
+                                        <EditableText
+                                            value={faq.answer}
+                                            onChange={(val) => {
+                                                const newFaqs = [...faqs];
+                                                newFaqs[i].answer = val;
+                                                setFaqs(newFaqs);
+                                            }}
+                                            multiline
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* CTA */}
+            <section className="py-16 bg-gradient-to-r from-blue-600 to-blue-700">
+                <div className="max-w-4xl mx-auto px-4 text-center">
+                    <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">Ready to Apply?</h2>
+                    <p className="text-blue-100 mb-6">Start your child's journey with Sankalpa Batika today.</p>
+                    <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50 px-8">
+                        Start Application
+                    </Button>
+                </div>
+            </section>
+        </div>
+    );
+}
