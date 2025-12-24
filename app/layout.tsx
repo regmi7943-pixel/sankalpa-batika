@@ -8,22 +8,25 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: {
-    default: 'Sankalpa Batika School',
-    template: '%s | Sankalpa Batika'
+    default: 'Sankalpa Vatika School',
+    template: '%s | Sankalpa Vatika'
   },
-  description: 'Empowering Future Leaders. A premier institution for quality education in Kathmandu, Nepal.',
-  keywords: ['school', 'education', 'kathmandu', 'nepal', 'admissions', 'sankalpa batika'],
-  authors: [{ name: 'Sankalpa Batika School' }],
+  description: 'Sankalpa Vatika School - Nurturing minds, building character, and shaping the future leaders of tomorrow.',
+  keywords: ['school', 'education', 'kathmandu', 'nepal', 'admissions', 'sankalpa vatika'],
+  authors: [{ name: 'Sankalpa Vatika School' }],
+  creator: 'Sankalpa Vatika School',
+  publisher: 'Sankalpa Vatika School',
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    siteName: 'Sankalpa Batika School',
-    title: 'Sankalpa Batika School',
-    description: 'Empowering Future Leaders. A premier institution for quality education.',
+    url: 'https://www.sankalpavatika.edu.np',
+    siteName: 'Sankalpa Vatika School',
+    title: 'Sankalpa Vatika School',
+    description: 'Nurturing minds, building character, and shaping future leaders.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Sankalpa Batika School',
+    title: 'Sankalpa Vatika School',
     description: 'Empowering Future Leaders.',
   },
 };

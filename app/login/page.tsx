@@ -71,7 +71,7 @@ export default function LoginPage() {
                             <GraduationCap className="h-10 w-10 text-white" />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-bold text-white">Sankalpa Batika</h1>
+                            <h1 className="text-2xl font-bold text-white">Sankalpa Vatika</h1>
                             <p className="text-blue-200 text-sm">Admin Portal</p>
                         </div>
                     </Link>
@@ -155,7 +155,7 @@ export default function LoginPage() {
 
                 {/* Footer */}
                 <p className="text-center text-blue-200/50 text-xs mt-8">
-                    © {new Date().getFullYear()} Sankalpa Batika School. All rights reserved.
+                    © {new Date().getFullYear()} Sankalpa Vatika School. All rights reserved.
                 </p>
             </div>
         </div>

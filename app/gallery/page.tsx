@@ -6,8 +6,8 @@ import { GalleryClient } from './gallery-client';
 import { ImageIcon } from 'lucide-react';
 
 export const metadata = {
-    title: 'Gallery - Sankalpa Batika School',
-    description: 'Explore life at Sankalpa Batika through our photo gallery and documents.',
+    title: 'Gallery - Sankalpa Vatika School',
+    description: 'Explore life at Sankalpa Vatika through our photo gallery and documents.',
 };
 
 export default async function GalleryPage() {
@@ -23,7 +23,7 @@ export default async function GalleryPage() {
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
                     <h1 className="text-4xl md:text-5xl font-extrabold mb-6">Our Gallery</h1>
                     <p className="text-xl text-blue-100 max-w-2xl mx-auto">
-                        Glimpses of life, learning, and growth at Sankalpa Batika School.
+                        Glimpses of life, learning, and growth at Sankalpa Vatika School.
                     </p>
                 </div>
             </section>

@@ -6,8 +6,8 @@ import { getEvents } from '@/app/actions/events';
 import { Calendar, MapPin, Clock } from 'lucide-react';
 
 export const metadata = {
-    title: 'Events - Sankalpa Batika',
-    description: 'Upcoming events and activities at Sankalpa Batika School.',
+    title: 'Events - Sankalpa Vatika',
+    description: 'Upcoming events and activities at Sankalpa Vatika School.',
 };
 
 export default async function EventsPage() {

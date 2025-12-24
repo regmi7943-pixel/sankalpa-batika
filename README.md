@@ -1,4 +1,4 @@
-# Sankalpa Batika School Website
+# Sankalpa Vatika School Website
 
 A modern, full-stack school website built with Next.js 14+, Firebase, and Cloudinary.
 

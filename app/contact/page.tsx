@@ -13,7 +13,7 @@ const defaultContent = {
     contactInfo: [
         { icon: 'MapPin', title: 'Visit Us', details: 'Kathmandu, Nepal' },
         { icon: 'Phone', title: 'Call Us', details: '+977-1-4XXXXXX' },
-        { icon: 'Mail', title: 'Email Us', details: 'info@sankalpabatika.edu.np' },
+        { icon: 'Mail', title: 'Email Us', details: 'info@sankalpavatika.edu.np' },
         { icon: 'Clock', title: 'Office Hours', details: 'Sun-Fri: 9AM-4PM' },
     ],
 };

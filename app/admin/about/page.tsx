@@ -13,7 +13,7 @@ import * as LucideIcons from 'lucide-react';
 
 
 const defaultContent = {
-    pageTitle: 'About Sankalpa Batika',
+    pageTitle: 'About Sankalpa Vatika',
     pageSubtitle: 'A premier educational institution committed to nurturing young minds and building future leaders.',
     missionTitle: 'Our Mission',
     missionText: 'To provide a safe, nurturing, and stimulating learning environment where every child can discover their potential.',

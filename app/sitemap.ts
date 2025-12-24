@@ -2,7 +2,7 @@ import { getEvents } from '@/app/actions/events';
 import { getNotices } from '@/app/actions/notices';
 import { MetadataRoute } from 'next';
 
-const BASE_URL = 'https://www.sankalpabatika.edu.np'; // Replace with actual domain
+const BASE_URL = 'https://www.sankalpavatika.edu.np'; // Replace with actual domain
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const { data: notices } = await getNotices();

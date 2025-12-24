@@ -17,7 +17,7 @@ import { IconPicker } from '@/components/admin/IconPicker';
 
 // Default content
 const defaultContent = {
-    heroTitle: 'Sankalpa Batika',
+    heroTitle: 'Sankalpa Vatika',
     heroSubtitle: 'Excellence in Education',
     heroDescription: 'Nurturing minds, building character, and shaping the future leaders of tomorrow. Join our community of learners and explorers.',
     heroBadge: 'Admissions Open for 2025',
@@ -36,7 +36,7 @@ const defaultContent = {
         { icon: 'Award', title: 'Holistic Development', description: 'Focus on sports, arts, and extracurricular activities.' },
         { icon: 'Shield', title: 'Safe Environment', description: 'Secure campus with modern infrastructure and facilities.' },
     ],
-    testimonialQuote: 'Sankalpa Batika has been instrumental in shaping my child\'s future. The dedicated faculty and nurturing environment have helped them grow both academically and personally.',
+    testimonialQuote: 'Sankalpa Vatika has been instrumental in shaping my child\'s future. The dedicated faculty and nurturing environment have helped them grow both academically and personally.',
     testimonialAuthor: 'Parent of Grade 5 Student',
 };
 

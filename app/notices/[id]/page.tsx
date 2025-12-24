@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
     const notice = await getNotice(params.id);
     if (!notice) return { title: 'Notice Not Found' };
     return {
-        title: `${notice.title} - Sankalpa Batika`,
+        title: `${notice.title} - Sankalpa Vatika`,
     };
 }
 

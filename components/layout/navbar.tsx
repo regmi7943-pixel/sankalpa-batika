@@ -35,7 +35,7 @@ export function Navbar() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center text-sm">
                     <div className="flex items-center gap-4">
                         <span>📞 +977-1-4XXXXXX</span>
-                        <span className="hidden sm:inline">✉️ info@sankalpabatika.edu.np</span>
+                        <span className="hidden sm:inline">✉️ info@sankalpavatika.edu.np</span>
                     </div>
                     <div className="hidden md:flex items-center gap-4">
                         <span>🕐 Sun - Fri: 9:00 AM - 4:00 PM</span>
@@ -59,7 +59,7 @@ export function Navbar() {
                             <div>
                                 <span className={`font-bold text-lg tracking-tight transition-colors ${isScrolled ? 'text-foreground' : 'text-white'
                                     }`}>
-                                    Sankalpa Batika
+                                    Sankalpa Vatika
                                 </span>
                                 <p className={`text-xs transition-colors ${isScrolled ? 'text-muted' : 'text-blue-100'
                                     }`}>

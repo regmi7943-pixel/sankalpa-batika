@@ -14,12 +14,12 @@ export default function AdminSettingsPage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
 
-    const [schoolName, setSchoolName] = useState('Sankalpa Batika');
+    const [schoolName, setSchoolName] = useState('Sankalpa Vatika');
     const [tagline, setTagline] = useState('Excellence in Education');
     const [phone1, setPhone1] = useState('+977-1-4XXXXXX');
     const [phone2, setPhone2] = useState('+977-98XXXXXXXX');
-    const [email1, setEmail1] = useState('info@sankalpabatika.edu.np');
-    const [email2, setEmail2] = useState('admissions@sankalpabatika.edu.np');
+    const [email1, setEmail1] = useState('info@sankalpavatika.edu.np');
+    const [email2, setEmail2] = useState('admissions@sankalpavatika.edu.np');
     const [address, setAddress] = useState('123 Knowledge Marg, Kathmandu, Nepal');
     const [hours, setHours] = useState('Sun - Fri: 9:00 AM - 4:00 PM');
     const [facebook, setFacebook] = useState('');

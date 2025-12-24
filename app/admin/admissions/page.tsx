@@ -13,7 +13,7 @@ import { EditableText } from '@/components/admin/EditableText';
 
 const defaultContent = {
     pageTitle: 'Admissions',
-    pageSubtitle: 'Begin your journey with Sankalpa Batika. We welcome students who are eager to learn and grow.',
+    pageSubtitle: 'Begin your journey with Sankalpa Vatika. We welcome students who are eager to learn and grow.',
     sessionText: 'Admissions Open for 2025-26',
     steps: [
         { number: '01', title: 'Application', description: 'Fill out the online application form with required details.' },
@@ -314,7 +314,7 @@ export default function AdminAdmissionsPage() {
             <section className="py-16 bg-gradient-to-r from-blue-600 to-blue-700">
                 <div className="max-w-4xl mx-auto px-4 text-center">
                     <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">Ready to Apply?</h2>
-                    <p className="text-blue-100 mb-6">Start your child's journey with Sankalpa Batika today.</p>
+                    <p className="text-blue-100 mb-6">Start your child's journey with Sankalpa Vatika today.</p>
                     <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50 px-8">
                         Start Application
                     </Button>

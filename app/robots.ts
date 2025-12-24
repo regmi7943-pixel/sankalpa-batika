@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
             allow: '/',
             disallow: '/admin/',
         },
-        sitemap: 'https://www.sankalpabatika.edu.np/sitemap.xml',
+        sitemap: 'https://www.sankalpavatika.edu.np/sitemap.xml',
     };
 }

@@ -8,7 +8,7 @@ import Link from 'next/link';
 
 const defaultContent = {
     pageTitle: 'Admissions',
-    pageSubtitle: 'Begin your journey with Sankalpa Batika. We welcome students who are eager to learn and grow.',
+    pageSubtitle: 'Begin your journey with Sankalpa Vatika. We welcome students who are eager to learn and grow.',
     sessionText: 'Admissions Open for 2025-26',
     steps: [
         { number: '01', title: 'Application', description: 'Fill out the online application form with required details.' },

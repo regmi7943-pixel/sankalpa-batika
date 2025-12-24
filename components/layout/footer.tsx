@@ -42,7 +42,7 @@ export function Footer() {
                                 <GraduationCap className="h-6 w-6 md:h-8 md:w-8 text-white" />
                             </div>
                             <div>
-                                <h3 className="text-lg md:text-xl font-bold text-foreground">Sankalpa Batika</h3>
+                                <h3 className="text-lg md:text-xl font-bold text-foreground">Sankalpa Vatika</h3>
                                 <p className="text-xs md:text-sm text-muted">Excellence in Education</p>
                             </div>
                         </div>
@@ -119,7 +119,7 @@ export function Footer() {
                                 </div>
                                 <div>
                                     <p className="text-xs md:text-sm font-medium text-foreground">Email</p>
-                                    <p className="text-muted text-xs md:text-sm break-all">info@sankalpabatika.edu.np</p>
+                                    <p className="text-muted text-xs md:text-sm break-all">info@sankalpavatika.edu.np</p>
                                 </div>
                             </li>
                         </ul>
@@ -142,7 +142,7 @@ export function Footer() {
             {/* Bottom Bar */}
             <div className="border-t border-surface-dark/10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-6 flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4 text-xs md:text-sm text-muted">
-                    <p className="text-center md:text-left">© {new Date().getFullYear()} Sankalpa Batika. All rights reserved.</p>
+                    <p className="text-center md:text-left">© {new Date().getFullYear()} Sankalpa Vatika. All rights reserved.</p>
                     <div className="flex items-center gap-4 md:gap-6">
                         <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
                         <Link href="/terms" className="hover:text-foreground transition-colors">Terms</Link>

@@ -16,7 +16,7 @@ export async function sendEmail({
 }) {
     try {
         const result = await resend.emails.send({
-            from: 'Sankalpa Batika School <notifications@kiranregmi11.com.np>',
+            from: 'Sankalpa Vatika School <notifications@kiranregmi11.com.np>',
             to,
             subject,
             html,
@@ -51,7 +51,7 @@ export async function sendBulkEmail({
 
     try {
         const emails = recipients.map((to) => ({
-            from: 'Sankalpa Batika School <notifications@kiranregmi11.com.np>',
+            from: 'Sankalpa Vatika School <notifications@kiranregmi11.com.np>',
             to,
             subject,
             html,
@@ -90,7 +90,7 @@ export function noticeEmailTemplate(notice: { title: string; content: string }) 
                     <!-- Header -->
                     <tr>
                         <td style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); padding: 32px; text-align: center;">
-                            <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 700;">Sankalpa Batika School</h1>
+                            <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 700;">Sankalpa Vatika School</h1>
                             <p style="margin: 8px 0 0 0; color: #bfdbfe; font-size: 14px;">New Notice</p>
                         </td>
                     </tr>
@@ -106,7 +106,7 @@ export function noticeEmailTemplate(notice: { title: string; content: string }) 
                     <!-- Footer -->
                     <tr>
                         <td style="background-color: #f9fafb; padding: 24px 32px; border-top: 1px solid #e5e7eb;">
-                            <p style="margin: 0 0 8px 0; color: #6b7280; font-size: 13px; text-align: center;">Sankalpa Batika School</p>
+                            <p style="margin: 0 0 8px 0; color: #6b7280; font-size: 13px; text-align: center;">Sankalpa Vatika School</p>
                             <p style="margin: 0 0 8px 0; color: #9ca3af; font-size: 12px; text-align: center;">Excellence in Education</p>
                             <p style="margin: 0; color: #9ca3af; font-size: 11px; text-align: center;">
                                 You received this email because you subscribed to our newsletter.<br>
@@ -148,7 +148,7 @@ export function eventEmailTemplate(event: { name: string; description: string; d
                     <!-- Header -->
                     <tr>
                         <td style="background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%); padding: 32px; text-align: center;">
-                            <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 700;">Sankalpa Batika School</h1>
+                            <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 700;">Sankalpa Vatika School</h1>
                             <p style="margin: 8px 0 0 0; color: #fef3c7; font-size: 14px;">Upcoming Event</p>
                         </td>
                     </tr>
@@ -175,7 +175,7 @@ export function eventEmailTemplate(event: { name: string; description: string; d
                     <!-- Footer -->
                     <tr>
                         <td style="background-color: #f9fafb; padding: 24px 32px; border-top: 1px solid #e5e7eb;">
-                            <p style="margin: 0 0 8px 0; color: #6b7280; font-size: 13px; text-align: center;">Sankalpa Batika School</p>
+                            <p style="margin: 0 0 8px 0; color: #6b7280; font-size: 13px; text-align: center;">Sankalpa Vatika School</p>
                             <p style="margin: 0 0 8px 0; color: #9ca3af; font-size: 12px; text-align: center;">Excellence in Education</p>
                             <p style="margin: 0; color: #9ca3af; font-size: 11px; text-align: center;">
                                 You received this email because you subscribed to our newsletter.<br>

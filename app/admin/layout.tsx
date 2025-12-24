@@ -73,7 +73,7 @@ export default function AdminLayout({
                             <GraduationCap className="h-5 w-5 text-white" />
                         </div>
                         <div>
-                            <h1 className="font-bold text-foreground text-sm">Sankalpa Batika</h1>
+                            <h1 className="font-bold text-foreground text-sm">Sankalpa Vatika</h1>
                             <p className="text-[10px] text-muted-foreground">Visual Editor</p>
                         </div>
                     </div>

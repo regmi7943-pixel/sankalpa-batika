@@ -48,7 +48,7 @@ export default function AdminHomepagePage() {
                 <CardContent className="p-6 space-y-6">
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-slate-700">Main Headline</label>
-                        <Input defaultValue="Welcome to Sankalpa Batika" className="bg-slate-50" />
+                        <Input defaultValue="Welcome to Sankalpa Vatika" className="bg-slate-50" />
                     </div>
 
                     <div className="space-y-2">
@@ -223,7 +223,7 @@ export default function AdminHomepagePage() {
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-slate-700">Testimonial Quote</label>
                         <textarea
-                            defaultValue="Sankalpa Batika has been instrumental in shaping my child's future. The dedicated faculty and nurturing environment have helped them grow both academically and personally."
+                            defaultValue="Sankalpa Vatika has been instrumental in shaping my child's future. The dedicated faculty and nurturing environment have helped them grow both academically and personally."
                             rows={4}
                             className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:bg-white focus:border-blue-500 outline-none"
                         />

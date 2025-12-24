@@ -8,8 +8,8 @@ import { ArrowRight, Bell, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
 export const metadata = {
-    title: 'Notices - Sankalpa Batika',
-    description: 'Latest news, announcements, and circulars from Sankalpa Batika School.',
+    title: 'Notices - Sankalpa Vatika',
+    description: 'Latest news, announcements, and circulars from Sankalpa Vatika School.',
 };
 
 export default async function NoticesPage() {
