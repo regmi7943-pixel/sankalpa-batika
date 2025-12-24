@@ -137,7 +137,15 @@ export default function AdminLayout({
                         <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700 text-xs h-8">
                             Undo
                         </Button>
-                        <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-xs h-8">
+                        <Button
+                            id="admin-save-btn"
+                            size="sm"
+                            className="bg-blue-600 hover:bg-blue-700 text-xs h-8"
+                            onClick={() => {
+                                const event = new CustomEvent('admin-save');
+                                window.dispatchEvent(event);
+                            }}
+                        >
                             Save Changes
                         </Button>
                     </div>

@@ -1,15 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
     Settings, Save, Upload, GraduationCap, Mail, Phone,
-    MapPin, Facebook, Instagram, Youtube
+    Facebook, Instagram, Youtube, Loader2
 } from 'lucide-react';
+import { getSiteSettings, saveSiteSettings } from '@/app/actions/settings';
 
 export default function AdminSettingsPage() {
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+
     const [schoolName, setSchoolName] = useState('Sankalpa Batika');
     const [tagline, setTagline] = useState('Excellence in Education');
     const [phone1, setPhone1] = useState('+977-1-4XXXXXX');
@@ -22,8 +26,71 @@ export default function AdminSettingsPage() {
     const [instagram, setInstagram] = useState('');
     const [youtube, setYoutube] = useState('');
 
+    // Load settings
+    useEffect(() => {
+        async function loadSettings() {
+            const result = await getSiteSettings();
+            if (result.success && result.data) {
+                const d = result.data;
+                if (d.schoolName) setSchoolName(d.schoolName);
+                if (d.tagline) setTagline(d.tagline);
+                if (d.phone1) setPhone1(d.phone1);
+                if (d.phone2) setPhone2(d.phone2);
+                if (d.email1) setEmail1(d.email1);
+                if (d.email2) setEmail2(d.email2);
+                if (d.address) setAddress(d.address);
+                if (d.hours) setHours(d.hours);
+                if (d.facebook) setFacebook(d.facebook);
+                if (d.instagram) setInstagram(d.instagram);
+                if (d.youtube) setYoutube(d.youtube);
+            }
+            setLoading(false);
+        }
+        loadSettings();
+    }, []);
+
+    // Save settings
+    const handleSave = async () => {
+        setSaving(true);
+        const settings = {
+            schoolName, tagline, phone1, phone2, email1, email2, address, hours, facebook, instagram, youtube
+        };
+        const result = await saveSiteSettings(settings);
+        if (result.success) {
+            alert('Settings saved successfully!');
+        } else {
+            alert('Failed to save settings: ' + result.error);
+        }
+        setSaving(false);
+    };
+
+    // Listen to toolbar save button
+    useEffect(() => {
+        const handleSaveEvent = () => handleSave();
+        window.addEventListener('admin-save', handleSaveEvent);
+        return () => window.removeEventListener('admin-save', handleSaveEvent);
+    }, [schoolName, tagline, phone1, phone2, email1, email2, address, hours, facebook, instagram, youtube]);
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+            </div>
+        );
+    }
+
     return (
-        <div className="p-6 max-w-4xl mx-auto space-y-6">
+        <div className="relative p-6 max-w-4xl mx-auto space-y-6">
+            {/* Loading Overlay */}
+            {saving && (
+                <div className="fixed inset-0 z-[60] bg-black/20 backdrop-blur-[2px] flex items-center justify-center">
+                    <div className="bg-white p-4 rounded-xl shadow-2xl flex items-center gap-3">
+                        <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+                        <span className="font-medium">Saving settings...</span>
+                    </div>
+                </div>
+            )}
+
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
@@ -32,9 +99,9 @@ export default function AdminSettingsPage() {
                     </h1>
                     <p className="text-gray-500 text-sm">General configuration for your website</p>
                 </div>
-                <Button className="bg-blue-600 hover:bg-blue-700">
+                <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700">
                     <Save className="h-4 w-4 mr-2" />
-                    Save
+                    Save Settings
                 </Button>
             </div>
 

@@ -145,11 +145,9 @@ export default function AdminHomePage() {
 
     // Update parent layout's save button
     useEffect(() => {
-        const saveBtn = document.querySelector('[data-save-btn]');
-        if (saveBtn) {
-            saveBtn.addEventListener('click', handleSave);
-            return () => saveBtn.removeEventListener('click', handleSave);
-        }
+        const handleSaveEvent = () => handleSave();
+        window.addEventListener('admin-save', handleSaveEvent);
+        return () => window.removeEventListener('admin-save', handleSaveEvent);
     }, [content]);
 
     const iconMap: Record<string, any> = { BookOpen, Users, Award, Shield };
@@ -164,24 +162,15 @@ export default function AdminHomePage() {
 
     return (
         <div className="relative">
-            {/* Floating Save Button */}
-            <div className="fixed bottom-6 right-6 z-50">
-                <Button
-                    onClick={handleSave}
-                    disabled={saving}
-                    size="lg"
-                    className="bg-blue-600 hover:bg-blue-700 shadow-xl px-6"
-                >
-                    {saving ? (
-                        <>
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                            Saving...
-                        </>
-                    ) : (
-                        'Save Changes'
-                    )}
-                </Button>
-            </div>
+            {/* Loading Overlay when saving */}
+            {saving && (
+                <div className="fixed inset-0 z-[60] bg-black/20 backdrop-blur-[2px] flex items-center justify-center">
+                    <div className="bg-white p-4 rounded-xl shadow-2xl flex items-center gap-3">
+                        <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+                        <span className="font-medium">Saving changes...</span>
+                    </div>
+                </div>
+            )}
 
             {/* Hero Section */}
             <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 text-white overflow-hidden">

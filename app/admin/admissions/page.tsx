@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import { GraduationCap, CheckCircle, FileText, ChevronDown, HelpCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { GraduationCap, CheckCircle, ChevronDown, HelpCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { getPageContent, savePageContent } from '@/app/actions/settings';
 
 // Editable Text Component
 function EditableText({
@@ -18,6 +19,10 @@ function EditableText({
 }) {
     const [isEditing, setIsEditing] = useState(false);
     const [tempValue, setTempValue] = useState(value);
+
+    useEffect(() => {
+        setTempValue(value);
+    }, [value]);
 
     if (isEditing) {
         if (multiline) {
@@ -60,35 +65,88 @@ function EditableText({
     );
 }
 
-export default function AdminAdmissionsPage() {
-    const [pageTitle, setPageTitle] = useState('Admissions');
-    const [pageSubtitle, setPageSubtitle] = useState('Begin your journey with Sankalpa Batika. We welcome students who are eager to learn and grow.');
-    const [sessionText, setSessionText] = useState('Admissions Open for 2025-26');
-
-    const [steps, setSteps] = useState([
+const defaultContent = {
+    pageTitle: 'Admissions',
+    pageSubtitle: 'Begin your journey with Sankalpa Batika. We welcome students who are eager to learn and grow.',
+    sessionText: 'Admissions Open for 2025-26',
+    steps: [
         { number: '01', title: 'Application', description: 'Fill out the online application form with required details.' },
         { number: '02', title: 'Document Submission', description: 'Submit all required documents for verification.' },
         { number: '03', title: 'Assessment', description: 'Students undergo a simple assessment or interaction.' },
         { number: '04', title: 'Admission Confirmation', description: 'Complete fee payment and receive confirmation.' },
-    ]);
-
-    const [requirements, setRequirements] = useState([
+    ],
+    requirements: [
         'Birth Certificate (Original + Copy)',
         'Previous School Report Card / Marksheet',
         'Transfer Certificate (TC)',
         'Character Certificate',
         '4 Passport Size Photos',
         'Parents\' Citizenship Copy',
-    ]);
+    ],
+    faqs: [
+        { question: 'What is the admission age for Nursery?', answer: 'Children must be at least 3 years old by the start of the academic session.' },
+        { question: 'Is there an entrance test?', answer: 'For Nursery to Grade 1, we conduct a simple interaction. For Grade 2 and above, there is a basic written assessment.' },
+        { question: 'What are the school timings?', answer: 'Our school operates from 9:00 AM to 4:00 PM, Sunday through Friday.' },
+    ],
+};
 
-    const [faqs, setFaqs] = useState([
-        { question: 'What is the admission age for Nursery?', answer: 'Children must be at least 3 years old by the start of the academic session.', open: false },
-        { question: 'Is there an entrance test?', answer: 'For Nursery to Grade 1, we conduct a simple interaction. For Grade 2 and above, there is a basic written assessment.', open: false },
-        { question: 'What are the school timings?', answer: 'Our school operates from 9:00 AM to 4:00 PM, Sunday through Friday.', open: false },
-    ]);
+export default function AdminAdmissionsPage() {
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [content, setContent] = useState(defaultContent);
+    const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+    // Load content
+    useEffect(() => {
+        async function loadContent() {
+            const result = await getPageContent('admissions');
+            if (result.success && result.data) {
+                setContent({ ...defaultContent, ...result.data });
+            }
+            setLoading(false);
+        }
+        loadContent();
+    }, []);
+
+    // Save content
+    const handleSave = async () => {
+        setSaving(true);
+        const result = await savePageContent('admissions', content);
+        if (result.success) {
+            alert('Changes saved successfully!');
+        } else {
+            alert('Failed to save changes: ' + result.error);
+        }
+        setSaving(false);
+    };
+
+    // Listen to toolbar save button
+    useEffect(() => {
+        const handleSaveEvent = () => handleSave();
+        window.addEventListener('admin-save', handleSaveEvent);
+        return () => window.removeEventListener('admin-save', handleSaveEvent);
+    }, [content]);
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+            </div>
+        );
+    }
 
     return (
-        <div className="pt-20">
+        <div className="relative">
+            {/* Loading Overlay */}
+            {saving && (
+                <div className="fixed inset-0 z-[60] bg-black/20 backdrop-blur-[2px] flex items-center justify-center">
+                    <div className="bg-white p-4 rounded-xl shadow-2xl flex items-center gap-3">
+                        <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+                        <span className="font-medium">Saving changes...</span>
+                    </div>
+                </div>
+            )}
+
             {/* Hero Section */}
             <section className="bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 text-white py-24 relative overflow-hidden">
                 <div className="absolute inset-0 opacity-20">
@@ -97,13 +155,13 @@ export default function AdminAdmissionsPage() {
                 <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
                     <div className="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-400/30 rounded-full px-4 py-2 mb-6">
                         <GraduationCap className="h-4 w-4 text-amber-400" />
-                        <EditableText value={sessionText} onChange={setSessionText} className="text-amber-200 text-sm font-medium" />
+                        <EditableText value={content.sessionText} onChange={(val) => setContent({ ...content, sessionText: val })} className="text-amber-200 text-sm font-medium" />
                     </div>
                     <h1 className="text-4xl md:text-5xl font-extrabold mb-6">
-                        <EditableText value={pageTitle} onChange={setPageTitle} />
+                        <EditableText value={content.pageTitle} onChange={(val) => setContent({ ...content, pageTitle: val })} />
                     </h1>
                     <p className="text-xl text-blue-100 max-w-2xl mx-auto">
-                        <EditableText value={pageSubtitle} onChange={setPageSubtitle} multiline />
+                        <EditableText value={content.pageSubtitle} onChange={(val) => setContent({ ...content, pageSubtitle: val })} multiline />
                     </p>
                 </div>
             </section>
@@ -118,15 +176,15 @@ export default function AdminAdmissionsPage() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {steps.map((step, i) => (
+                        {content.steps.map((step, i) => (
                             <div key={i} className="relative p-6 bg-gray-50 rounded-2xl">
                                 <div className="text-5xl font-bold text-blue-100 mb-4">
                                     <EditableText
                                         value={step.number}
                                         onChange={(val) => {
-                                            const newSteps = [...steps];
+                                            const newSteps = [...content.steps];
                                             newSteps[i].number = val;
-                                            setSteps(newSteps);
+                                            setContent({ ...content, steps: newSteps });
                                         }}
                                     />
                                 </div>
@@ -134,9 +192,9 @@ export default function AdminAdmissionsPage() {
                                     <EditableText
                                         value={step.title}
                                         onChange={(val) => {
-                                            const newSteps = [...steps];
+                                            const newSteps = [...content.steps];
                                             newSteps[i].title = val;
-                                            setSteps(newSteps);
+                                            setContent({ ...content, steps: newSteps });
                                         }}
                                     />
                                 </h3>
@@ -144,9 +202,9 @@ export default function AdminAdmissionsPage() {
                                     <EditableText
                                         value={step.description}
                                         onChange={(val) => {
-                                            const newSteps = [...steps];
+                                            const newSteps = [...content.steps];
                                             newSteps[i].description = val;
-                                            setSteps(newSteps);
+                                            setContent({ ...content, steps: newSteps });
                                         }}
                                         multiline
                                     />
@@ -168,15 +226,15 @@ export default function AdminAdmissionsPage() {
 
                     <div className="bg-white rounded-2xl shadow-lg p-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {requirements.map((req, i) => (
+                            {content.requirements.map((req, i) => (
                                 <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
                                     <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
                                     <EditableText
                                         value={req}
                                         onChange={(val) => {
-                                            const newReqs = [...requirements];
+                                            const newReqs = [...content.requirements];
                                             newReqs[i] = val;
-                                            setRequirements(newReqs);
+                                            setContent({ ...content, requirements: newReqs });
                                         }}
                                         className="text-gray-700"
                                     />
@@ -197,14 +255,10 @@ export default function AdminAdmissionsPage() {
                     </div>
 
                     <div className="space-y-4">
-                        {faqs.map((faq, i) => (
+                        {content.faqs.map((faq, i) => (
                             <div key={i} className="bg-gray-50 rounded-xl overflow-hidden">
                                 <button
-                                    onClick={() => {
-                                        const newFaqs = [...faqs];
-                                        newFaqs[i].open = !newFaqs[i].open;
-                                        setFaqs(newFaqs);
-                                    }}
+                                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
                                     className="w-full flex items-center justify-between p-5 text-left"
                                 >
                                     <span className="font-semibold text-gray-900 flex items-center gap-2">
@@ -212,22 +266,22 @@ export default function AdminAdmissionsPage() {
                                         <EditableText
                                             value={faq.question}
                                             onChange={(val) => {
-                                                const newFaqs = [...faqs];
+                                                const newFaqs = [...content.faqs];
                                                 newFaqs[i].question = val;
-                                                setFaqs(newFaqs);
+                                                setContent({ ...content, faqs: newFaqs });
                                             }}
                                         />
                                     </span>
-                                    <ChevronDown className={`h-5 w-5 text-gray-400 transition-transform ${faq.open ? 'rotate-180' : ''}`} />
+                                    <ChevronDown className={`h-5 w-5 text-gray-400 transition-transform ${openFaq === i ? 'rotate-180' : ''}`} />
                                 </button>
-                                {faq.open && (
+                                {openFaq === i && (
                                     <div className="px-5 pb-5 text-gray-600">
                                         <EditableText
                                             value={faq.answer}
                                             onChange={(val) => {
-                                                const newFaqs = [...faqs];
+                                                const newFaqs = [...content.faqs];
                                                 newFaqs[i].answer = val;
-                                                setFaqs(newFaqs);
+                                                setContent({ ...content, faqs: newFaqs });
                                             }}
                                             multiline
                                         />

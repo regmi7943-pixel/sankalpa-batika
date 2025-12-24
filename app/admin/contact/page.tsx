@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import { MapPin, Phone, Mail, Clock, Send } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { MapPin, Phone, Mail, Clock, Send, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
+import { getPageContent, savePageContent } from '@/app/actions/settings';
 
 // Editable Text Component
 function EditableText({
@@ -18,6 +19,10 @@ function EditableText({
 }) {
     const [isEditing, setIsEditing] = useState(false);
     const [tempValue, setTempValue] = useState(value);
+
+    useEffect(() => {
+        setTempValue(value);
+    }, [value]);
 
     if (isEditing) {
         return (
@@ -47,21 +52,75 @@ function EditableText({
     );
 }
 
-export default function AdminContactPage() {
-    const [pageTitle, setPageTitle] = useState('Get In Touch');
-    const [pageSubtitle, setPageSubtitle] = useState('Have questions? We\'d love to hear from you.');
-
-    const [contactInfo, setContactInfo] = useState([
+const defaultContent = {
+    pageTitle: 'Get In Touch',
+    pageSubtitle: 'Have questions? We\'d love to hear from you.',
+    contactInfo: [
         { icon: 'MapPin', title: 'Visit Us', details: 'Kathmandu, Nepal' },
         { icon: 'Phone', title: 'Call Us', details: '+977-1-4XXXXXX' },
         { icon: 'Mail', title: 'Email Us', details: 'info@sankalpabatika.edu.np' },
         { icon: 'Clock', title: 'Office Hours', details: 'Sun-Fri: 9AM-4PM' },
-    ]);
+    ],
+};
+
+export default function AdminContactPage() {
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [content, setContent] = useState(defaultContent);
+
+    // Load content
+    useEffect(() => {
+        async function loadContent() {
+            const result = await getPageContent('contact');
+            if (result.success && result.data) {
+                setContent({ ...defaultContent, ...result.data });
+            }
+            setLoading(false);
+        }
+        loadContent();
+    }, []);
+
+    // Save content
+    const handleSave = async () => {
+        setSaving(true);
+        const result = await savePageContent('contact', content);
+        if (result.success) {
+            alert('Changes saved successfully!');
+        } else {
+            alert('Failed to save changes: ' + result.error);
+        }
+        setSaving(false);
+    };
+
+    // Listen to toolbar save button
+    useEffect(() => {
+        const handleSaveEvent = () => handleSave();
+        window.addEventListener('admin-save', handleSaveEvent);
+        return () => window.removeEventListener('admin-save', handleSaveEvent);
+    }, [content]);
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+            </div>
+        );
+    }
 
     const iconMap: Record<string, any> = { MapPin, Phone, Mail, Clock };
 
     return (
-        <div className="pt-20">
+        <div className="relative">
+            {/* Loading Overlay */}
+            {saving && (
+                <div className="fixed inset-0 z-[60] bg-black/20 backdrop-blur-[2px] flex items-center justify-center">
+                    <div className="bg-white p-4 rounded-xl shadow-2xl flex items-center gap-3">
+                        <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+                        <span className="font-medium">Saving changes...</span>
+                    </div>
+                </div>
+            )}
+
             {/* Hero Section */}
             <section className="bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 text-white py-24 relative overflow-hidden">
                 <div className="absolute inset-0 opacity-20">
@@ -69,10 +128,10 @@ export default function AdminContactPage() {
                 </div>
                 <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
                     <h1 className="text-4xl md:text-5xl font-extrabold mb-6">
-                        <EditableText value={pageTitle} onChange={setPageTitle} />
+                        <EditableText value={content.pageTitle} onChange={(val) => setContent({ ...content, pageTitle: val })} />
                     </h1>
                     <p className="text-xl text-blue-100 max-w-2xl mx-auto">
-                        <EditableText value={pageSubtitle} onChange={setPageSubtitle} />
+                        <EditableText value={content.pageSubtitle} onChange={(val) => setContent({ ...content, pageSubtitle: val })} />
                     </p>
                 </div>
             </section>
@@ -81,7 +140,7 @@ export default function AdminContactPage() {
             <section className="py-16 bg-gray-50 -mt-16 relative z-10">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                        {contactInfo.map((info, i) => {
+                        {content.contactInfo.map((info, i) => {
                             const IconComponent = iconMap[info.icon] || MapPin;
                             return (
                                 <Card key={i} className="border-0 shadow-lg">
@@ -93,9 +152,9 @@ export default function AdminContactPage() {
                                             <EditableText
                                                 value={info.title}
                                                 onChange={(val) => {
-                                                    const newInfo = [...contactInfo];
+                                                    const newInfo = [...content.contactInfo];
                                                     newInfo[i].title = val;
-                                                    setContactInfo(newInfo);
+                                                    setContent({ ...content, contactInfo: newInfo });
                                                 }}
                                             />
                                         </h3>
@@ -103,9 +162,9 @@ export default function AdminContactPage() {
                                             <EditableText
                                                 value={info.details}
                                                 onChange={(val) => {
-                                                    const newInfo = [...contactInfo];
+                                                    const newInfo = [...content.contactInfo];
                                                     newInfo[i].details = val;
-                                                    setContactInfo(newInfo);
+                                                    setContent({ ...content, contactInfo: newInfo });
                                                 }}
                                             />
                                         </p>
