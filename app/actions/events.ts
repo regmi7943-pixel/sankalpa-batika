@@ -38,8 +38,30 @@ export async function createEvent(data: Omit<Event, 'id'>) {
         await ref.set(data);
         revalidatePath('/events'); // Revalidate events page
         revalidatePath('/'); // Revalidate home
+
+        // Send email to subscribers
+        const { sendBulkEmail, eventEmailTemplate } = await import('@/lib/email');
+        const { getNewsletterSubscribers } = await import('./newsletter');
+
+        const subscribersResult = await getNewsletterSubscribers();
+        if (subscribersResult.success && subscribersResult.data && subscribersResult.data.length > 0) {
+            const emails = subscribersResult.data.map((s: any) => s.email);
+            const html = eventEmailTemplate({
+                name: data.name,
+                description: data.description,
+                date: data.date,
+                location: data.location,
+            });
+            await sendBulkEmail({
+                recipients: emails,
+                subject: `📅 Upcoming Event: ${data.name}`,
+                html,
+            });
+        }
+
         return { success: true };
     } catch (error) {
+        console.error('Error creating event:', error);
         return { success: false, error: 'Failed to create event' };
     }
 }

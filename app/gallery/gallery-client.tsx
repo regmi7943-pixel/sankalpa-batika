@@ -83,26 +83,26 @@ export function GalleryClient({ items }: GalleryClientProps) {
                                         href={item.url}
                                         target="_blank"
                                         rel="noreferrer"
-                                        className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 group-hover:from-blue-50 group-hover:to-blue-100 transition-colors"
+                                        className="w-full h-full flex flex-col items-center justify-center bg-surface group-hover:bg-blue-900/10 transition-colors"
                                         onClick={(e) => e.stopPropagation()}
                                     >
                                         <div className="w-20 h-20 rounded-2xl bg-red-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                                             <FileText className="h-10 w-10 text-red-500" />
                                         </div>
-                                        <p className="text-gray-700 font-medium text-center px-4 truncate max-w-full">
+                                        <p className="text-foreground font-medium text-center px-4 truncate max-w-full">
                                             {item.caption || 'Document'}
                                         </p>
-                                        <p className="text-gray-400 text-sm mt-1">Click to view PDF</p>
+                                        <p className="text-muted text-sm mt-1">Click to view PDF</p>
                                     </a>
                                 )}
                             </CardContent>
                         </Card>
                     ))
                 ) : (
-                    <div className="col-span-full text-center py-20 bg-gray-50 rounded-2xl">
-                        <ImageIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                        <p className="text-gray-500 font-medium">No items found</p>
-                        <p className="text-gray-400 text-sm mt-1">Check back later for updates</p>
+                    <div className="col-span-full text-center py-20 bg-surface rounded-2xl border border-surface-dark/10">
+                        <ImageIcon className="h-16 w-16 text-muted-light mx-auto mb-4" />
+                        <p className="text-foreground font-medium">No items found</p>
+                        <p className="text-muted text-sm mt-1">Check back later for updates</p>
                     </div>
                 )}
             </div>

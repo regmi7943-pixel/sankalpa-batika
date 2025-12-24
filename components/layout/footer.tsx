@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Facebook, Twitter, Mail, Phone, MapPin, Instagram, Youtube, ArrowRight, GraduationCap } from 'lucide-react';
+import { NewsletterForm } from '@/components/newsletter-form';
 
 export function Footer() {
     const quickLinks = [
@@ -12,12 +13,12 @@ export function Footer() {
     ];
 
     return (
-        <footer className="bg-gradient-to-b from-slate-900 to-slate-950 text-white">
+        <footer className="bg-background text-foreground border-t border-surface-dark/10">
             {/* CTA Section */}
             <div className="bg-gradient-to-r from-blue-600 to-blue-700 py-8 md:py-12">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 text-center md:text-left">
                     <div>
-                        <h3 className="text-xl md:text-2xl lg:text-3xl font-bold mb-1 md:mb-2">Ready to Join Our School?</h3>
+                        <h3 className="text-xl md:text-2xl lg:text-3xl font-bold mb-1 md:mb-2 text-white">Ready to Join Our School?</h3>
                         <p className="text-blue-100 text-sm md:text-base">Admissions are now open for the upcoming academic session.</p>
                     </div>
                     <Link
@@ -41,11 +42,11 @@ export function Footer() {
                                 <GraduationCap className="h-6 w-6 md:h-8 md:w-8 text-white" />
                             </div>
                             <div>
-                                <h3 className="text-lg md:text-xl font-bold">Sankalpa Batika</h3>
-                                <p className="text-xs md:text-sm text-slate-400">Excellence in Education</p>
+                                <h3 className="text-lg md:text-xl font-bold text-foreground">Sankalpa Batika</h3>
+                                <p className="text-xs md:text-sm text-muted">Excellence in Education</p>
                             </div>
                         </div>
-                        <p className="text-slate-400 text-xs md:text-sm leading-relaxed mb-4 md:mb-6">
+                        <p className="text-muted text-xs md:text-sm leading-relaxed mb-4 md:mb-6">
                             Empowering students with knowledge, character, and vision for a better tomorrow.
                         </p>
                         <div className="flex gap-2 md:gap-3">
@@ -58,7 +59,7 @@ export function Footer() {
                                 <a
                                     key={i}
                                     href={social.href}
-                                    className={`p-2 md:p-2.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white transition-all duration-300 ${social.color}`}
+                                    className={`p-2 md:p-2.5 rounded-lg bg-surface text-muted hover:text-white transition-all duration-300 ${social.color}`}
                                 >
                                     <social.icon className="h-4 w-4 md:h-5 md:w-5" />
                                 </a>
@@ -77,7 +78,7 @@ export function Footer() {
                                 <li key={link.href}>
                                     <Link
                                         href={link.href}
-                                        className="text-slate-400 hover:text-white hover:pl-2 transition-all duration-200 flex items-center gap-2 group text-sm md:text-base"
+                                        className="text-muted hover:text-blue-600 dark:hover:text-blue-400 hover:pl-2 transition-all duration-200 flex items-center gap-2 group text-sm md:text-base"
                                     >
                                         <ArrowRight className="h-3 w-3 md:h-4 md:w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
                                         {link.label}
@@ -99,26 +100,26 @@ export function Footer() {
                                     <MapPin className="h-3 w-3 md:h-4 md:w-4 text-amber-500" />
                                 </div>
                                 <div>
-                                    <p className="text-xs md:text-sm font-medium">Address</p>
-                                    <p className="text-slate-400 text-xs md:text-sm">Kathmandu, Nepal</p>
+                                    <p className="text-xs md:text-sm font-medium text-foreground">Address</p>
+                                    <p className="text-muted text-xs md:text-sm">Kathmandu, Nepal</p>
                                 </div>
                             </li>
                             <li className="flex items-start gap-2 md:gap-3">
-                                <div className="bg-slate-800 p-1.5 md:p-2 rounded-lg mt-0.5 flex-shrink-0">
+                                <div className="bg-surface p-1.5 md:p-2 rounded-lg mt-0.5 flex-shrink-0">
                                     <Phone className="h-3 w-3 md:h-4 md:w-4 text-amber-500" />
                                 </div>
                                 <div>
-                                    <p className="text-xs md:text-sm font-medium">Phone</p>
-                                    <p className="text-slate-400 text-xs md:text-sm">+977-1-4XXXXXX</p>
+                                    <p className="text-xs md:text-sm font-medium text-foreground">Phone</p>
+                                    <p className="text-muted text-xs md:text-sm">+977-1-4XXXXXX</p>
                                 </div>
                             </li>
                             <li className="flex items-start gap-2 md:gap-3">
-                                <div className="bg-slate-800 p-1.5 md:p-2 rounded-lg mt-0.5 flex-shrink-0">
+                                <div className="bg-surface p-1.5 md:p-2 rounded-lg mt-0.5 flex-shrink-0">
                                     <Mail className="h-3 w-3 md:h-4 md:w-4 text-amber-500" />
                                 </div>
                                 <div>
-                                    <p className="text-xs md:text-sm font-medium">Email</p>
-                                    <p className="text-slate-400 text-xs md:text-sm break-all">info@sankalpabatika.edu.np</p>
+                                    <p className="text-xs md:text-sm font-medium text-foreground">Email</p>
+                                    <p className="text-muted text-xs md:text-sm break-all">info@sankalpabatika.edu.np</p>
                                 </div>
                             </li>
                         </ul>
@@ -133,31 +134,19 @@ export function Footer() {
                         <p className="text-slate-400 text-xs md:text-sm mb-3 md:mb-4">
                             Subscribe to get updates on admissions and events.
                         </p>
-                        <form className="space-y-2 md:space-y-3">
-                            <input
-                                type="email"
-                                placeholder="Enter your email"
-                                className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-lg bg-slate-800 border border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-sm"
-                            />
-                            <button
-                                type="submit"
-                                className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium hover:from-blue-700 hover:to-blue-800 transition-all duration-300 text-sm"
-                            >
-                                Subscribe
-                            </button>
-                        </form>
+                        <NewsletterForm />
                     </div>
                 </div>
             </div>
 
             {/* Bottom Bar */}
-            <div className="border-t border-slate-800">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-6 flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4 text-xs md:text-sm text-slate-500">
+            <div className="border-t border-surface-dark/10">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-6 flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4 text-xs md:text-sm text-muted">
                     <p className="text-center md:text-left">© {new Date().getFullYear()} Sankalpa Batika. All rights reserved.</p>
                     <div className="flex items-center gap-4 md:gap-6">
-                        <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
-                        <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
-                        <Link href="/admin" className="hover:text-white transition-colors">Admin</Link>
+                        <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
+                        <Link href="/terms" className="hover:text-foreground transition-colors">Terms</Link>
+                        <Link href="/admin" className="hover:text-foreground transition-colors">Admin</Link>
                     </div>
                 </div>
             </div>

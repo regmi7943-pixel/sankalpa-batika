@@ -1,69 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { GraduationCap, CheckCircle, ChevronDown, HelpCircle, Loader2 } from 'lucide-react';
+import { GraduationCap, CheckCircle, ChevronDown, HelpCircle, Loader2, Plus, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getPageContent, savePageContent } from '@/app/actions/settings';
+import { DeletableWrapper } from '@/components/admin/deletable-wrapper';
+import { Card, CardContent } from '@/components/ui/card';
 
-// Editable Text Component
-function EditableText({
-    value,
-    onChange,
-    className = '',
-    multiline = false,
-}: {
-    value: string;
-    onChange: (val: string) => void;
-    className?: string;
-    multiline?: boolean;
-}) {
-    const [isEditing, setIsEditing] = useState(false);
-    const [tempValue, setTempValue] = useState(value);
 
-    useEffect(() => {
-        setTempValue(value);
-    }, [value]);
+import { EditableText } from '@/components/admin/EditableText';
 
-    if (isEditing) {
-        if (multiline) {
-            return (
-                <textarea
-                    autoFocus
-                    value={tempValue}
-                    onChange={(e) => setTempValue(e.target.value)}
-                    onBlur={() => { onChange(tempValue); setIsEditing(false); }}
-                    onKeyDown={(e) => { if (e.key === 'Escape') { setTempValue(value); setIsEditing(false); } }}
-                    className={`${className} bg-blue-50 border-2 border-blue-400 rounded px-2 py-1 outline-none resize-none w-full`}
-                    rows={2}
-                />
-            );
-        }
-        return (
-            <input
-                autoFocus
-                type="text"
-                value={tempValue}
-                onChange={(e) => setTempValue(e.target.value)}
-                onBlur={() => { onChange(tempValue); setIsEditing(false); }}
-                onKeyDown={(e) => {
-                    if (e.key === 'Enter') { onChange(tempValue); setIsEditing(false); }
-                    if (e.key === 'Escape') { setTempValue(value); setIsEditing(false); }
-                }}
-                className={`${className} bg-blue-50 border-2 border-blue-400 rounded px-2 py-1 outline-none w-full`}
-            />
-        );
-    }
-
-    return (
-        <span
-            onClick={() => setIsEditing(true)}
-            className={`${className} cursor-pointer hover:bg-blue-100 hover:outline hover:outline-2 hover:outline-blue-400 hover:outline-dashed rounded px-1 -mx-1 transition-all inline-block`}
-            title="Click to edit"
-        >
-            {value}
-        </span>
-    );
-}
 
 const defaultContent = {
     pageTitle: 'Admissions',
@@ -140,9 +86,9 @@ export default function AdminAdmissionsPage() {
             {/* Loading Overlay */}
             {saving && (
                 <div className="fixed inset-0 z-[60] bg-black/20 backdrop-blur-[2px] flex items-center justify-center">
-                    <div className="bg-white p-4 rounded-xl shadow-2xl flex items-center gap-3">
+                    <div className="bg-surface p-4 rounded-xl shadow-2xl flex items-center gap-3 border border-border">
                         <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
-                        <span className="font-medium">Saving changes...</span>
+                        <span className="font-medium text-foreground">Saving changes...</span>
                     </div>
                 </div>
             )}
@@ -167,115 +113,171 @@ export default function AdminAdmissionsPage() {
             </section>
 
             {/* Admission Steps */}
-            <section className="py-20 bg-white">
+            <section className="py-20 bg-background">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="text-center mb-16">
                         <span className="text-blue-600 font-semibold text-sm uppercase tracking-wider">How It Works</span>
-                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mt-2">Admission Process</h2>
+                        <h2 className="text-3xl md:text-4xl font-bold text-foreground mt-2">Admission Process</h2>
                         <div className="w-20 h-1 bg-gradient-to-r from-blue-500 to-amber-500 mx-auto mt-4 rounded"></div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {content.steps.map((step, i) => (
-                            <div key={i} className="relative p-6 bg-gray-50 rounded-2xl">
-                                <div className="text-5xl font-bold text-blue-100 mb-4">
-                                    <EditableText
-                                        value={step.number}
-                                        onChange={(val) => {
-                                            const newSteps = [...content.steps];
-                                            newSteps[i].number = val;
-                                            setContent({ ...content, steps: newSteps });
-                                        }}
-                                    />
+                            <DeletableWrapper
+                                key={i}
+                                onDelete={() => {
+                                    const newSteps = content.steps.filter((_, index) => index !== i);
+                                    setContent({ ...content, steps: newSteps });
+                                }}
+                            >
+                                <div className="relative p-6 bg-surface rounded-2xl h-full border border-transparent hover:border-blue-100 dark:hover:border-blue-900/50 transition-all text-center flex flex-col items-center">
+                                    <div className="text-5xl font-bold text-blue-100 dark:text-blue-500/20 mb-4">
+                                        <EditableText
+                                            value={step.number}
+                                            onChange={(val) => {
+                                                const newSteps = [...content.steps];
+                                                newSteps[i].number = val;
+                                                setContent({ ...content, steps: newSteps });
+                                            }}
+                                        />
+                                    </div>
+                                    <h3 className="text-lg font-bold text-foreground mb-2">
+                                        <EditableText
+                                            value={step.title}
+                                            onChange={(val) => {
+                                                const newSteps = [...content.steps];
+                                                newSteps[i].title = val;
+                                                setContent({ ...content, steps: newSteps });
+                                            }}
+                                        />
+                                    </h3>
+                                    <p className="text-muted text-sm">
+                                        <EditableText
+                                            value={step.description}
+                                            onChange={(val) => {
+                                                const newSteps = [...content.steps];
+                                                newSteps[i].description = val;
+                                                setContent({ ...content, steps: newSteps });
+                                            }}
+                                            multiline
+                                        />
+                                    </p>
                                 </div>
-                                <h3 className="text-lg font-bold text-gray-900 mb-2">
-                                    <EditableText
-                                        value={step.title}
-                                        onChange={(val) => {
-                                            const newSteps = [...content.steps];
-                                            newSteps[i].title = val;
-                                            setContent({ ...content, steps: newSteps });
-                                        }}
-                                    />
-                                </h3>
-                                <p className="text-gray-600 text-sm">
-                                    <EditableText
-                                        value={step.description}
-                                        onChange={(val) => {
-                                            const newSteps = [...content.steps];
-                                            newSteps[i].description = val;
-                                            setContent({ ...content, steps: newSteps });
-                                        }}
-                                        multiline
-                                    />
-                                </p>
-                            </div>
+                            </DeletableWrapper>
                         ))}
+                        {/* Add Step Button */}
+                        <Button
+                            variant="outline"
+                            className="border-dashed border-blue-200 text-blue-600 hover:bg-blue-50 h-full min-h-[160px] rounded-2xl flex flex-col gap-2 p-6"
+                            onClick={() => {
+                                setContent({
+                                    ...content,
+                                    steps: [...content.steps, { number: '05', title: 'New Step', description: 'Step description here' }]
+                                });
+                            }}
+                        >
+                            <Plus className="h-6 w-6" />
+                            <span className="font-semibold">Add Step</span>
+                        </Button>
                     </div>
                 </div>
             </section>
 
             {/* Required Documents */}
-            <section className="py-20 bg-gray-50">
+            <section className="py-20 bg-surface">
                 <div className="max-w-4xl mx-auto px-4">
                     <div className="text-center mb-16">
                         <span className="text-blue-600 font-semibold text-sm uppercase tracking-wider">Prepare These</span>
-                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mt-2">Required Documents</h2>
+                        <h2 className="text-3xl md:text-4xl font-bold text-foreground mt-2">Required Documents</h2>
                         <div className="w-20 h-1 bg-gradient-to-r from-blue-500 to-amber-500 mx-auto mt-4 rounded"></div>
                     </div>
 
-                    <div className="bg-white rounded-2xl shadow-lg p-8">
+                    <div className="bg-background rounded-2xl shadow-lg p-8 border border-border">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {content.requirements.map((req, i) => (
-                                <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                                    <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
-                                    <EditableText
-                                        value={req}
-                                        onChange={(val) => {
-                                            const newReqs = [...content.requirements];
-                                            newReqs[i] = val;
-                                            setContent({ ...content, requirements: newReqs });
-                                        }}
-                                        className="text-gray-700"
-                                    />
-                                </div>
+                                <DeletableWrapper
+                                    key={i}
+                                    onDelete={() => {
+                                        const newReqs = content.requirements.filter((_, index) => index !== i);
+                                        setContent({ ...content, requirements: newReqs });
+                                    }}
+                                >
+                                    <div className="flex items-center gap-3 p-3 bg-surface rounded-xl">
+                                        <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                                        <EditableText
+                                            value={req}
+                                            onChange={(val) => {
+                                                const newReqs = [...content.requirements];
+                                                newReqs[i] = val;
+                                                setContent({ ...content, requirements: newReqs });
+                                            }}
+                                            className="text-foreground"
+                                        />
+                                    </div>
+                                </DeletableWrapper>
                             ))}
+                            <div className="flex items-center justify-center p-3 border border-dashed border-green-200 bg-green-50/50 rounded-xl">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-green-600 hover:text-green-700 hover:bg-green-100 w-full h-8 gap-2"
+                                    onClick={() => {
+                                        setContent({
+                                            ...content,
+                                            requirements: [...content.requirements, 'New required document']
+                                        });
+                                    }}
+                                >
+                                    <Plus className="h-4 w-4" />
+                                    <span>Add Requirement</span>
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
 
             {/* FAQs */}
-            <section className="py-20 bg-white">
+            <section className="py-20 bg-background">
                 <div className="max-w-4xl mx-auto px-4">
                     <div className="text-center mb-16">
                         <span className="text-blue-600 font-semibold text-sm uppercase tracking-wider">Questions?</span>
-                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mt-2">Frequently Asked</h2>
+                        <h2 className="text-3xl md:text-4xl font-bold text-foreground mt-2">Frequently Asked</h2>
                         <div className="w-20 h-1 bg-gradient-to-r from-blue-500 to-amber-500 mx-auto mt-4 rounded"></div>
                     </div>
 
                     <div className="space-y-4">
                         {content.faqs.map((faq, i) => (
-                            <div key={i} className="bg-gray-50 rounded-xl overflow-hidden">
-                                <button
-                                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                                    className="w-full flex items-center justify-between p-5 text-left"
-                                >
-                                    <span className="font-semibold text-gray-900 flex items-center gap-2">
-                                        <HelpCircle className="h-5 w-5 text-blue-500" />
-                                        <EditableText
-                                            value={faq.question}
-                                            onChange={(val) => {
-                                                const newFaqs = [...content.faqs];
-                                                newFaqs[i].question = val;
-                                                setContent({ ...content, faqs: newFaqs });
-                                            }}
-                                        />
-                                    </span>
-                                    <ChevronDown className={`h-5 w-5 text-gray-400 transition-transform ${openFaq === i ? 'rotate-180' : ''}`} />
-                                </button>
-                                {openFaq === i && (
-                                    <div className="px-5 pb-5 text-gray-600">
+                            <DeletableWrapper
+                                key={i}
+                                onDelete={() => {
+                                    const newFaqs = content.faqs.filter((_, index) => index !== i);
+                                    setContent({ ...content, faqs: newFaqs });
+                                }}
+                            >
+                                <div className="bg-surface rounded-xl overflow-hidden border border-transparent hover:border-blue-100 dark:hover:border-blue-900/50 transition-all">
+                                    <div className="w-full flex items-center justify-between p-5 text-left bg-background">
+                                        <span className="font-semibold text-foreground flex items-center gap-2 flex-1">
+                                            <HelpCircle className="h-5 w-5 text-blue-500 flex-shrink-0" />
+                                            <EditableText
+                                                value={faq.question}
+                                                onChange={(val) => {
+                                                    const newFaqs = [...content.faqs];
+                                                    newFaqs[i].question = val;
+                                                    setContent({ ...content, faqs: newFaqs });
+                                                }}
+                                            />
+                                        </span>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-8 w-8 text-gray-400 hover:text-blue-600 ml-2"
+                                            onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                                        >
+                                            <ChevronDown className={`h-5 w-5 transition-transform ${openFaq === i ? 'rotate-180' : ''}`} />
+                                        </Button>
+                                    </div>
+                                    <div className={`px-5 py-5 text-muted border-t border-border bg-background ${openFaq === i ? 'block' : 'hidden'}`}>
                                         <EditableText
                                             value={faq.answer}
                                             onChange={(val) => {
@@ -286,9 +288,24 @@ export default function AdminAdmissionsPage() {
                                             multiline
                                         />
                                     </div>
-                                )}
-                            </div>
+                                </div>
+                            </DeletableWrapper>
                         ))}
+                        {/* Add FAQ Button */}
+                        <Button
+                            variant="outline"
+                            className="border-dashed border-blue-200 text-blue-600 hover:bg-blue-50 w-full py-8 rounded-xl flex items-center gap-2"
+                            onClick={() => {
+                                setContent({
+                                    ...content,
+                                    faqs: [...content.faqs, { question: 'New Question?', answer: 'New Answer here.' }]
+                                });
+                                setOpenFaq(content.faqs.length);
+                            }}
+                        >
+                            <Plus className="h-5 w-5" />
+                            <span className="font-semibold">Add New FAQ</span>
+                        </Button>
                     </div>
                 </div>
             </section>

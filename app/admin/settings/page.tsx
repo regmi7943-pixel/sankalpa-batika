@@ -80,137 +80,201 @@ export default function AdminSettingsPage() {
     }
 
     return (
-        <div className="relative p-6 max-w-4xl mx-auto space-y-6">
-            {/* Loading Overlay */}
-            {saving && (
-                <div className="fixed inset-0 z-[60] bg-black/20 backdrop-blur-[2px] flex items-center justify-center">
-                    <div className="bg-white p-4 rounded-xl shadow-2xl flex items-center gap-3">
-                        <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
-                        <span className="font-medium">Saving settings...</span>
-                    </div>
-                </div>
-            )}
-
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-                        <Settings className="h-6 w-6 text-gray-600" />
-                        Site Settings
-                    </h1>
-                    <p className="text-gray-500 text-sm">General configuration for your website</p>
-                </div>
-                <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700">
-                    <Save className="h-4 w-4 mr-2" />
-                    Save Settings
-                </Button>
-            </div>
-
-            {/* School Identity */}
-            <Card className="border shadow-sm">
-                <CardHeader className="border-b bg-gray-50">
-                    <CardTitle className="text-base flex items-center gap-2">
-                        <GraduationCap className="h-5 w-5 text-blue-600" />
-                        School Identity
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6 space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">School Name</label>
-                            <Input value={schoolName} onChange={(e) => setSchoolName(e.target.value)} />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Tagline</label>
-                            <Input value={tagline} onChange={(e) => setTagline(e.target.value)} />
+        <div className="min-h-full bg-surface/50 dark:bg-background/50 backdrop-blur-sm">
+            <div className="max-w-4xl mx-auto p-4 md:p-8 space-y-8 animate-fade-in">
+                {/* Loading Overlay */}
+                {saving && (
+                    <div className="fixed inset-0 z-[60] bg-background/20 backdrop-blur-[2px] flex items-center justify-center">
+                        <div className="bg-surface p-4 rounded-xl shadow-2xl flex items-center gap-3 border border-surface-dark/10">
+                            <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+                            <span className="font-medium text-foreground">Saving settings...</span>
                         </div>
                     </div>
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700">School Logo</label>
-                        <div className="flex items-center gap-4">
-                            <div className="w-16 h-16 rounded-xl bg-blue-600 flex items-center justify-center">
-                                <GraduationCap className="h-8 w-8 text-white" />
+                )}
+
+                {/* Header */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h1 className="text-3xl font-extrabold text-foreground tracking-tight flex items-center gap-3">
+                            <div className="p-2 bg-blue-600 rounded-xl shadow-lg shadow-blue-500/20">
+                                <Settings className="h-6 w-6 text-white" />
                             </div>
-                            <Button variant="outline" size="sm">
-                                <Upload className="h-4 w-4 mr-2" />
-                                Upload
-                            </Button>
-                        </div>
+                            Site Settings
+                        </h1>
+                        <p className="text-muted-foreground mt-1 ml-12">General configuration for your school website</p>
                     </div>
-                </CardContent>
-            </Card>
+                    <Button
+                        onClick={handleSave}
+                        className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg shadow-blue-500/20 transition-all active:scale-95 py-6 px-6"
+                    >
+                        <Save className="h-5 w-5 mr-2" />
+                        Save All Settings
+                    </Button>
+                </div>
 
-            {/* Contact Info */}
-            <Card className="border shadow-sm">
-                <CardHeader className="border-b bg-gray-50">
-                    <CardTitle className="text-base flex items-center gap-2">
-                        <Phone className="h-5 w-5 text-green-600" />
-                        Contact Information
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6 space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Primary Phone</label>
-                            <Input value={phone1} onChange={(e) => setPhone1(e.target.value)} />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Secondary Phone</label>
-                            <Input value={phone2} onChange={(e) => setPhone2(e.target.value)} />
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Primary Email</label>
-                            <Input value={email1} onChange={(e) => setEmail1(e.target.value)} />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Admissions Email</label>
-                            <Input value={email2} onChange={(e) => setEmail2(e.target.value)} />
-                        </div>
-                    </div>
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700">Address</label>
-                        <Input value={address} onChange={(e) => setAddress(e.target.value)} />
-                    </div>
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700">Office Hours</label>
-                        <Input value={hours} onChange={(e) => setHours(e.target.value)} />
-                    </div>
-                </CardContent>
-            </Card>
+                <div className="grid grid-cols-1 gap-8">
+                    {/* School Identity */}
+                    <Card className="border-none shadow-xl shadow-black/5 dark:shadow-blue-900/5 bg-surface/80 dark:bg-surface/30 backdrop-blur-md overflow-hidden ring-1 ring-black/5 dark:ring-white/5">
+                        <CardHeader className="p-6 pb-0">
+                            <CardTitle className="text-lg font-bold flex items-center gap-3 text-foreground">
+                                <GraduationCap className="h-5 w-5 text-blue-500" />
+                                School Identity
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-6 space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">School Name</label>
+                                    <Input
+                                        value={schoolName}
+                                        onChange={(e) => setSchoolName(e.target.value)}
+                                        className="bg-background/50 border-surface-dark/10 focus:ring-blue-500/20 py-6"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">Tagline</label>
+                                    <Input
+                                        value={tagline}
+                                        onChange={(e) => setTagline(e.target.value)}
+                                        className="bg-background/50 border-surface-dark/10 focus:ring-blue-500/20 py-6"
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-4">
+                                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">School Logo</label>
+                                <div className="flex items-center gap-6 p-4 rounded-2xl bg-background/40 border border-surface-dark/10">
+                                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center shadow-lg">
+                                        <GraduationCap className="h-10 w-10 text-white" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Button variant="outline" className="border-surface-dark/20 text-foreground hover:bg-surface">
+                                            <Upload className="h-4 w-4 mr-2" />
+                                            Upload New Logo
+                                        </Button>
+                                        <p className="text-[10px] text-muted-foreground px-1">Recommended size: 512x512px (PNG/SVG)</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
 
-            {/* Social Media */}
-            <Card className="border shadow-sm">
-                <CardHeader className="border-b bg-gray-50">
-                    <CardTitle className="text-base flex items-center gap-2">
-                        <Facebook className="h-5 w-5 text-blue-600" />
-                        Social Media Links
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6 space-y-4">
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                            <Facebook className="h-4 w-4 text-blue-600" />
-                            Facebook
-                        </label>
-                        <Input value={facebook} onChange={(e) => setFacebook(e.target.value)} placeholder="https://facebook.com/yourpage" />
-                    </div>
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                            <Instagram className="h-4 w-4 text-pink-600" />
-                            Instagram
-                        </label>
-                        <Input value={instagram} onChange={(e) => setInstagram(e.target.value)} placeholder="https://instagram.com/yourpage" />
-                    </div>
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                            <Youtube className="h-4 w-4 text-red-600" />
-                            YouTube
-                        </label>
-                        <Input value={youtube} onChange={(e) => setYoutube(e.target.value)} placeholder="https://youtube.com/yourchannel" />
-                    </div>
-                </CardContent>
-            </Card>
+                    {/* Contact Info */}
+                    <Card className="border-none shadow-xl shadow-black/5 dark:shadow-blue-900/5 bg-surface/80 dark:bg-surface/30 backdrop-blur-md overflow-hidden ring-1 ring-black/5 dark:ring-white/5">
+                        <CardHeader className="p-6 pb-0">
+                            <CardTitle className="text-lg font-bold flex items-center gap-3 text-foreground">
+                                <Phone className="h-5 w-5 text-green-500" />
+                                Contact Information
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-6 space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">Primary Phone</label>
+                                    <Input
+                                        value={phone1}
+                                        onChange={(e) => setPhone1(e.target.value)}
+                                        className="bg-background/50 border-surface-dark/10 focus:ring-blue-500/20 py-6"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">Secondary Phone</label>
+                                    <Input
+                                        value={phone2}
+                                        onChange={(e) => setPhone2(e.target.value)}
+                                        className="bg-background/50 border-surface-dark/10 focus:ring-blue-500/20 py-6"
+                                    />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">General Email</label>
+                                    <Input
+                                        value={email1}
+                                        onChange={(e) => setEmail1(e.target.value)}
+                                        className="bg-background/50 border-surface-dark/10 focus:ring-blue-500/20 py-6"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">Admissions Email</label>
+                                    <Input
+                                        value={email2}
+                                        onChange={(e) => setEmail2(e.target.value)}
+                                        className="bg-background/50 border-surface-dark/10 focus:ring-blue-500/20 py-6"
+                                    />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">Physical Address</label>
+                                    <Input
+                                        value={address}
+                                        onChange={(e) => setAddress(e.target.value)}
+                                        className="bg-background/50 border-surface-dark/10 focus:ring-blue-500/20 py-6"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">Office Hours</label>
+                                    <Input
+                                        value={hours}
+                                        onChange={(e) => setHours(e.target.value)}
+                                        className="bg-background/50 border-surface-dark/10 focus:ring-blue-500/20 py-6"
+                                    />
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Social Media */}
+                    <Card className="border-none shadow-xl shadow-black/5 dark:shadow-blue-900/5 bg-surface/80 dark:bg-surface/30 backdrop-blur-md overflow-hidden ring-1 ring-black/5 dark:ring-white/5">
+                        <CardHeader className="p-6 pb-0">
+                            <CardTitle className="text-lg font-bold flex items-center gap-3 text-foreground">
+                                <Facebook className="h-5 w-5 text-blue-500" />
+                                Connectivity
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-6 space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1 flex items-center gap-2">
+                                        <Facebook className="h-3 w-3 text-blue-600" />
+                                        Facebook
+                                    </label>
+                                    <Input
+                                        value={facebook}
+                                        onChange={(e) => setFacebook(e.target.value)}
+                                        placeholder="Username"
+                                        className="bg-background/50 border-surface-dark/10 focus:ring-blue-500/20 py-6"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1 flex items-center gap-2">
+                                        <Instagram className="h-3 w-3 text-pink-600" />
+                                        Instagram
+                                    </label>
+                                    <Input
+                                        value={instagram}
+                                        onChange={(e) => setInstagram(e.target.value)}
+                                        placeholder="Username"
+                                        className="bg-background/50 border-surface-dark/10 focus:ring-blue-500/20 py-6"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1 flex items-center gap-2">
+                                        <Youtube className="h-3 w-3 text-red-600" />
+                                        YouTube
+                                    </label>
+                                    <Input
+                                        value={youtube}
+                                        onChange={(e) => setYoutube(e.target.value)}
+                                        placeholder="Channel Handle"
+                                        className="bg-background/50 border-surface-dark/10 focus:ring-blue-500/20 py-6"
+                                    />
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
         </div>
     );
 }

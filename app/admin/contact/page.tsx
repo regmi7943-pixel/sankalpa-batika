@@ -1,56 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MapPin, Phone, Mail, Clock, Send, Loader2 } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Send, Loader2, Plus } from 'lucide-react';
+import { DeletableWrapper } from '@/components/admin/deletable-wrapper';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { getPageContent, savePageContent } from '@/app/actions/settings';
 
-// Editable Text Component
-function EditableText({
-    value,
-    onChange,
-    className = '',
-}: {
-    value: string;
-    onChange: (val: string) => void;
-    className?: string;
-}) {
-    const [isEditing, setIsEditing] = useState(false);
-    const [tempValue, setTempValue] = useState(value);
 
-    useEffect(() => {
-        setTempValue(value);
-    }, [value]);
+import { EditableText } from '@/components/admin/EditableText';
+import { IconPicker } from '@/components/admin/IconPicker';
 
-    if (isEditing) {
-        return (
-            <input
-                autoFocus
-                type="text"
-                value={tempValue}
-                onChange={(e) => setTempValue(e.target.value)}
-                onBlur={() => { onChange(tempValue); setIsEditing(false); }}
-                onKeyDown={(e) => {
-                    if (e.key === 'Enter') { onChange(tempValue); setIsEditing(false); }
-                    if (e.key === 'Escape') { setTempValue(value); setIsEditing(false); }
-                }}
-                className={`${className} bg-blue-50 border-2 border-blue-400 rounded px-2 py-1 outline-none w-full`}
-            />
-        );
-    }
-
-    return (
-        <span
-            onClick={() => setIsEditing(true)}
-            className={`${className} cursor-pointer hover:bg-blue-100 hover:outline hover:outline-2 hover:outline-blue-400 hover:outline-dashed rounded px-1 -mx-1 transition-all inline-block`}
-            title="Click to edit"
-        >
-            {value}
-        </span>
-    );
-}
 
 const defaultContent = {
     pageTitle: 'Get In Touch',
@@ -114,9 +75,9 @@ export default function AdminContactPage() {
             {/* Loading Overlay */}
             {saving && (
                 <div className="fixed inset-0 z-[60] bg-black/20 backdrop-blur-[2px] flex items-center justify-center">
-                    <div className="bg-white p-4 rounded-xl shadow-2xl flex items-center gap-3">
+                    <div className="bg-surface p-4 rounded-xl shadow-2xl flex items-center gap-3 border border-border">
                         <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
-                        <span className="font-medium">Saving changes...</span>
+                        <span className="font-medium text-foreground">Saving changes...</span>
                     </div>
                 </div>
             )}
@@ -137,72 +98,102 @@ export default function AdminContactPage() {
             </section>
 
             {/* Contact Cards */}
-            <section className="py-16 bg-gray-50 -mt-16 relative z-10">
+            <section className="py-16 bg-surface -mt-16 relative z-10">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                         {content.contactInfo.map((info, i) => {
                             const IconComponent = iconMap[info.icon] || MapPin;
                             return (
-                                <Card key={i} className="border-0 shadow-lg">
-                                    <CardContent className="p-6 text-center">
-                                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center mx-auto mb-4">
-                                            <IconComponent className="h-7 w-7 text-white" />
-                                        </div>
-                                        <h3 className="text-lg font-bold text-gray-900 mb-2">
-                                            <EditableText
-                                                value={info.title}
-                                                onChange={(val) => {
-                                                    const newInfo = [...content.contactInfo];
-                                                    newInfo[i].title = val;
-                                                    setContent({ ...content, contactInfo: newInfo });
-                                                }}
-                                            />
-                                        </h3>
-                                        <p className="text-gray-600">
-                                            <EditableText
-                                                value={info.details}
-                                                onChange={(val) => {
-                                                    const newInfo = [...content.contactInfo];
-                                                    newInfo[i].details = val;
-                                                    setContent({ ...content, contactInfo: newInfo });
-                                                }}
-                                            />
-                                        </p>
-                                    </CardContent>
-                                </Card>
+                                <DeletableWrapper
+                                    key={i}
+                                    onDelete={() => {
+                                        const newInfo = content.contactInfo.filter((_, index) => index !== i);
+                                        setContent({ ...content, contactInfo: newInfo });
+                                    }}
+                                >
+                                    <Card className="border-0 shadow-lg h-full">
+                                        <CardContent className="p-6 text-center">
+                                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center mx-auto mb-4 overflow-hidden">
+                                                <IconPicker
+                                                    value={info.icon || 'MapPin'}
+                                                    onChange={(newIcon) => {
+                                                        const newInfo = [...content.contactInfo];
+                                                        newInfo[i].icon = newIcon;
+                                                        setContent({ ...content, contactInfo: newInfo });
+                                                    }}
+                                                    className="h-7 w-7 text-white"
+                                                />
+                                            </div>
+                                            <h3 className="text-lg font-bold text-foreground mb-2">
+                                                <EditableText
+                                                    value={info.title}
+                                                    onChange={(val) => {
+                                                        const newInfo = [...content.contactInfo];
+                                                        newInfo[i].title = val;
+                                                        setContent({ ...content, contactInfo: newInfo });
+                                                    }}
+                                                />
+                                            </h3>
+                                            <p className="text-muted">
+                                                <EditableText
+                                                    value={info.details}
+                                                    onChange={(val) => {
+                                                        const newInfo = [...content.contactInfo];
+                                                        newInfo[i].details = val;
+                                                        setContent({ ...content, contactInfo: newInfo });
+                                                    }}
+                                                />
+                                            </p>
+                                        </CardContent>
+                                    </Card>
+                                </DeletableWrapper>
                             );
                         })}
+                        {/* Add Contact Info Button */}
+                        <Button
+                            variant="outline"
+                            className="border-dashed border-blue-200 text-blue-600 hover:bg-blue-50 h-full min-h-[200px] rounded-2xl flex flex-col gap-2 p-6 bg-white shadow-sm"
+                            onClick={() => {
+                                setContent({
+                                    ...content,
+                                    contactInfo: [...content.contactInfo, { icon: 'MapPin', title: 'New Location', details: 'Address here' }]
+                                });
+                            }}
+                        >
+                            <Plus className="h-6 w-6" />
+                            <span className="font-semibold">Add Contact Card</span>
+                        </Button>
                     </div>
                 </div>
             </section>
 
             {/* Contact Form & Map */}
-            <section className="py-20 bg-white">
+            <section className="py-20 bg-background">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                         {/* Contact Form */}
                         <div>
-                            <h2 className="text-2xl font-bold text-gray-900 mb-6">Send a Message</h2>
+                            <h2 className="text-2xl font-bold text-foreground mb-6">Send a Message</h2>
                             <form className="space-y-6">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700">First Name</label>
-                                        <Input placeholder="John" className="bg-gray-50" />
+                                        <label className="text-sm font-medium text-muted">First Name</label>
+                                        <Input placeholder="John" className="bg-surface" />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700">Last Name</label>
-                                        <Input placeholder="Doe" className="bg-gray-50" />
+                                        <label className="text-sm font-medium text-muted">Last Name</label>
+                                        <Input placeholder="Doe" className="bg-surface" />
                                     </div>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700">Email</label>
-                                    <Input type="email" placeholder="john@example.com" className="bg-gray-50" />
+                                    <label className="text-sm font-medium text-muted">Email</label>
+                                    <Input type="email" placeholder="john@example.com" className="bg-surface" />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700">Subject</label>
-                                    <select className="w-full h-10 rounded-md border border-gray-200 bg-gray-50 px-3 text-sm">
+                                    <label className="text-sm font-medium text-muted">Subject</label>
+                                    <select className="w-full h-10 rounded-md border border-border bg-surface px-3 text-sm text-foreground">
                                         <option>Select a subject</option>
                                         <option>Admission Inquiry</option>
                                         <option>General Information</option>
@@ -211,11 +202,11 @@ export default function AdminContactPage() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700">Message</label>
+                                    <label className="text-sm font-medium text-muted">Message</label>
                                     <textarea
                                         rows={4}
                                         placeholder="How can we help you?"
-                                        className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm"
+                                        className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground"
                                     ></textarea>
                                 </div>
 
@@ -228,12 +219,12 @@ export default function AdminContactPage() {
 
                         {/* Map */}
                         <div>
-                            <h2 className="text-2xl font-bold text-gray-900 mb-6">Find Us</h2>
-                            <div className="bg-gray-100 rounded-2xl h-[400px] flex items-center justify-center">
+                            <h2 className="text-2xl font-bold text-foreground mb-6">Find Us</h2>
+                            <div className="bg-surface rounded-2xl h-[400px] flex items-center justify-center">
                                 <div className="text-center">
-                                    <MapPin className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                                    <p className="text-gray-500 font-medium">Google Maps</p>
-                                    <p className="text-gray-400 text-sm">Map will be displayed here</p>
+                                    <MapPin className="h-16 w-16 text-muted-light mx-auto mb-4" />
+                                    <p className="text-muted font-medium">Google Maps</p>
+                                    <p className="text-muted-light text-sm">Map will be displayed here</p>
                                 </div>
                             </div>
                         </div>

@@ -48,8 +48,28 @@ export async function createNotice(data: Omit<Notice, 'id' | 'createdAt'>) {
         await ref.set(newNotice);
         revalidatePath('/notices');
         revalidatePath('/'); // Revalidate home if it shows notices
+
+        // Send email to subscribers if notice is published
+        if (data.published) {
+            // Import dynamically to avoid issues
+            const { sendBulkEmail, noticeEmailTemplate } = await import('@/lib/email');
+            const { getNewsletterSubscribers } = await import('./newsletter');
+
+            const subscribersResult = await getNewsletterSubscribers();
+            if (subscribersResult.success && subscribersResult.data && subscribersResult.data.length > 0) {
+                const emails = subscribersResult.data.map((s: any) => s.email);
+                const html = noticeEmailTemplate({ title: data.title, content: data.content });
+                await sendBulkEmail({
+                    recipients: emails,
+                    subject: `📢 New Notice: ${data.title}`,
+                    html,
+                });
+            }
+        }
+
         return { success: true };
     } catch (error) {
+        console.error('Error creating notice:', error);
         return { success: false, error: 'Failed to create notice' };
     }
 }

@@ -28,7 +28,7 @@ export default async function NoticesPage() {
             </section>
 
             {/* Notices List */}
-            <section className="py-12 md:py-20 bg-gray-50">
+            <section className="py-12 md:py-20 bg-surface">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
                     {/* Search Bar */}
@@ -36,7 +36,7 @@ export default async function NoticesPage() {
                         <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-gray-400" />
                         <Input
                             placeholder="Search notices..."
-                            className="pl-10 md:pl-12 py-5 md:py-6 text-sm md:text-lg bg-white shadow-sm border-gray-200"
+                            className="pl-10 md:pl-12 py-5 md:py-6 text-sm md:text-lg bg-background shadow-sm border-surface-dark/20 text-foreground"
                         />
                     </div>
 
@@ -61,10 +61,10 @@ export default async function NoticesPage() {
 
                                             {/* Content */}
                                             <div className="p-4 md:p-6 flex-grow flex flex-col justify-center">
-                                                <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-1 md:mb-2 hover:text-blue-600 transition-colors">
+                                                <h2 className="text-lg md:text-xl font-bold text-foreground mb-1 md:mb-2 hover:text-blue-600 transition-colors">
                                                     <Link href={`/notices/${notice.id}`}>{notice.title}</Link>
                                                 </h2>
-                                                <p className="text-gray-600 line-clamp-2 text-xs md:text-sm">
+                                                <p className="text-muted line-clamp-2 text-xs md:text-sm">
                                                     {notice.content.replace(/<[^>]*>/g, '').substring(0, 150)}...
                                                 </p>
                                             </div>
@@ -72,7 +72,7 @@ export default async function NoticesPage() {
                                             {/* Arrow */}
                                             <Link
                                                 href={`/notices/${notice.id}`}
-                                                className="hidden sm:flex items-center justify-center px-4 md:px-6 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                                                className="hidden sm:flex items-center justify-center px-4 md:px-6 text-muted-light hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
                                             >
                                                 <ArrowRight className="h-5 w-5 md:h-6 md:w-6" />
                                             </Link>
@@ -81,10 +81,10 @@ export default async function NoticesPage() {
                                 </Card>
                             ))
                         ) : (
-                            <div className="text-center py-16 md:py-20 bg-white rounded-xl md:rounded-2xl shadow-sm">
-                                <Bell className="h-12 w-12 md:h-16 md:w-16 text-gray-300 mx-auto mb-3 md:mb-4" />
-                                <h3 className="text-lg md:text-xl font-semibold text-gray-700 mb-2">No Notices Yet</h3>
-                                <p className="text-gray-500 text-sm md:text-base">Check back later for announcements.</p>
+                            <div className="text-center py-16 md:py-20 bg-background rounded-xl md:rounded-2xl shadow-sm border border-surface-dark/10">
+                                <Bell className="h-12 w-12 md:h-16 md:w-16 text-muted-light mx-auto mb-3 md:mb-4" />
+                                <h3 className="text-lg md:text-xl font-semibold text-foreground mb-2">No Notices Yet</h3>
+                                <p className="text-muted text-sm md:text-base">Check back later for announcements.</p>
                             </div>
                         )}
                     </div>

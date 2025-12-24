@@ -31,14 +31,14 @@ export default async function EventsPage() {
             </section>
 
             {/* Events Section */}
-            <section className="py-12 md:py-20 bg-gray-50">
+            <section className="py-12 md:py-20 bg-surface">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
                     {/* Upcoming Events */}
                     <div className="mb-12 md:mb-16">
                         <div className="flex items-center gap-2 md:gap-3 mb-6 md:mb-8">
                             <div className="w-8 md:w-10 h-1 bg-gradient-to-r from-blue-500 to-blue-600 rounded"></div>
-                            <h2 className="text-xl md:text-2xl font-bold text-gray-900">Upcoming Events</h2>
+                            <h2 className="text-xl md:text-2xl font-bold text-foreground">Upcoming Events</h2>
                         </div>
 
                         {upcoming.length > 0 ? (
@@ -57,11 +57,11 @@ export default async function EventsPage() {
 
                                         {/* Content */}
                                         <CardContent className="p-4 md:p-6">
-                                            <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3 group-hover:text-blue-600 transition-colors">
+                                            <h3 className="text-lg md:text-xl font-bold text-foreground mb-2 md:mb-3 group-hover:text-blue-600 transition-colors">
                                                 {event.name}
                                             </h3>
 
-                                            <div className="space-y-1.5 md:space-y-2 text-xs md:text-sm text-gray-600 mb-3 md:mb-4">
+                                            <div className="space-y-1.5 md:space-y-2 text-xs md:text-sm text-muted mb-3 md:mb-4">
                                                 <div className="flex items-center gap-2">
                                                     <Clock className="h-3 w-3 md:h-4 md:w-4 text-blue-500 flex-shrink-0" />
                                                     {new Date(event.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -74,7 +74,7 @@ export default async function EventsPage() {
                                                 )}
                                             </div>
 
-                                            <p className="text-gray-600 text-xs md:text-sm line-clamp-3">
+                                            <p className="text-muted text-xs md:text-sm line-clamp-3">
                                                 {event.description}
                                             </p>
                                         </CardContent>
@@ -82,10 +82,10 @@ export default async function EventsPage() {
                                 ))}
                             </div>
                         ) : (
-                            <div className="text-center py-12 md:py-16 bg-white rounded-xl md:rounded-2xl shadow-sm">
-                                <Calendar className="h-12 w-12 md:h-16 md:w-16 text-gray-300 mx-auto mb-3 md:mb-4" />
-                                <h3 className="text-lg md:text-xl font-semibold text-gray-700 mb-2">No Upcoming Events</h3>
-                                <p className="text-gray-500 text-sm md:text-base">Check back later for new events.</p>
+                            <div className="text-center py-12 md:py-16 bg-background rounded-xl md:rounded-2xl shadow-sm border border-surface-dark/10">
+                                <Calendar className="h-12 w-12 md:h-16 md:w-16 text-muted-light mx-auto mb-3 md:mb-4" />
+                                <h3 className="text-lg md:text-xl font-semibold text-foreground mb-2">No Upcoming Events</h3>
+                                <p className="text-muted text-sm md:text-base">Check back later for new events.</p>
                             </div>
                         )}
                     </div>
@@ -95,19 +95,19 @@ export default async function EventsPage() {
                         <div>
                             <div className="flex items-center gap-2 md:gap-3 mb-6 md:mb-8">
                                 <div className="w-8 md:w-10 h-1 bg-gradient-to-r from-gray-400 to-gray-500 rounded"></div>
-                                <h2 className="text-xl md:text-2xl font-bold text-gray-700">Past Events</h2>
+                                <h2 className="text-xl md:text-2xl font-bold text-foreground/70">Past Events</h2>
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6 opacity-75">
                                 {past.slice(0, 6).map((event) => (
                                     <Card key={event.id} className="overflow-hidden">
-                                        <div className="bg-gray-200 text-gray-700 p-3 md:p-4 text-center">
+                                        <div className="bg-surface-dark text-foreground p-3 md:p-4 text-center">
                                             <p className="text-xs md:text-sm font-bold uppercase">
                                                 {new Date(event.date).toLocaleString('default', { month: 'short' })} {new Date(event.date).getDate()}, {new Date(event.date).getFullYear()}
                                             </p>
                                         </div>
                                         <CardContent className="p-3 md:p-4">
-                                            <h3 className="font-semibold text-gray-700 text-sm md:text-base">{event.name}</h3>
+                                            <h3 className="font-semibold text-foreground text-sm md:text-base">{event.name}</h3>
                                         </CardContent>
                                     </Card>
                                 ))}

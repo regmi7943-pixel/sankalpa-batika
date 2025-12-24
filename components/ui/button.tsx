@@ -40,8 +40,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         const hardcodedVariants = {
             default: "bg-blue-600 text-white hover:bg-blue-700",
             destructive: "bg-red-600 text-white hover:bg-red-700",
-            outline: "border border-gray-300 bg-white hover:bg-gray-100 text-gray-900",
-            ghost: "hover:bg-gray-100 text-gray-900",
+            outline: "border border-surface-dark/30 bg-background hover:bg-surface text-foreground shadow-sm",
+            ghost: "hover:bg-surface text-foreground",
         }
 
         return (

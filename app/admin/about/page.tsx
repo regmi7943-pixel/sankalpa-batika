@@ -1,74 +1,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Target, Eye, Heart, Loader2 } from 'lucide-react';
+import { Target, Eye, Heart, Loader2, Plus } from 'lucide-react';
 import { getPageContent, savePageContent } from '@/app/actions/settings';
+import { DeletableWrapper } from '@/components/admin/deletable-wrapper';
+import { Button } from '@/components/ui/button';
+import { EditableText } from '@/components/admin/EditableText';
+import { IconPicker } from '@/components/admin/IconPicker';
+import * as LucideIcons from 'lucide-react';
 
-// Editable Text Component
-function EditableText({
-    value,
-    onChange,
-    className = '',
-    multiline = false,
-}: {
-    value: string;
-    onChange: (val: string) => void;
-    className?: string;
-    multiline?: boolean;
-}) {
-    const [isEditing, setIsEditing] = useState(false);
-    const [tempValue, setTempValue] = useState(value);
 
-    useEffect(() => {
-        setTempValue(value);
-    }, [value]);
 
-    if (isEditing) {
-        if (multiline) {
-            return (
-                <textarea
-                    autoFocus
-                    value={tempValue}
-                    onChange={(e) => setTempValue(e.target.value)}
-                    onBlur={() => { onChange(tempValue); setIsEditing(false); }}
-                    onKeyDown={(e) => { if (e.key === 'Escape') { setTempValue(value); setIsEditing(false); } }}
-                    className={`${className} bg-blue-50 border-2 border-blue-400 rounded px-2 py-1 outline-none resize-none w-full`}
-                    rows={3}
-                />
-            );
-        }
-        return (
-            <input
-                autoFocus
-                type="text"
-                value={tempValue}
-                onChange={(e) => setTempValue(e.target.value)}
-                onBlur={() => { onChange(tempValue); setIsEditing(false); }}
-                onKeyDown={(e) => {
-                    if (e.key === 'Enter') { onChange(tempValue); setIsEditing(false); }
-                    if (e.key === 'Escape') { setTempValue(value); setIsEditing(false); }
-                }}
-                className={`${className} bg-blue-50 border-2 border-blue-400 rounded px-2 py-1 outline-none w-full`}
-            />
-        );
-    }
-
-    return (
-        <span
-            onClick={() => setIsEditing(true)}
-            className={`${className} cursor-pointer hover:bg-blue-100 hover:outline hover:outline-2 hover:outline-blue-400 hover:outline-dashed rounded px-1 -mx-1 transition-all inline-block`}
-            title="Click to edit"
-        >
-            {value}
-        </span>
-    );
-}
 
 const defaultContent = {
     pageTitle: 'About Sankalpa Batika',
     pageSubtitle: 'A premier educational institution committed to nurturing young minds and building future leaders.',
     missionTitle: 'Our Mission',
     missionText: 'To provide a safe, nurturing, and stimulating learning environment where every child can discover their potential.',
+    missionIcon: 'Target',
     missionPoints: [
         'Foster critical thinking and creativity',
         'Promote moral values and ethics',
@@ -76,16 +25,17 @@ const defaultContent = {
     ],
     visionTitle: 'Our Vision',
     visionText: 'To be a center of excellence in education that inspires students to become global citizens.',
+    visionIcon: 'Eye',
     visionPoints: [
         'Leading institution in holistic education',
         'Preparing students for global challenges',
         'Building responsible citizens',
     ],
     values: [
-        { title: 'Excellence', description: 'Striving for the highest standards in education.' },
-        { title: 'Integrity', description: 'Building character through honesty and ethics.' },
-        { title: 'Community', description: 'Fostering a sense of belonging and teamwork.' },
-        { title: 'Innovation', description: 'Embracing new ideas and modern teaching methods.' },
+        { title: 'Excellence', description: 'Striving for the highest standards in education.', icon: 'Award' },
+        { title: 'Integrity', description: 'Building character through honesty and ethics.', icon: 'Shield' },
+        { title: 'Community', description: 'Fostering a sense of belonging and teamwork.', icon: 'Users' },
+        { title: 'Innovation', description: 'Embracing new ideas and modern teaching methods.', icon: 'Zap' },
     ],
     timeline: [
         { year: '2010', title: 'School Founded', description: 'Established with a vision to provide quality education.' },
@@ -144,9 +94,9 @@ export default function AdminAboutPage() {
             {/* Loading Overlay */}
             {saving && (
                 <div className="fixed inset-0 z-[60] bg-black/20 backdrop-blur-[2px] flex items-center justify-center">
-                    <div className="bg-white p-4 rounded-xl shadow-2xl flex items-center gap-3">
+                    <div className="bg-surface p-4 rounded-xl shadow-2xl flex items-center gap-3 border border-border">
                         <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
-                        <span className="font-medium">Saving changes...</span>
+                        <span className="font-medium text-foreground">Saving changes...</span>
                     </div>
                 </div>
             )}
@@ -167,62 +117,112 @@ export default function AdminAboutPage() {
             </section>
 
             {/* Mission & Vision */}
-            <section className="py-20 bg-white">
+            <section className="py-20 bg-background">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                         {/* Mission */}
-                        <div className="bg-gradient-to-br from-blue-50 to-white p-8 rounded-3xl border border-blue-100">
-                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center mb-6">
-                                <Target className="h-8 w-8 text-white" />
+                        <div className="bg-gradient-to-br from-blue-50 to-background dark:from-blue-950/30 dark:to-background p-8 rounded-3xl border border-blue-100 dark:border-blue-900/50">
+                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center mb-6 overflow-hidden">
+                                <IconPicker
+                                    value={content.missionIcon || 'Target'}
+                                    onChange={(newIcon) => setContent({ ...content, missionIcon: newIcon })}
+                                    className="w-8 h-8 text-white"
+                                />
                             </div>
-                            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                            <h2 className="text-2xl font-bold text-foreground mb-4">
                                 <EditableText value={content.missionTitle} onChange={(val) => setContent({ ...content, missionTitle: val })} />
                             </h2>
-                            <p className="text-gray-600 leading-relaxed mb-4">
+                            <p className="text-muted leading-relaxed mb-4">
                                 <EditableText value={content.missionText} onChange={(val) => setContent({ ...content, missionText: val })} multiline />
                             </p>
-                            <ul className="space-y-2 text-gray-600">
+                            <ul className="space-y-2 text-muted">
                                 {content.missionPoints.map((point, i) => (
-                                    <li key={i} className="flex items-start gap-2">
-                                        <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></span>
-                                        <EditableText
-                                            value={point}
-                                            onChange={(val) => {
-                                                const newPoints = [...content.missionPoints];
-                                                newPoints[i] = val;
+                                    <li key={i}>
+                                        <DeletableWrapper
+                                            onDelete={() => {
+                                                const newPoints = content.missionPoints.filter((_, index) => index !== i);
                                                 setContent({ ...content, missionPoints: newPoints });
                                             }}
-                                        />
+                                            className="flex items-start gap-2"
+                                        >
+                                            <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></span>
+                                            <EditableText
+                                                value={point}
+                                                onChange={(val) => {
+                                                    const newPoints = [...content.missionPoints];
+                                                    newPoints[i] = val;
+                                                    setContent({ ...content, missionPoints: newPoints });
+                                                }}
+                                            />
+                                        </DeletableWrapper>
                                     </li>
                                 ))}
+                                <div className="pt-4">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 h-8 px-2 gap-1"
+                                        onClick={() => {
+                                            setContent({ ...content, missionPoints: [...content.missionPoints, 'New mission point'] });
+                                        }}
+                                    >
+                                        <Plus className="h-4 w-4" />
+                                        <span>Add Point</span>
+                                    </Button>
+                                </div>
                             </ul>
                         </div>
 
                         {/* Vision */}
-                        <div className="bg-gradient-to-br from-amber-50 to-white p-8 rounded-3xl border border-amber-100">
-                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 flex items-center justify-center mb-6">
-                                <Eye className="h-8 w-8 text-white" />
+                        <div className="bg-gradient-to-br from-amber-50 to-background dark:from-amber-950/30 dark:to-background p-8 rounded-3xl border border-amber-100 dark:border-amber-900/50">
+                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 flex items-center justify-center mb-6 overflow-hidden">
+                                <IconPicker
+                                    value={content.visionIcon || 'Eye'}
+                                    onChange={(newIcon) => setContent({ ...content, visionIcon: newIcon })}
+                                    className="w-8 h-8 text-white"
+                                />
                             </div>
-                            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                            <h2 className="text-2xl font-bold text-foreground mb-4">
                                 <EditableText value={content.visionTitle} onChange={(val) => setContent({ ...content, visionTitle: val })} />
                             </h2>
-                            <p className="text-gray-600 leading-relaxed mb-4">
+                            <p className="text-muted leading-relaxed mb-4">
                                 <EditableText value={content.visionText} onChange={(val) => setContent({ ...content, visionText: val })} multiline />
                             </p>
-                            <ul className="space-y-2 text-gray-600">
+                            <ul className="space-y-2 text-muted">
                                 {content.visionPoints.map((point, i) => (
-                                    <li key={i} className="flex items-start gap-2">
-                                        <span className="w-1.5 h-1.5 bg-amber-500 rounded-full mt-2 flex-shrink-0"></span>
-                                        <EditableText
-                                            value={point}
-                                            onChange={(val) => {
-                                                const newPoints = [...content.visionPoints];
-                                                newPoints[i] = val;
+                                    <li key={i}>
+                                        <DeletableWrapper
+                                            onDelete={() => {
+                                                const newPoints = content.visionPoints.filter((_, index) => index !== i);
                                                 setContent({ ...content, visionPoints: newPoints });
                                             }}
-                                        />
+                                            className="flex items-start gap-2"
+                                        >
+                                            <span className="w-1.5 h-1.5 bg-amber-500 rounded-full mt-2 flex-shrink-0"></span>
+                                            <EditableText
+                                                value={point}
+                                                onChange={(val) => {
+                                                    const newPoints = [...content.visionPoints];
+                                                    newPoints[i] = val;
+                                                    setContent({ ...content, visionPoints: newPoints });
+                                                }}
+                                            />
+                                        </DeletableWrapper>
                                     </li>
                                 ))}
+                                <div className="pt-4">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="text-amber-600 hover:text-amber-700 hover:bg-amber-50 h-8 px-2 gap-1"
+                                        onClick={() => {
+                                            setContent({ ...content, visionPoints: [...content.visionPoints, 'New vision point'] });
+                                        }}
+                                    >
+                                        <Plus className="h-4 w-4" />
+                                        <span>Add Point</span>
+                                    </Button>
+                                </div>
                             </ul>
                         </div>
                     </div>
@@ -230,97 +230,153 @@ export default function AdminAboutPage() {
             </section>
 
             {/* Core Values */}
-            <section className="py-20 bg-gray-50">
+            <section className="py-20 bg-surface">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="text-center mb-16">
                         <span className="text-blue-600 font-semibold text-sm uppercase tracking-wider">What We Believe</span>
-                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mt-2">Our Core Values</h2>
+                        <h2 className="text-3xl md:text-4xl font-bold text-foreground mt-2">Our Core Values</h2>
                         <div className="w-20 h-1 bg-gradient-to-r from-blue-500 to-amber-500 mx-auto mt-4 rounded"></div>
                     </div>
 
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
                         {content.values.map((value, i) => (
-                            <div key={i} className="text-center group">
-                                <div className="w-20 h-20 rounded-full bg-white shadow-lg flex items-center justify-center mx-auto mb-6 group-hover:shadow-xl transition-shadow">
-                                    <Heart className="h-10 w-10 text-blue-600" />
+                            <DeletableWrapper
+                                key={i}
+                                onDelete={() => {
+                                    const newValues = content.values.filter((_, index) => index !== i);
+                                    setContent({ ...content, values: newValues });
+                                }}
+                            >
+                                <div className="text-center group h-full p-4 bg-background rounded-2xl shadow-sm border border-transparent hover:border-blue-100 dark:hover:border-blue-900/50 transition-all">
+                                    <div className="w-16 h-16 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform overflow-hidden">
+                                        <IconPicker
+                                            value={value.icon || 'Heart'}
+                                            onChange={(newIcon) => {
+                                                const newValues = [...content.values];
+                                                newValues[i].icon = newIcon;
+                                                setContent({ ...content, values: newValues });
+                                            }}
+                                            className="w-8 h-8 text-blue-600"
+                                        />
+                                    </div>
+                                    <h3 className="text-lg font-bold text-foreground mb-2">
+                                        <EditableText
+                                            value={value.title}
+                                            onChange={(val) => {
+                                                const newValues = [...content.values];
+                                                newValues[i].title = val;
+                                                setContent({ ...content, values: newValues });
+                                            }}
+                                        />
+                                    </h3>
+                                    <p className="text-muted text-sm">
+                                        <EditableText
+                                            value={value.description}
+                                            onChange={(val) => {
+                                                const newValues = [...content.values];
+                                                newValues[i].description = val;
+                                                setContent({ ...content, values: newValues });
+                                            }}
+                                        />
+                                    </p>
                                 </div>
-                                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                                    <EditableText
-                                        value={value.title}
-                                        onChange={(val) => {
-                                            const newValues = [...content.values];
-                                            newValues[i].title = val;
-                                            setContent({ ...content, values: newValues });
-                                        }}
-                                    />
-                                </h3>
-                                <p className="text-gray-600">
-                                    <EditableText
-                                        value={value.description}
-                                        onChange={(val) => {
-                                            const newValues = [...content.values];
-                                            newValues[i].description = val;
-                                            setContent({ ...content, values: newValues });
-                                        }}
-                                    />
-                                </p>
-                            </div>
+                            </DeletableWrapper>
                         ))}
+                        {/* Add Value Button */}
+                        <Button
+                            variant="outline"
+                            className="border-dashed border-blue-200 text-blue-600 hover:bg-blue-50 h-full min-h-[160px] rounded-2xl flex flex-col gap-2 p-6"
+                            onClick={() => {
+                                setContent({
+                                    ...content,
+                                    values: [...content.values, { title: 'New Value', description: 'Description', icon: 'Heart' }]
+                                });
+                            }}
+                        >
+                            <Plus className="h-6 w-6" />
+                            <span className="font-semibold">Add Value</span>
+                        </Button>
                     </div>
                 </div>
             </section>
 
             {/* Timeline */}
-            <section className="py-20 bg-white">
+            <section className="py-20 bg-background">
                 <div className="max-w-4xl mx-auto px-4">
                     <div className="text-center mb-16">
                         <span className="text-blue-600 font-semibold text-sm uppercase tracking-wider">Our Journey</span>
-                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mt-2">School History</h2>
+                        <h2 className="text-3xl md:text-4xl font-bold text-foreground mt-2">School History</h2>
                         <div className="w-20 h-1 bg-gradient-to-r from-blue-500 to-amber-500 mx-auto mt-4 rounded"></div>
                     </div>
 
                     <div className="relative">
-                        <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-blue-200"></div>
+                        <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-blue-200 dark:bg-blue-800"></div>
 
                         {content.timeline.map((item, i) => (
-                            <div key={i} className="relative flex items-start gap-8 mb-12">
-                                <div className="z-10 flex-shrink-0">
-                                    <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg text-sm">
-                                        <EditableText
-                                            value={item.year}
-                                            onChange={(val) => {
-                                                const newTimeline = [...content.timeline];
-                                                newTimeline[i].year = val;
-                                                setContent({ ...content, timeline: newTimeline });
-                                            }}
-                                        />
+                            <DeletableWrapper
+                                key={i}
+                                onDelete={() => {
+                                    const newTimeline = content.timeline.filter((_, index) => index !== i);
+                                    setContent({ ...content, timeline: newTimeline });
+                                }}
+                                className="mb-8"
+                            >
+                                <div className="relative flex items-start gap-8">
+                                    <div className="z-10 flex-shrink-0">
+                                        <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg text-sm">
+                                            <EditableText
+                                                value={item.year}
+                                                onChange={(val) => {
+                                                    const newTimeline = [...content.timeline];
+                                                    newTimeline[i].year = val;
+                                                    setContent({ ...content, timeline: newTimeline });
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex-1 p-4 bg-surface rounded-xl">
+                                        <h3 className="text-lg font-bold text-foreground">
+                                            <EditableText
+                                                value={item.title}
+                                                onChange={(val) => {
+                                                    const newTimeline = [...content.timeline];
+                                                    newTimeline[i].title = val;
+                                                    setContent({ ...content, timeline: newTimeline });
+                                                }}
+                                            />
+                                        </h3>
+                                        <p className="text-muted mt-1">
+                                            <EditableText
+                                                value={item.description}
+                                                onChange={(val) => {
+                                                    const newTimeline = [...content.timeline];
+                                                    newTimeline[i].description = val;
+                                                    setContent({ ...content, timeline: newTimeline });
+                                                }}
+                                            />
+                                        </p>
                                     </div>
                                 </div>
-
-                                <div className="flex-1 p-4 bg-gray-50 rounded-xl">
-                                    <h3 className="text-lg font-bold text-gray-900">
-                                        <EditableText
-                                            value={item.title}
-                                            onChange={(val) => {
-                                                const newTimeline = [...content.timeline];
-                                                newTimeline[i].title = val;
-                                                setContent({ ...content, timeline: newTimeline });
-                                            }}
-                                        />
-                                    </h3>
-                                    <p className="text-gray-600 mt-1">
-                                        <EditableText
-                                            value={item.description}
-                                            onChange={(val) => {
-                                                const newTimeline = [...content.timeline];
-                                                newTimeline[i].description = val;
-                                                setContent({ ...content, timeline: newTimeline });
-                                            }}
-                                        />
-                                    </p>
-                                </div>
-                            </div>
+                            </DeletableWrapper>
                         ))}
+
+                        {/* Add Timeline Item Button */}
+                        <div className="pl-24">
+                            <Button
+                                variant="outline"
+                                className="border-dashed border-blue-200 text-blue-600 hover:bg-blue-50 w-full rounded-xl py-6 gap-2"
+                                onClick={() => {
+                                    setContent({
+                                        ...content,
+                                        timeline: [...content.timeline, { year: '20XX', title: 'New Achievement', description: 'Description here' }]
+                                    });
+                                }}
+                            >
+                                <Plus className="h-5 w-5" />
+                                <span className="font-semibold">Add Journey Item</span>
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </section>

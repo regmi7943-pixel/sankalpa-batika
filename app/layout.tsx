@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { LayoutWrapper } from '@/components/layout/layout-wrapper';
+import { ThemeProvider } from '@/components/theme-provider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -33,11 +34,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="scroll-smooth">
-      <body className={`${inter.className} bg-white text-gray-900 antialiased`}>
-        <LayoutWrapper>
-          {children}
-        </LayoutWrapper>
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+      <body className={`${inter.className} bg-[var(--background)] text-[var(--foreground)] antialiased`}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <LayoutWrapper>
+            {children}
+          </LayoutWrapper>
+        </ThemeProvider>
       </body>
     </html>
   );
