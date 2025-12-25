@@ -2,7 +2,19 @@ import Link from 'next/link';
 import { Facebook, Twitter, Mail, Phone, MapPin, Instagram, Youtube, ArrowRight, GraduationCap } from 'lucide-react';
 import { NewsletterForm } from '@/components/newsletter-form';
 
-export function Footer() {
+interface SiteSettings {
+    schoolName: string;
+    tagline: string;
+    logoUrl: string;
+    phone1: string;
+    email1: string;
+    address: string;
+    facebook: string;
+    instagram: string;
+    youtube: string;
+}
+
+export function Footer({ settings }: { settings: SiteSettings }) {
     const quickLinks = [
         { href: '/about', label: 'About Us' },
         { href: '/admissions', label: 'Admissions' },
@@ -10,6 +22,14 @@ export function Footer() {
         { href: '/events', label: 'Events' },
         { href: '/gallery', label: 'Gallery' },
         { href: '/contact', label: 'Contact Us' },
+    ];
+
+    // Build social links array
+    const socialLinks = [
+        { icon: Facebook, href: settings.facebook ? `https://facebook.com/${settings.facebook}` : '#', color: 'hover:bg-blue-600' },
+        { icon: Instagram, href: settings.instagram ? `https://instagram.com/${settings.instagram}` : '#', color: 'hover:bg-pink-600' },
+        { icon: Twitter, href: '#', color: 'hover:bg-sky-500' },
+        { icon: Youtube, href: settings.youtube ? `https://youtube.com/${settings.youtube}` : '#', color: 'hover:bg-red-600' },
     ];
 
     return (
@@ -39,28 +59,25 @@ export function Footer() {
                     <div className="sm:col-span-2 lg:col-span-1">
                         <div className="flex items-center gap-3 mb-4 md:mb-6">
                             <img
-                                src="/logo.png"
-                                alt="Sankalpa Vatika Logo"
+                                src={settings.logoUrl || '/logo.png'}
+                                alt={`${settings.schoolName} Logo`}
                                 className="h-12 w-12 md:h-14 md:w-14 object-contain"
                             />
                             <div>
-                                <h3 className="text-lg md:text-xl font-bold text-foreground">Sankalpa Vatika</h3>
-                                <p className="text-xs md:text-sm text-muted">Excellence in Education</p>
+                                <h3 className="text-lg md:text-xl font-bold text-foreground">{settings.schoolName}</h3>
+                                <p className="text-xs md:text-sm text-muted">{settings.tagline}</p>
                             </div>
                         </div>
                         <p className="text-muted text-xs md:text-sm leading-relaxed mb-4 md:mb-6">
                             Empowering students with knowledge, character, and vision for a better tomorrow.
                         </p>
                         <div className="flex gap-2 md:gap-3">
-                            {[
-                                { icon: Facebook, href: '#', color: 'hover:bg-blue-600' },
-                                { icon: Instagram, href: '#', color: 'hover:bg-pink-600' },
-                                { icon: Twitter, href: '#', color: 'hover:bg-sky-500' },
-                                { icon: Youtube, href: '#', color: 'hover:bg-red-600' },
-                            ].map((social, i) => (
+                            {socialLinks.map((social, i) => (
                                 <a
                                     key={i}
                                     href={social.href}
+                                    target="_blank"
+                                    rel="noreferrer"
                                     className={`p-2 md:p-2.5 rounded-lg bg-surface text-muted hover:text-white transition-all duration-300 ${social.color}`}
                                 >
                                     <social.icon className="h-4 w-4 md:h-5 md:w-5" />
@@ -103,7 +120,7 @@ export function Footer() {
                                 </div>
                                 <div>
                                     <p className="text-xs md:text-sm font-medium text-foreground">Address</p>
-                                    <p className="text-muted text-xs md:text-sm">Kathmandu, Nepal</p>
+                                    <p className="text-muted text-xs md:text-sm">{settings.address}</p>
                                 </div>
                             </li>
                             <li className="flex items-start gap-2 md:gap-3">
@@ -112,7 +129,7 @@ export function Footer() {
                                 </div>
                                 <div>
                                     <p className="text-xs md:text-sm font-medium text-foreground">Phone</p>
-                                    <p className="text-muted text-xs md:text-sm">+977-1-4XXXXXX</p>
+                                    <p className="text-muted text-xs md:text-sm">{settings.phone1}</p>
                                 </div>
                             </li>
                             <li className="flex items-start gap-2 md:gap-3">
@@ -121,7 +138,7 @@ export function Footer() {
                                 </div>
                                 <div>
                                     <p className="text-xs md:text-sm font-medium text-foreground">Email</p>
-                                    <p className="text-muted text-xs md:text-sm break-all">info@sankalpavatika.edu.np</p>
+                                    <p className="text-muted text-xs md:text-sm break-all">{settings.email1}</p>
                                 </div>
                             </li>
                         </ul>
@@ -144,7 +161,7 @@ export function Footer() {
             {/* Bottom Bar */}
             <div className="border-t border-surface-dark/10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-6 flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4 text-xs md:text-sm text-muted">
-                    <p className="text-center md:text-left">© {new Date().getFullYear()} Sankalpa Vatika. All rights reserved.</p>
+                    <p className="text-center md:text-left">© {new Date().getFullYear()} {settings.schoolName}. All rights reserved.</p>
                     <div className="flex items-center gap-4 md:gap-6">
                         <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
                         <Link href="/terms" className="hover:text-foreground transition-colors">Terms</Link>

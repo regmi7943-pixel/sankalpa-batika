@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { LayoutWrapper } from '@/components/layout/layout-wrapper';
 import { ThemeProvider } from '@/components/theme-provider';
+import { SiteLayout } from '@/components/layout/site-layout';
+import { LayoutWrapper } from '@/components/layout/layout-wrapper';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -45,7 +46,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <LayoutWrapper>
+          <LayoutWrapper
+            siteLayout={
+              <SiteLayout>
+                {children}
+              </SiteLayout>
+            }
+          >
             {children}
           </LayoutWrapper>
         </ThemeProvider>

@@ -8,14 +8,18 @@ import {
     Settings, Save, Upload, GraduationCap, Mail, Phone,
     Facebook, Instagram, Youtube, Loader2
 } from 'lucide-react';
-import { getSiteSettings, saveSiteSettings } from '@/app/actions/settings';
+import { getSiteSettings, saveSiteSettings, uploadLogo } from '@/app/actions/settings';
+import { useRef } from 'react';
 
 export default function AdminSettingsPage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [uploadingLogo, setUploadingLogo] = useState(false);
+    const logoInputRef = useRef<HTMLInputElement>(null);
 
     const [schoolName, setSchoolName] = useState('Sankalpa Vatika');
     const [tagline, setTagline] = useState('Excellence in Education');
+    const [logoUrl, setLogoUrl] = useState('');
     const [phone1, setPhone1] = useState('+977-1-4XXXXXX');
     const [phone2, setPhone2] = useState('+977-98XXXXXXXX');
     const [email1, setEmail1] = useState('info@sankalpavatika.edu.np');
@@ -34,6 +38,7 @@ export default function AdminSettingsPage() {
                 const d = result.data;
                 if (d.schoolName) setSchoolName(d.schoolName);
                 if (d.tagline) setTagline(d.tagline);
+                if (d.logoUrl) setLogoUrl(d.logoUrl);
                 if (d.phone1) setPhone1(d.phone1);
                 if (d.phone2) setPhone2(d.phone2);
                 if (d.email1) setEmail1(d.email1);
@@ -143,13 +148,46 @@ export default function AdminSettingsPage() {
                             <div className="space-y-4">
                                 <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">School Logo</label>
                                 <div className="flex items-center gap-6 p-4 rounded-2xl bg-background/40 border border-surface-dark/10">
-                                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center shadow-lg">
-                                        <GraduationCap className="h-10 w-10 text-white" />
+                                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center shadow-lg overflow-hidden">
+                                        {logoUrl ? (
+                                            <img src={logoUrl} alt="School Logo" className="w-full h-full object-contain" />
+                                        ) : (
+                                            <GraduationCap className="h-10 w-10 text-white" />
+                                        )}
                                     </div>
                                     <div className="space-y-2">
-                                        <Button variant="outline" className="border-surface-dark/20 text-foreground hover:bg-surface">
-                                            <Upload className="h-4 w-4 mr-2" />
-                                            Upload New Logo
+                                        <input
+                                            ref={logoInputRef}
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={async (e) => {
+                                                const file = e.target.files?.[0];
+                                                if (!file) return;
+                                                setUploadingLogo(true);
+                                                const formData = new FormData();
+                                                formData.append('file', file);
+                                                const result = await uploadLogo(formData);
+                                                if (result.success && result.url) {
+                                                    setLogoUrl(result.url);
+                                                } else {
+                                                    alert('Logo upload failed: ' + result.error);
+                                                }
+                                                setUploadingLogo(false);
+                                            }}
+                                        />
+                                        <Button
+                                            variant="outline"
+                                            className="border-surface-dark/20 text-foreground hover:bg-surface"
+                                            onClick={() => logoInputRef.current?.click()}
+                                            disabled={uploadingLogo}
+                                        >
+                                            {uploadingLogo ? (
+                                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                            ) : (
+                                                <Upload className="h-4 w-4 mr-2" />
+                                            )}
+                                            {uploadingLogo ? 'Uploading...' : 'Upload New Logo'}
                                         </Button>
                                         <p className="text-[10px] text-muted-foreground px-1">Recommended size: 512x512px (PNG/SVG)</p>
                                     </div>

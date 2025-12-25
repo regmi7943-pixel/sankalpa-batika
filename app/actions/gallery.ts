@@ -7,6 +7,79 @@ import { getSession } from './auth';
 import { revalidatePath } from 'next/cache';
 
 const GALLERY_PATH = 'gallery';
+const CATEGORY_PATH = 'gallery_categories';
+
+// --- CATEGORY ACTIONS ---
+
+export async function getCategories() {
+    try {
+        const ref = adminDb.ref(CATEGORY_PATH);
+        const snapshot = await ref.once('value');
+        const data = snapshot.val();
+
+        const categories = Object.keys(data || {}).map(key => ({
+            id: key,
+            ...data[key]
+        }));
+
+        return { success: true, data: categories };
+    } catch (error) {
+        console.error('Fetch categories failed:', error);
+        return { success: false, data: [] };
+    }
+}
+
+export async function addCategory(name: string) {
+    const session = await getSession();
+    if (!session) return { success: false, error: 'Unauthorized' };
+
+    try {
+        const newCat = {
+            name,
+            createdAt: Date.now()
+        };
+        await adminDb.ref(CATEGORY_PATH).push(newCat);
+        revalidatePath('/admin/gallery');
+        revalidatePath('/gallery');
+        return { success: true };
+    } catch (error) {
+        console.error('Add category failed:', error);
+        return { success: false, error: 'Failed to add category' };
+    }
+}
+
+export async function deleteCategory(id: string) {
+    const session = await getSession();
+    if (!session) return { success: false, error: 'Unauthorized' };
+
+    try {
+        await adminDb.ref(`${CATEGORY_PATH}/${id}`).remove();
+        revalidatePath('/admin/gallery');
+        revalidatePath('/gallery');
+        return { success: true };
+    } catch (error) {
+        console.error('Delete category failed:', error);
+        return { success: false, error: 'Failed to delete category' };
+    }
+}
+
+export async function updateItemCategory(itemId: string, newCategory: string) {
+    const session = await getSession();
+    if (!session) return { success: false, error: 'Unauthorized' };
+
+    try {
+        await adminDb.ref(`${GALLERY_PATH}/${itemId}`).update({ category: newCategory });
+        revalidatePath('/admin/gallery');
+        revalidatePath('/gallery');
+        return { success: true };
+    } catch (error) {
+        console.error('Update category failed:', error);
+        return { success: false, error: 'Failed to update category' };
+    }
+}
+
+
+// --- GALLERY ITEM ACTIONS ---
 
 // PUBLIC: Fetch gallery items
 export async function getGallery() {
@@ -69,6 +142,8 @@ export async function uploadGalleryItem(formData: FormData) {
     }
 
     try {
+        // Map common "system" categories to specific folders. 
+        // Dynamic categories will go to 'sankalpa-batika/gallery' (shared folder).
         const folderMap: Record<string, string> = {
             'slide': 'sankalpa-batika/slides',
             'staff': 'sankalpa-batika/staff',
@@ -99,7 +174,7 @@ export async function uploadGalleryItem(formData: FormData) {
                 type: uploadResult.resource_type === 'image' ? 'image' : 'pdf',
                 publicId: uploadResult.public_id,
                 caption: caption || '', // Shared caption for multi-upload, or empty
-                category: category,
+                category: category, // Saves the dynamic category ID or System Name
                 uploadedAt: Date.now(),
             };
 

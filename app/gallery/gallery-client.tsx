@@ -7,33 +7,42 @@ import { FileText, X, ChevronLeft, ChevronRight, Download, ImageIcon, ZoomIn } f
 
 interface GalleryClientProps {
     items: any[];
+    categories: any[];
 }
 
-export function GalleryClient({ items }: GalleryClientProps) {
+export function GalleryClient({ items, categories }: GalleryClientProps) {
     const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
-    const [images, setImages] = useState<any[]>([]);
-    const [documents, setDocuments] = useState<any[]>([]);
+    const [activeCategory, setActiveCategory] = useState<string>('all');
 
-    useEffect(() => {
-        // Separate images and documents
-        const imgs = items.filter(item => item.type === 'image');
-        const docs = items.filter(item => item.type !== 'image');
-        setImages(imgs);
-        setDocuments(docs);
-    }, [items]);
+    // Separate documents (always show at bottom)
+    const documents = items.filter(item => item.type !== 'image');
+
+    // Get all images
+    const allImages = items.filter(item => item.type === 'image');
+
+    // Filter images for Marquee
+    const displayImages = activeCategory === 'all'
+        ? allImages
+        : allImages.filter(img => img.category === activeCategory);
+
+    // Prepare images for infinite scroll (Duplicate to create seamless loop)
+    // If few images, repeat more times to fill width
+    const marqueeImages = displayImages.length > 0 && displayImages.length < 5
+        ? [...displayImages, ...displayImages, ...displayImages, ...displayImages]
+        : [...displayImages, ...displayImages];
 
     // Handlers for Lightbox Navigation
     const handleNext = useCallback((e?: React.MouseEvent) => {
         e?.stopPropagation();
         if (selectedImageIndex === null) return;
-        setSelectedImageIndex((prev) => (prev! + 1) % images.length);
-    }, [selectedImageIndex, images.length]);
+        setSelectedImageIndex((prev) => (prev! + 1) % displayImages.length);
+    }, [selectedImageIndex, displayImages.length]);
 
     const handlePrev = useCallback((e?: React.MouseEvent) => {
         e?.stopPropagation();
         if (selectedImageIndex === null) return;
-        setSelectedImageIndex((prev) => (prev! - 1 + images.length) % images.length);
-    }, [selectedImageIndex, images.length]);
+        setSelectedImageIndex((prev) => (prev! - 1 + displayImages.length) % displayImages.length);
+    }, [selectedImageIndex, displayImages.length]);
 
     const handleClose = () => setSelectedImageIndex(null);
 
@@ -50,55 +59,99 @@ export function GalleryClient({ items }: GalleryClientProps) {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [selectedImageIndex, handleNext, handlePrev]);
 
-    // Prepare images for infinite scroll (Duplicate to create seamless loop)
-    // If few images, repeat more times to fill width
-    const marqueeImages = images.length < 5
-        ? [...images, ...images, ...images, ...images]
-        : [...images, ...images];
-
     return (
-        <div className="space-y-16">
+        <div className="space-y-12">
 
-            {/* --- Running Train Gallery (Single Infinite Marquee) --- */}
-            {images.length > 0 ? (
-                <div className="overflow-hidden relative py-8">
+            {/* --- Category Tabs --- */}
+            {categories.length > 0 && (
+                <div className="flex justify-center flex-wrap gap-2 px-4 animate-fade-in">
+                    <button
+                        onClick={() => setActiveCategory('all')}
+                        className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${activeCategory === 'all'
+                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+                            : 'bg-surface text-muted-foreground hover:bg-surface-dark'
+                            }`}
+                    >
+                        All Photos
+                    </button>
+                    {categories.map(cat => (
+                        <button
+                            key={cat.id}
+                            onClick={() => setActiveCategory(cat.id)}
+                            className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${activeCategory === cat.id
+                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+                                : 'bg-surface text-muted-foreground hover:bg-surface-dark'
+                                }`}
+                        >
+                            {cat.name}
+                        </button>
+                    ))}
+                </div>
+            )}
 
-                    <div className="relative group">
-                        <div className="flex gap-8 animate-scroll-left w-max group-hover:paused">
-                            {marqueeImages.map((item, idx) => (
-                                <div
-                                    key={`${item.id}-${idx}`}
-                                    className="w-[320px] h-[240px] md:w-[500px] md:h-[350px] flex-shrink-0 relative rounded-2xl overflow-hidden cursor-pointer shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300"
-                                    onClick={() => {
-                                        // Find original index in full 'images' array
-                                        const originalIndex = images.findIndex(img => img.id === item.id);
-                                        setSelectedImageIndex(originalIndex);
-                                    }}
-                                >
-                                    <Image
-                                        src={item.url}
-                                        alt={item.caption || 'Gallery Image'}
-                                        fill
-                                        className="object-cover"
-                                        sizes="(max-width: 768px) 350px, 500px"
-                                        priority={idx < 4}
-                                    />
-                                    <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
-
-                                    {/* Optional Caption Overlay on Hover */}
-                                    <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                        <p className="text-white font-medium truncate">{item.caption}</p>
+            {/* --- Gallery Display --- */}
+            {displayImages.length > 0 ? (
+                // Use marquee only when more than 4 images (can't fit in one row)
+                displayImages.length > 4 ? (
+                    // Running Train Marquee
+                    <div className="overflow-hidden relative py-8">
+                        <div className="relative group">
+                            <div className="flex gap-8 animate-scroll-left w-max group-hover:paused">
+                                {marqueeImages.map((item, idx) => (
+                                    <div
+                                        key={`${item.id}-${idx}`}
+                                        className="w-[320px] h-[240px] md:w-[500px] md:h-[350px] flex-shrink-0 relative rounded-2xl overflow-hidden cursor-pointer shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300"
+                                        onClick={() => {
+                                            const index = displayImages.findIndex(img => img.id === item.id);
+                                            setSelectedImageIndex(index);
+                                        }}
+                                    >
+                                        <Image
+                                            src={item.url}
+                                            alt={item.caption || 'Gallery Image'}
+                                            fill
+                                            className="object-cover"
+                                            sizes="(max-width: 768px) 350px, 500px"
+                                            priority={idx < 4}
+                                        />
+                                        <div className="absolute inset-0 bg-black/10 hover:bg-transparent transition-colors" />
+                                        <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300">
+                                            <p className="text-white font-medium truncate">{item.caption}</p>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
                     </div>
-
-                </div>
+                ) : (
+                    // Static Centered Grid for few images
+                    <div className="flex justify-center gap-6 flex-wrap px-4 py-8">
+                        {displayImages.map((item, idx) => (
+                            <div
+                                key={item.id}
+                                className="w-[320px] h-[240px] md:w-[400px] md:h-[280px] relative rounded-2xl overflow-hidden cursor-pointer shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 group"
+                                onClick={() => setSelectedImageIndex(idx)}
+                            >
+                                <Image
+                                    src={item.url}
+                                    alt={item.caption || 'Gallery Image'}
+                                    fill
+                                    className="object-cover"
+                                    sizes="(max-width: 768px) 350px, 400px"
+                                    priority
+                                />
+                                <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
+                                <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    <p className="text-white font-medium truncate">{item.caption}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )
             ) : (
-                <div className="text-center py-20 bg-surface rounded-2xl border border-surface-dark/10">
+                <div className="text-center py-20 bg-surface rounded-2xl border border-surface-dark/10 mx-4">
                     <ImageIcon className="h-16 w-16 text-muted-light mx-auto mb-4" />
-                    <p className="text-foreground font-medium">No images found yet.</p>
+                    <p className="text-foreground font-medium">No images found in this category.</p>
                 </div>
             )}
 
@@ -137,7 +190,7 @@ export function GalleryClient({ items }: GalleryClientProps) {
 
 
             {/* --- Lightbox Modal --- */}
-            {selectedImageIndex !== null && images[selectedImageIndex] && (
+            {selectedImageIndex !== null && displayImages[selectedImageIndex] && (
                 <div
                     className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in"
                     onClick={handleClose}
@@ -169,7 +222,7 @@ export function GalleryClient({ items }: GalleryClientProps) {
                     <div className="relative max-w-6xl max-h-[85vh] w-full h-full flex flex-col items-center justify-center" onClick={(e) => e.stopPropagation()}>
                         <div className="relative w-full h-full">
                             <Image
-                                src={images[selectedImageIndex].url}
+                                src={displayImages[selectedImageIndex].url}
                                 alt="Gallery Image"
                                 fill
                                 className="object-contain"
@@ -179,16 +232,16 @@ export function GalleryClient({ items }: GalleryClientProps) {
 
                         {/* Caption & Counter */}
                         <div className="mt-4 text-center">
-                            <p className="text-white text-lg font-medium">{images[selectedImageIndex].caption}</p>
+                            <p className="text-white text-lg font-medium">{displayImages[selectedImageIndex].caption}</p>
                             <p className="text-white/50 text-sm mt-1">
-                                {selectedImageIndex + 1} / {images.length}
+                                {selectedImageIndex + 1} / {displayImages.length}
                             </p>
                         </div>
                     </div>
 
                     {/* Download Button */}
                     <a
-                        href={images[selectedImageIndex].url}
+                        href={displayImages[selectedImageIndex].url}
                         target="_blank"
                         rel="noreferrer"
                         className="absolute bottom-6 right-6 flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg backdrop-blur-sm transition-all text-sm font-medium"

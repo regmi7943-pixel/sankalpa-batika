@@ -67,3 +67,48 @@ export async function savePageContent(pageName: string, content: Record<string, 
         return { success: false, error: `Failed to save ${pageName} content` };
     }
 }
+
+// Upload logo to Cloudinary and save URL
+export async function uploadLogo(formData: FormData) {
+    const { getSession } = await import('./auth');
+    const cloudinary = (await import('@/lib/cloudinary')).default;
+    const { revalidatePath } = await import('next/cache');
+
+    const session = await getSession();
+    if (!session) return { success: false, error: 'Unauthorized' };
+
+    try {
+        const file = formData.get('file') as File;
+        if (!file) return { success: false, error: 'No file provided' };
+
+        const bytes = await file.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+
+        // Upload to Cloudinary
+        const result = await new Promise<any>((resolve, reject) => {
+            cloudinary.uploader.upload_stream(
+                {
+                    folder: 'sankalpa-vatika/logo',
+                    public_id: 'school-logo',
+                    overwrite: true,
+                    resource_type: 'image'
+                },
+                (error, result) => {
+                    if (error) reject(error);
+                    else resolve(result);
+                }
+            ).end(buffer);
+        });
+
+        // Save URL to Firebase
+        await adminDb.ref('siteSettings').update({ logoUrl: result.secure_url });
+
+        revalidatePath('/');
+        revalidatePath('/admin/settings');
+
+        return { success: true, url: result.secure_url };
+    } catch (error) {
+        console.error('Logo upload failed:', error);
+        return { success: false, error: 'Failed to upload logo' };
+    }
+}

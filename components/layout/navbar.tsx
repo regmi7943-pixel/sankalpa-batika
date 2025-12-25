@@ -6,7 +6,16 @@ import { Menu, X, GraduationCap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 
-export function Navbar() {
+interface SiteSettings {
+    schoolName: string;
+    tagline: string;
+    logoUrl: string;
+    phone1: string;
+    email1: string;
+    hours: string;
+}
+
+export function Navbar({ settings }: { settings: SiteSettings }) {
     const [isOpen, setIsOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
 
@@ -34,11 +43,11 @@ export function Navbar() {
             <div className={`bg-blue-900 text-white transition-all duration-300 ${isScrolled ? 'h-0 overflow-hidden opacity-0' : 'py-2 opacity-100'}`}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center text-sm">
                     <div className="flex items-center gap-4">
-                        <span>📞 +977-1-4XXXXXX</span>
-                        <span className="hidden sm:inline">✉️ info@sankalpavatika.edu.np</span>
+                        <span>📞 {settings.phone1}</span>
+                        <span className="hidden sm:inline">✉️ {settings.email1}</span>
                     </div>
                     <div className="hidden md:flex items-center gap-4">
-                        <span>🕐 Sun - Fri: 9:00 AM - 4:00 PM</span>
+                        <span>🕐 {settings.hours}</span>
                     </div>
                 </div>
             </div>
@@ -54,19 +63,19 @@ export function Navbar() {
                         <Link href="/" className="flex items-center gap-3 group">
                             <div className="relative">
                                 <img
-                                    src="/logo.png"
-                                    alt="Sankalpa Vatika Logo"
+                                    src={settings.logoUrl || '/logo.png'}
+                                    alt={`${settings.schoolName} Logo`}
                                     className="h-10 w-10 md:h-12 md:w-12 object-contain group-hover:scale-105 transition-transform duration-300"
                                 />
                             </div>
                             <div>
                                 <span className={`font-bold text-lg tracking-tight transition-colors ${isScrolled ? 'text-foreground' : 'text-white'
                                     }`}>
-                                    Sankalpa Vatika
+                                    {settings.schoolName}
                                 </span>
                                 <p className={`text-xs transition-colors ${isScrolled ? 'text-muted' : 'text-blue-100'
                                     }`}>
-                                    Excellence in Education
+                                    {settings.tagline}
                                 </p>
                             </div>
                         </Link>

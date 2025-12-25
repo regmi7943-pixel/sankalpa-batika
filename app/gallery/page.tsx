@@ -1,7 +1,7 @@
 // Force dynamic rendering to ensure fresh data on Vercel
 export const dynamic = 'force-dynamic';
 
-import { getGallery } from '@/app/actions/gallery';
+import { getGallery, getCategories } from '@/app/actions/gallery';
 import { GalleryClient } from './gallery-client';
 import { ImageIcon } from 'lucide-react';
 
@@ -11,7 +11,13 @@ export const metadata = {
 };
 
 export default async function GalleryPage() {
-    const { data: galleryItems } = await getGallery();
+    const [galleryRes, catRes] = await Promise.all([
+        getGallery(),
+        getCategories()
+    ]);
+
+    const galleryItems = galleryRes.data || [];
+    const categories = catRes.data || [];
 
     return (
         <div className="pt-20">
@@ -30,7 +36,7 @@ export default async function GalleryPage() {
 
             {/* Gallery Section */}
             <section className="py-20 bg-background overflow-hidden">
-                <GalleryClient items={galleryItems || []} />
+                <GalleryClient items={galleryItems} categories={categories} />
             </section>
         </div>
     );
