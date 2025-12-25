@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import {
     LogOut, GraduationCap, Menu, X, Eye, Edit3,
     Home, Info, UserCheck, Phone, Settings,
-    Megaphone, Calendar, Image as Image
+    Megaphone, Calendar, Image as Image, Mail
 } from 'lucide-react';
 import { logoutAction } from '@/app/actions/auth';
 import { Button } from '@/components/ui/button';
@@ -28,6 +28,7 @@ export default function AdminLayout({
     ];
 
     const managementLinks = [
+        { href: '/admin/messages', label: 'Messages', icon: Mail },
         { href: '/admin/notices', label: 'Notices', icon: Megaphone },
         { href: '/admin/events', label: 'Events', icon: Calendar },
         { href: '/admin/gallery', label: 'Gallery', icon: Image },

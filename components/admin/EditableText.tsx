@@ -62,8 +62,9 @@ export function EditableText({
                     onChange={(e) => setTempValue(e.target.value)}
                     onBlur={handleBlur}
                     onKeyDown={handleKeyDown}
-                    className={`${className} bg-blue-50/90 text-slate-900 border-2 border-blue-400 rounded-lg px-3 py-2 outline-none resize-none w-full min-h-[100px] shadow-inner font-normal`}
+                    className={`${className} bg-transparent text-inherit border-2 border-white/50 border-dashed rounded-lg px-2 py-1 outline-none resize-y w-full min-h-[100px] font-inherit leading-inherit`}
                     rows={4}
+                    style={{ fontFamily: 'inherit', fontSize: 'inherit', fontWeight: 'inherit', lineHeight: 'inherit' }}
                 />
             );
         }
@@ -75,7 +76,8 @@ export function EditableText({
                 onChange={(e) => setTempValue(e.target.value)}
                 onBlur={handleBlur}
                 onKeyDown={handleKeyDown}
-                className={`${className} bg-blue-50/90 text-slate-900 border-2 border-blue-400 rounded-lg px-3 py-1 outline-none w-full shadow-inner font-normal`}
+                className={`${className} bg-transparent text-inherit border-2 border-white/50 border-dashed rounded-lg px-1 py-0 outline-none w-full font-inherit leading-inherit`}
+                style={{ fontFamily: 'inherit', fontSize: 'inherit', fontWeight: 'inherit', lineHeight: 'inherit' }}
             />
         );
     }

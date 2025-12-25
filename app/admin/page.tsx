@@ -1,26 +1,24 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import {
-    GraduationCap, ArrowRight, Award, Users, BookOpen, Shield,
-    Star, Quote, ChevronDown, Bell, Calendar, Loader2, Plus
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import {
+    Home, Save, Star, TrendingUp, Quote, Image as ImageIcon,
+    Plus, Trash2, GripVertical, Loader2, ArrowRight, BookOpen, Users, Award, Shield, Bell, Calendar
+} from 'lucide-react';
 import { getPageContent, savePageContent } from '@/app/actions/settings';
+import link from 'next/link';
 import { DeletableWrapper } from '@/components/admin/deletable-wrapper';
 import { EditableText } from '@/components/admin/EditableText';
 import { IconPicker } from '@/components/admin/IconPicker';
 
-
-
 // Default content
 const defaultContent = {
-    heroTitle: 'Sankalpa Vatika',
+    heroTitle: 'Welcome to Sankalpa Vatika',
     heroSubtitle: 'Excellence in Education',
     heroDescription: 'Nurturing minds, building character, and shaping the future leaders of tomorrow. Join our community of learners and explorers.',
-    heroBadge: 'Admissions Open for 2025',
+    heroBadge: 'Admissions Open for 2026',
     ctaText: 'Apply for Admission',
     secondaryCtaText: 'Learn More',
     stats: [
@@ -31,10 +29,10 @@ const defaultContent = {
     ],
     featuresTitle: 'Excellence in Every Aspect',
     features: [
-        { icon: 'BookOpen', title: 'Academic Excellence', description: 'Comprehensive curriculum designed to nurture critical thinking and creativity.' },
-        { icon: 'Users', title: 'Expert Faculty', description: 'Dedicated teachers with years of experience in education.' },
+        { icon: 'BookOpen', title: 'Academic Excellence', description: 'Comprehensive curriculum designed to nurture critical thinking.' },
+        { icon: 'Users', title: 'Expert Faculty', description: 'Dedicated teachers with years of experience.' },
         { icon: 'Award', title: 'Holistic Development', description: 'Focus on sports, arts, and extracurricular activities.' },
-        { icon: 'Shield', title: 'Safe Environment', description: 'Secure campus with modern infrastructure and facilities.' },
+        { icon: 'Shield', title: 'Safe Environment', description: 'Secure campus with modern facilities.' },
     ],
     testimonialQuote: 'Sankalpa Vatika has been instrumental in shaping my child\'s future. The dedicated faculty and nurturing environment have helped them grow both academically and personally.',
     testimonialAuthor: 'Parent of Grade 5 Student',
@@ -50,7 +48,8 @@ export default function AdminHomePage() {
         async function loadContent() {
             const result = await getPageContent('homepage');
             if (result.success && result.data) {
-                setContent({ ...defaultContent, ...result.data });
+                // Merge loaded data with defaults to ensure all fields exist
+                setContent(prev => ({ ...prev, ...result.data }));
             }
             setLoading(false);
         }
@@ -86,6 +85,10 @@ export default function AdminHomePage() {
         );
     }
 
+    const handleChange = (key: string, value: any) => {
+        setContent(prev => ({ ...prev, [key]: value }));
+    };
+
     return (
         <div className="relative">
             {/* Loading Overlay when saving */}
@@ -98,118 +101,148 @@ export default function AdminHomePage() {
                 </div>
             )}
 
-            {/* Hero Section */}
-            <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 text-white overflow-hidden">
-                <div className="absolute inset-0 opacity-20">
-                    <div className="absolute top-20 left-10 w-72 h-72 bg-amber-400 rounded-full blur-3xl"></div>
-                    <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-400 rounded-full blur-3xl"></div>
+            {/* VISUAL EDITOR - HERO SECTION */}
+            <div className="relative min-h-[85vh] flex items-center justify-center bg-blue-950 text-white overflow-hidden">
+                {/* Background Fallback - Only visible if no slides (which is default here in admin unless we simulate slides) */}
+                <div className="absolute inset-0 z-0 select-none pointer-events-none">
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900"></div>
+                    <div className="absolute inset-0 opacity-20">
+                        <div className="absolute top-20 left-10 w-48 md:w-72 h-48 md:h-72 bg-amber-400 rounded-full blur-3xl"></div>
+                        <div className="absolute bottom-20 right-10 w-64 md:w-96 h-64 md:h-96 bg-blue-400 rounded-full blur-3xl"></div>
+                    </div>
+                    {/* Professional Dark Overlay */}
+                    <div className="absolute inset-0 bg-black/70" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-blue-950/90 via-blue-950/40 to-black/60" />
                 </div>
 
-                <div className="relative z-10 max-w-5xl mx-auto px-4 text-center pt-32 pb-20 md:pt-40 md:pb-24">
-                    <div className="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-400/30 rounded-full px-4 py-2 mb-6">
-                        <Star className="h-4 w-4 text-amber-400" />
-                        <EditableText
-                            value={content.heroBadge}
-                            onChange={(val) => setContent({ ...content, heroBadge: val })}
-                            className="text-amber-200 text-sm font-medium"
-                        />
-                    </div>
+                {/* Content Layer */}
+                <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col justify-center pt-20 pb-48 lg:pb-32">
+                    <div className="max-w-3xl space-y-6 md:space-y-8 animate-fade-in-up">
 
-                    <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold mb-2">
-                        <EditableText
-                            value={content.heroTitle}
-                            onChange={(val) => setContent({ ...content, heroTitle: val })}
-                            className="text-white"
-                        />
-                    </h1>
-
-                    <p className="text-xl md:text-2xl text-blue-200 mb-6">
-                        <EditableText
-                            value={content.heroSubtitle}
-                            onChange={(val) => setContent({ ...content, heroSubtitle: val })}
-                        />
-                    </p>
-
-                    <p className="text-lg text-blue-100/80 max-w-2xl mx-auto mb-8">
-                        <EditableText
-                            value={content.heroDescription}
-                            onChange={(val) => setContent({ ...content, heroDescription: val })}
-                            multiline
-                        />
-                    </p>
-
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Button size="lg" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-8 py-6 text-lg shadow-xl">
-                            <EditableText value={content.ctaText} onChange={(val) => setContent({ ...content, ctaText: val })} />
-                            <ArrowRight className="ml-2 h-5 w-5" />
-                        </Button>
-                        <Button size="lg" className="bg-white hover:bg-gray-100 text-black px-8 py-6 text-lg transition-all shadow-lg">
-                            <EditableText value={content.secondaryCtaText} onChange={(val) => setContent({ ...content, secondaryCtaText: val })} />
-                        </Button>
-                    </div>
-
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-16">
-                        {content.stats.map((stat, i) => (
-                            <DeletableWrapper
-                                key={i}
-                                onDelete={() => {
-                                    const newStats = content.stats.filter((_, index) => index !== i);
-                                    setContent({ ...content, stats: newStats });
-                                }}
-                            >
-                                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/10 h-full">
-                                    <div className="text-3xl font-bold text-white mb-1">
-                                        <EditableText
-                                            value={stat.value}
-                                            onChange={(val) => {
-                                                const newStats = [...content.stats];
-                                                newStats[i] = { ...newStats[i], value: val };
-                                                setContent({ ...content, stats: newStats });
-                                            }}
-                                        />
-                                    </div>
-                                    <div className="text-blue-200 text-sm">
-                                        <EditableText
-                                            value={stat.label}
-                                            onChange={(val) => {
-                                                const newStats = [...content.stats];
-                                                newStats[i] = { ...newStats[i], label: val };
-                                                setContent({ ...content, stats: newStats });
-                                            }}
-                                        />
-                                    </div>
+                        {/* Badge with Accent */}
+                        <div className="flex items-center gap-4">
+                            <div className="w-1.5 h-12 bg-red-600 rounded-sm"></div>
+                            <div className="space-y-1">
+                                <div className="inline-flex items-center gap-2 text-red-400 font-bold uppercase tracking-widest text-sm">
+                                    <Star className="h-3 w-3" />
+                                    <EditableText
+                                        value={content.heroBadge}
+                                        onChange={(val) => handleChange('heroBadge', val)}
+                                        className="min-w-[100px]"
+                                    />
                                 </div>
-                            </DeletableWrapper>
-                        ))}
-                        {/* Add Stat Button */}
-                        <Button
-                            variant="outline"
-                            className="bg-white/5 border-dashed border-white/20 text-white hover:bg-white/10 h-24 rounded-xl flex flex-col gap-2"
-                            onClick={() => {
-                                setContent({
-                                    ...content,
-                                    stats: [...content.stats, { value: '0', label: 'New Stat' }]
-                                });
-                            }}
-                        >
-                            <Plus className="h-5 w-5" />
-                            <span className="text-xs">Add Stat</span>
-                        </Button>
+                                <div className="text-xl md:text-2xl text-blue-100 font-medium">
+                                    <EditableText
+                                        value={content.heroSubtitle}
+                                        onChange={(val) => handleChange('heroSubtitle', val)}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Main Title */}
+                        <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white leading-tight drop-shadow-xl flex flex-wrap">
+                            <EditableText
+                                value={content.heroTitle}
+                                onChange={(val) => handleChange('heroTitle', val)}
+                                className="w-full min-w-[300px]"
+                                multiline
+                            />
+                        </h1>
+
+                        {/* Description */}
+                        <div className="text-lg md:text-xl text-gray-200 max-w-2xl leading-relaxed drop-shadow-md border-l-4 border-white/20 pl-6">
+                            <EditableText
+                                value={content.heroDescription}
+                                onChange={(val) => handleChange('heroDescription', val)}
+                                multiline
+                                className="w-full"
+                            />
+                        </div>
+
+                        {/* CTAs */}
+                        <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                            <Button size="lg" className="w-full sm:w-auto bg-red-700 hover:bg-red-800 text-white text-lg uppercase tracking-wider font-bold rounded-none shadow-2xl border-l-4 border-red-500 p-0 h-auto min-h-[60px]">
+                                <div className="px-8 py-4 flex items-center justify-center w-full h-full">
+                                    <EditableText
+                                        value={content.ctaText}
+                                        onChange={(val) => handleChange('ctaText', val)}
+                                        className="text-center min-w-[100px]"
+                                    />
+                                    <ArrowRight className="ml-3 h-5 w-5 flex-shrink-0" />
+                                </div>
+                            </Button>
+                            <Button size="lg" variant="outline" className="w-full sm:w-auto bg-transparent hover:bg-white text-white hover:text-blue-950 border-2 border-white text-lg uppercase tracking-wider font-bold rounded-none transition-all p-0 h-auto min-h-[60px]">
+                                <div className="px-8 py-4 flex items-center justify-center w-full h-full">
+                                    <EditableText
+                                        value={content.secondaryCtaText}
+                                        onChange={(val) => handleChange('secondaryCtaText', val)}
+                                        className="text-center min-w-[100px]"
+                                    />
+                                </div>
+                            </Button>
+                        </div>
+                    </div>
+
+                    {/* Stats Strip */}
+                    <div className="absolute bottom-0 right-0 left-0 lg:left-auto bg-blue-950/80 backdrop-blur-md border-t border-white/10 p-6 lg:p-10 lg:rounded-tl-3xl">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+                            {(content.stats || []).map((stat, i) => (
+                                <DeletableWrapper
+                                    key={i}
+                                    onDelete={() => {
+                                        const newStats = content.stats.filter((_, idx) => idx !== i);
+                                        handleChange('stats', newStats);
+                                    }}
+                                    className="relative group"
+                                >
+                                    <div className="text-left group-hover:bg-white/5 p-2 rounded-lg transition-colors cursor-text">
+                                        <div className="text-3xl md:text-4xl font-black text-white mb-1">
+                                            <EditableText
+                                                value={stat.value}
+                                                onChange={(val) => {
+                                                    const newStats = [...content.stats];
+                                                    newStats[i].value = val;
+                                                    handleChange('stats', newStats);
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="text-blue-200 text-xs md:text-sm uppercase tracking-wider font-semibold">
+                                            <EditableText
+                                                value={stat.label}
+                                                onChange={(val) => {
+                                                    const newStats = [...content.stats];
+                                                    newStats[i].label = val;
+                                                    handleChange('stats', newStats);
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                </DeletableWrapper>
+                            ))}
+                            <button
+                                onClick={() => handleChange('stats', [...(content.stats || []), { value: '0+', label: 'New Stat' }])}
+                                className="flex flex-col items-center justify-center p-2 rounded-lg border-2 border-dashed border-white/20 text-white/50 hover:text-white hover:border-white/50 hover:bg-white/10 transition-all"
+                            >
+                                <Plus className="h-6 w-6 mb-1" />
+                                <span className="text-xs uppercase font-bold">Add Stat</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
-                    <ChevronDown className="h-8 w-8 text-white/50 animate-bounce" />
-                </div>
-            </section>
-
-            {/* Features Section */}
+            {/* VISUAL EDITOR - FEATURES SECTION */}
             <section className="py-20 bg-surface">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="text-center mb-12">
                         <span className="text-blue-600 font-semibold text-sm uppercase tracking-wider">Why Choose Us</span>
-                        <h2 className="text-3xl md:text-4xl font-bold text-foreground mt-2">
-                            <EditableText value={content.featuresTitle} onChange={(val) => setContent({ ...content, featuresTitle: val })} />
+                        <h2 className="text-3xl md:text-4xl font-bold text-foreground mt-2 flex justify-center">
+                            <EditableText
+                                value={content.featuresTitle}
+                                onChange={(val) => setContent({ ...content, featuresTitle: val })}
+                                className="min-w-[200px] text-center"
+                            />
                         </h2>
                         <div className="w-20 h-1 bg-gradient-to-r from-blue-500 to-amber-500 mx-auto mt-4 rounded"></div>
                     </div>
@@ -225,42 +258,42 @@ export default function AdminHomePage() {
                                         setContent({ ...content, features: newFeatures });
                                     }}
                                 >
-                                    <Card className="group hover:shadow-xl transition-all duration-300 border-0 shadow-md overflow-hidden h-full">
-                                        <CardContent className="p-6">
-                                            <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform overflow-hidden">
-                                                <IconPicker
-                                                    value={feature.icon || 'BookOpen'}
-                                                    onChange={(newIcon) => {
-                                                        const newFeatures = [...content.features];
-                                                        newFeatures[i] = { ...newFeatures[i], icon: newIcon };
-                                                        setContent({ ...content, features: newFeatures });
-                                                    }}
-                                                    className="w-7 h-7 text-white"
-                                                />
-                                            </div>
-                                            <h3 className="text-lg font-bold text-foreground mb-2">
-                                                <EditableText
-                                                    value={feature.title}
-                                                    onChange={(val) => {
-                                                        const newFeatures = [...content.features];
-                                                        newFeatures[i] = { ...newFeatures[i], title: val };
-                                                        setContent({ ...content, features: newFeatures });
-                                                    }}
-                                                />
-                                            </h3>
-                                            <p className="text-muted text-sm">
-                                                <EditableText
-                                                    value={feature.description}
-                                                    onChange={(val) => {
-                                                        const newFeatures = [...content.features];
-                                                        newFeatures[i] = { ...newFeatures[i], description: val };
-                                                        setContent({ ...content, features: newFeatures });
-                                                    }}
-                                                    multiline
-                                                />
-                                            </p>
-                                        </CardContent>
-                                    </Card>
+                                    <div className="group hover:shadow-xl transition-all duration-300 bg-surface border rounded-xl overflow-hidden h-full flex flex-col p-6 relative">
+                                        <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform flex-shrink-0">
+                                            <IconPicker
+                                                value={feature.icon || 'BookOpen'}
+                                                onChange={(newIcon) => {
+                                                    const newFeatures = [...content.features];
+                                                    newFeatures[i] = { ...newFeatures[i], icon: newIcon };
+                                                    setContent({ ...content, features: newFeatures });
+                                                }}
+                                                className="w-7 h-7 text-white"
+                                            />
+                                        </div>
+                                        <h3 className="text-lg font-bold text-foreground mb-2">
+                                            <EditableText
+                                                value={feature.title}
+                                                onChange={(val) => {
+                                                    const newFeatures = [...content.features];
+                                                    newFeatures[i] = { ...newFeatures[i], title: val };
+                                                    setContent({ ...content, features: newFeatures });
+                                                }}
+                                                className="w-full"
+                                            />
+                                        </h3>
+                                        <div className="text-muted text-sm flex-1">
+                                            <EditableText
+                                                value={feature.description}
+                                                onChange={(val) => {
+                                                    const newFeatures = [...content.features];
+                                                    newFeatures[i] = { ...newFeatures[i], description: val };
+                                                    setContent({ ...content, features: newFeatures });
+                                                }}
+                                                multiline
+                                                className="w-full h-full"
+                                            />
+                                        </div>
+                                    </div>
                                 </DeletableWrapper>
                             );
                         })}
@@ -282,7 +315,7 @@ export default function AdminHomePage() {
                 </div>
             </section>
 
-            {/* Testimonial Section */}
+            {/* VISUAL EDITOR - TESTIMONIAL SECTION */}
             <section className="py-20 bg-gradient-to-br from-slate-900 to-slate-800 text-white">
                 <div className="max-w-4xl mx-auto px-4 text-center">
                     <Quote className="h-16 w-16 text-amber-500/30 mx-auto mb-6" />
@@ -296,55 +329,6 @@ export default function AdminHomePage() {
                     <p className="text-amber-400 font-semibold">
                         <EditableText value={content.testimonialAuthor} onChange={(val) => setContent({ ...content, testimonialAuthor: val })} />
                     </p>
-                </div>
-            </section>
-
-            {/* Quick Links */}
-            <section className="py-20 bg-background">
-                <div className="max-w-7xl mx-auto px-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <Card className="border-0 shadow-lg overflow-hidden">
-                            <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-white p-4">
-                                <div className="flex items-center gap-2">
-                                    <Bell className="h-5 w-5" />
-                                    <h3 className="font-bold">Latest Notices</h3>
-                                </div>
-                            </div>
-                            <CardContent className="p-4 space-y-3">
-                                <div className="p-3 bg-surface rounded-lg">
-                                    <p className="font-medium text-foreground">Sample Notice</p>
-                                    <p className="text-sm text-muted">Dec 20, 2024</p>
-                                </div>
-                                <Link href="/notices" className="text-blue-600 text-sm font-medium flex items-center gap-1">
-                                    View All <ArrowRight className="h-4 w-4" />
-                                </Link>
-                            </CardContent>
-                        </Card>
-
-                        <Card className="border-0 shadow-lg overflow-hidden">
-                            <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4">
-                                <div className="flex items-center gap-2">
-                                    <Calendar className="h-5 w-5" />
-                                    <h3 className="font-bold">Upcoming Events</h3>
-                                </div>
-                            </div>
-                            <CardContent className="p-4 space-y-3">
-                                <div className="flex items-center gap-3 p-3 bg-surface rounded-lg">
-                                    <div className="bg-blue-500 text-white rounded-lg p-2 text-center min-w-[50px]">
-                                        <p className="text-xs font-bold">JAN</p>
-                                        <p className="text-lg font-bold">15</p>
-                                    </div>
-                                    <div>
-                                        <p className="font-medium text-foreground">Annual Sports Day</p>
-                                        <p className="text-sm text-muted">Main Ground</p>
-                                    </div>
-                                </div>
-                                <Link href="/events" className="text-blue-600 text-sm font-medium flex items-center gap-1">
-                                    View All <ArrowRight className="h-4 w-4" />
-                                </Link>
-                            </CardContent>
-                        </Card>
-                    </div>
                 </div>
             </section>
         </div>

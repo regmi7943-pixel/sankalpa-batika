@@ -217,3 +217,36 @@ body {
   background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
   border-radius: 2px;
 }
+
+/* Infinite Marquee Scroll */
+@keyframes scrollLeft {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes scrollRight {
+  0% {
+    transform: translateX(-50%);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.animate-scroll-left {
+  animation: scrollLeft 40s linear infinite;
+}
+
+.animate-scroll-right {
+  animation: scrollRight 40s linear infinite;
+}
+
+.paused {
+  animation-play-state: paused !important;
+}

@@ -21,6 +21,7 @@ export interface GalleryItem {
     type: 'image' | 'pdf';
     caption?: string;
     publicId?: string; // Cloudinary public_id
+    category?: string;
     uploadedAt: number;
 }
 

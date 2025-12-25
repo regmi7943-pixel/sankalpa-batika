@@ -6,10 +6,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { getNotices } from '@/app/actions/notices';
 import { getEvents } from '@/app/actions/events';
+import { getSlides } from '@/app/actions/gallery';
 import { getPageContent } from '@/app/actions/settings';
+import HeroSlider from '@/components/hero-slider';
 import {
   ArrowRight, GraduationCap, Award, Users, BookOpen, Shield,
-  Star, Quote, ChevronDown, Bell, Calendar, Play
+  Bell, Calendar, Play, Quote
 } from 'lucide-react';
 
 // Default content (fallback)
@@ -46,74 +48,18 @@ export default async function HomePage() {
     ? { ...defaultContent, ...contentResult.data }
     : defaultContent;
 
-  // Fetch notices and events
+  // Fetch notices, events, and slides
   const { data: notices } = await getNotices();
   const { data: events } = await getEvents();
+  const { data: slides } = await getSlides();
 
   return (
     <>
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 text-white overflow-hidden">
-        {/* Background Effects */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-20 left-10 w-48 md:w-72 h-48 md:h-72 bg-amber-400 rounded-full blur-3xl animate-pulse-slow"></div>
-          <div className="absolute bottom-20 right-10 w-64 md:w-96 h-64 md:h-96 bg-blue-400 rounded-full blur-3xl animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
-        </div>
-
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-28 pb-16 md:pt-32 md:pb-20">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-400/30 rounded-full px-3 md:px-4 py-1.5 md:py-2 mb-4 md:mb-6 animate-fade-in">
-            <Star className="h-3 w-3 md:h-4 md:w-4 text-amber-400" />
-            <span className="text-amber-200 text-xs md:text-sm font-medium">{content.heroBadge}</span>
-          </div>
-
-          {/* Main Title */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-2 md:mb-4 animate-fade-in">
-            <span className="bg-gradient-to-r from-white via-blue-100 to-amber-200 text-transparent bg-clip-text">
-              {content.heroTitle}
-            </span>
-          </h1>
-
-          <p className="text-lg sm:text-xl md:text-2xl text-blue-200 mb-4 md:mb-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            {content.heroSubtitle}
-          </p>
-
-          {/* Description */}
-          <p className="text-sm sm:text-base md:text-lg text-blue-100/80 max-w-2xl mx-auto mb-6 md:mb-8 animate-fade-in px-4" style={{ animationDelay: '0.2s' }}>
-            {content.heroDescription}
-          </p>
-
-          {/* CTAs */}
-          <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center px-4 animate-slide-up" style={{ animationDelay: '0.3s' }}>
-            <Link href="/admissions">
-              <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-6 md:px-8 py-5 md:py-6 text-base md:text-lg shadow-xl shadow-amber-500/20">
-                {content.ctaText}
-                <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5" />
-              </Button>
-            </Link>
-            <Link href="/about">
-              <Button size="lg" className="w-full sm:w-auto bg-surface hover:bg-surface-dark text-foreground px-6 md:px-8 py-5 md:py-6 text-base md:text-lg transition-all shadow-lg border border-surface-dark/10">
-                {content.secondaryCtaText}
-              </Button>
-            </Link>
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mt-12 md:mt-20 animate-slide-up px-2" style={{ animationDelay: '0.4s' }}>
-            {content.stats.map((stat: any, i: number) => (
-              <div key={i} className="bg-white/10 backdrop-blur-sm rounded-xl md:rounded-2xl p-4 md:p-6 border border-white/10">
-                <div className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-1">{stat.value}</div>
-                <div className="text-blue-200 text-xs md:text-sm">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:block">
-          <ChevronDown className="h-8 w-8 text-white/50 animate-bounce" />
-        </div>
-      </section>
+      <HeroSlider
+        slides={slides || []}
+        content={content as any}
+      />
 
       {/* Features Section */}
       <section className="py-16 md:py-24 bg-surface">

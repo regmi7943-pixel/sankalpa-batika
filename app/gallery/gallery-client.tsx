@@ -1,147 +1,204 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { getGallery } from '@/app/actions/gallery';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { FileText, X, ZoomIn, Download, ImageIcon, Filter } from 'lucide-react';
+import { FileText, X, ChevronLeft, ChevronRight, Download, ImageIcon, ZoomIn } from 'lucide-react';
 
 interface GalleryClientProps {
     items: any[];
 }
 
 export function GalleryClient({ items }: GalleryClientProps) {
-    const [selectedImage, setSelectedImage] = useState<string | null>(null);
-    const [filter, setFilter] = useState<'all' | 'image' | 'pdf'>('all');
+    const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+    const [images, setImages] = useState<any[]>([]);
+    const [documents, setDocuments] = useState<any[]>([]);
 
-    const filteredItems = items.filter(item =>
-        filter === 'all' ? true : item.type === filter
-    );
+    useEffect(() => {
+        // Separate images and documents
+        const imgs = items.filter(item => item.type === 'image');
+        const docs = items.filter(item => item.type !== 'image');
+        setImages(imgs);
+        setDocuments(docs);
+    }, [items]);
+
+    // Handlers for Lightbox Navigation
+    const handleNext = useCallback((e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        if (selectedImageIndex === null) return;
+        setSelectedImageIndex((prev) => (prev! + 1) % images.length);
+    }, [selectedImageIndex, images.length]);
+
+    const handlePrev = useCallback((e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        if (selectedImageIndex === null) return;
+        setSelectedImageIndex((prev) => (prev! - 1 + images.length) % images.length);
+    }, [selectedImageIndex, images.length]);
+
+    const handleClose = () => setSelectedImageIndex(null);
+
+    // Keyboard Navigation
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (selectedImageIndex === null) return;
+            if (e.key === 'ArrowRight') handleNext();
+            if (e.key === 'ArrowLeft') handlePrev();
+            if (e.key === 'Escape') handleClose();
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [selectedImageIndex, handleNext, handlePrev]);
+
+    // Prepare images for infinite scroll (Duplicate to create seamless loop)
+    // If few images, repeat more times to fill width
+    const marqueeImages = images.length < 5
+        ? [...images, ...images, ...images, ...images]
+        : [...images, ...images];
 
     return (
-        <>
-            {/* Filter Buttons */}
-            <div className="flex items-center justify-center gap-3 mb-12">
-                <Button
-                    variant={filter === 'all' ? 'default' : 'outline'}
-                    onClick={() => setFilter('all')}
-                    className={filter === 'all' ? 'bg-blue-600' : ''}
-                >
-                    All
-                </Button>
-                <Button
-                    variant={filter === 'image' ? 'default' : 'outline'}
-                    onClick={() => setFilter('image')}
-                    className={filter === 'image' ? 'bg-blue-600' : ''}
-                >
-                    <ImageIcon className="h-4 w-4 mr-2" />
-                    Images
-                </Button>
-                <Button
-                    variant={filter === 'pdf' ? 'default' : 'outline'}
-                    onClick={() => setFilter('pdf')}
-                    className={filter === 'pdf' ? 'bg-blue-600' : ''}
-                >
-                    <FileText className="h-4 w-4 mr-2" />
-                    Documents
-                </Button>
-            </div>
+        <div className="space-y-16">
 
-            {/* Gallery Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {filteredItems.length > 0 ? (
-                    filteredItems.map((item) => (
-                        <Card
-                            key={item.id}
-                            className="overflow-hidden group cursor-pointer card-hover"
-                            onClick={() => item.type === 'image' && setSelectedImage(item.url)}
-                        >
-                            <CardContent className="p-0 relative aspect-square">
-                                {item.type === 'image' ? (
-                                    <div className="relative w-full h-full">
-                                        <Image
-                                            src={item.url}
-                                            alt={item.caption || 'Gallery Image'}
-                                            fill
-                                            className="object-cover transition-transform duration-500 group-hover:scale-110"
-                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                                        />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                            <div className="absolute bottom-0 left-0 right-0 p-4">
-                                                <p className="text-white font-medium truncate">{item.caption || 'Untitled'}</p>
-                                            </div>
-                                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                                                <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                                                    <ZoomIn className="h-6 w-6 text-white" />
-                                                </div>
-                                            </div>
-                                        </div>
+            {/* --- Running Train Gallery (Single Infinite Marquee) --- */}
+            {images.length > 0 ? (
+                <div className="overflow-hidden relative py-8">
+
+                    <div className="relative group">
+                        <div className="flex gap-8 animate-scroll-left w-max group-hover:paused">
+                            {marqueeImages.map((item, idx) => (
+                                <div
+                                    key={`${item.id}-${idx}`}
+                                    className="w-[320px] h-[240px] md:w-[500px] md:h-[350px] flex-shrink-0 relative rounded-2xl overflow-hidden cursor-pointer shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300"
+                                    onClick={() => {
+                                        // Find original index in full 'images' array
+                                        const originalIndex = images.findIndex(img => img.id === item.id);
+                                        setSelectedImageIndex(originalIndex);
+                                    }}
+                                >
+                                    <Image
+                                        src={item.url}
+                                        alt={item.caption || 'Gallery Image'}
+                                        fill
+                                        className="object-cover"
+                                        sizes="(max-width: 768px) 350px, 500px"
+                                        priority={idx < 4}
+                                    />
+                                    <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
+
+                                    {/* Optional Caption Overlay on Hover */}
+                                    <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        <p className="text-white font-medium truncate">{item.caption}</p>
                                     </div>
-                                ) : (
-                                    <a
-                                        href={item.url}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="w-full h-full flex flex-col items-center justify-center bg-surface group-hover:bg-blue-900/10 transition-colors"
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <div className="w-20 h-20 rounded-2xl bg-red-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                            <FileText className="h-10 w-10 text-red-500" />
-                                        </div>
-                                        <p className="text-foreground font-medium text-center px-4 truncate max-w-full">
-                                            {item.caption || 'Document'}
-                                        </p>
-                                        <p className="text-muted text-sm mt-1">Click to view PDF</p>
-                                    </a>
-                                )}
-                            </CardContent>
-                        </Card>
-                    ))
-                ) : (
-                    <div className="col-span-full text-center py-20 bg-surface rounded-2xl border border-surface-dark/10">
-                        <ImageIcon className="h-16 w-16 text-muted-light mx-auto mb-4" />
-                        <p className="text-foreground font-medium">No items found</p>
-                        <p className="text-muted text-sm mt-1">Check back later for updates</p>
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                )}
-            </div>
 
-            {/* Lightbox Modal */}
-            {selectedImage && (
+                </div>
+            ) : (
+                <div className="text-center py-20 bg-surface rounded-2xl border border-surface-dark/10">
+                    <ImageIcon className="h-16 w-16 text-muted-light mx-auto mb-4" />
+                    <p className="text-foreground font-medium">No images found yet.</p>
+                </div>
+            )}
+
+
+            {/* --- Documents Section (Static Grid) --- */}
+            {documents.length > 0 && (
+                <div className="max-w-6xl mx-auto px-4">
+                    <div className="flex items-center gap-4 mb-8">
+                        <div className="h-1 flex-1 bg-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
+                        <h2 className="text-2xl font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2">
+                            <FileText className="text-red-500" />
+                            Documents
+                        </h2>
+                        <div className="h-1 flex-1 bg-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        {documents.map((doc) => (
+                            <a
+                                key={doc.id}
+                                href={doc.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="group block bg-white border border-slate-200 rounded-xl p-6 hover:shadow-lg transition-all text-center hover:border-blue-400"
+                            >
+                                <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                                    <FileText className="h-8 w-8 text-red-500" />
+                                </div>
+                                <p className="font-semibold text-slate-800 truncate">{doc.caption || 'Untitled Document'}</p>
+                                <p className="text-xs text-slate-500 mt-1">PDF Document</p>
+                            </a>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+
+            {/* --- Lightbox Modal --- */}
+            {selectedImageIndex !== null && images[selectedImageIndex] && (
                 <div
-                    className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4"
-                    onClick={() => setSelectedImage(null)}
+                    className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in"
+                    onClick={handleClose}
                 >
+                    {/* Close Button */}
                     <button
-                        className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors z-10"
-                        onClick={() => setSelectedImage(null)}
+                        className="absolute top-6 right-6 text-white/50 hover:text-white transition-colors z-50 p-2 hover:bg-white/10 rounded-full"
+                        onClick={handleClose}
                     >
                         <X className="h-8 w-8" />
                     </button>
 
-                    <div className="relative max-w-5xl max-h-[90vh] w-full" onClick={(e) => e.stopPropagation()}>
-                        <Image
-                            src={selectedImage}
-                            alt="Gallery Image"
-                            width={1200}
-                            height={800}
-                            className="object-contain w-full h-full rounded-lg"
-                        />
+                    {/* Navigation Buttons (Desktop) */}
+                    <button
+                        className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white hover:bg-white/10 p-3 rounded-full transition-all hidden md:block"
+                        onClick={handlePrev}
+                    >
+                        <ChevronLeft className="h-10 w-10" />
+                    </button>
+
+                    <button
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white hover:bg-white/10 p-3 rounded-full transition-all hidden md:block"
+                        onClick={handleNext}
+                    >
+                        <ChevronRight className="h-10 w-10" />
+                    </button>
+
+                    {/* Main Image */}
+                    <div className="relative max-w-6xl max-h-[85vh] w-full h-full flex flex-col items-center justify-center" onClick={(e) => e.stopPropagation()}>
+                        <div className="relative w-full h-full">
+                            <Image
+                                src={images[selectedImageIndex].url}
+                                alt="Gallery Image"
+                                fill
+                                className="object-contain"
+                                priority
+                            />
+                        </div>
+
+                        {/* Caption & Counter */}
+                        <div className="mt-4 text-center">
+                            <p className="text-white text-lg font-medium">{images[selectedImageIndex].caption}</p>
+                            <p className="text-white/50 text-sm mt-1">
+                                {selectedImageIndex + 1} / {images.length}
+                            </p>
+                        </div>
                     </div>
 
+                    {/* Download Button */}
                     <a
-                        href={selectedImage}
+                        href={images[selectedImageIndex].url}
                         target="_blank"
                         rel="noreferrer"
-                        className="absolute bottom-4 right-4 flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white px-4 py-2 rounded-lg hover:bg-white/20 transition-colors"
+                        className="absolute bottom-6 right-6 flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg backdrop-blur-sm transition-all text-sm font-medium"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <Download className="h-5 w-5" />
-                        Open Original
+                        <Download className="h-4 w-4" />
+                        Original
                     </a>
                 </div>
             )}
-        </>
+        </div>
     );
 }
