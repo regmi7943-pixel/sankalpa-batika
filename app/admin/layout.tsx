@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import {
     LogOut, GraduationCap, Menu, X, Eye, Edit3,
     Home, Info, UserCheck, Phone, Settings,
-    Megaphone, Calendar, Image as Image, Mail
+    Megaphone, Calendar, Image as Image, Mail, FileText
 } from 'lucide-react';
 import { logoutAction } from '@/app/actions/auth';
 import { Button } from '@/components/ui/button';
@@ -23,11 +23,12 @@ export default function AdminLayout({
     const pageLinks = [
         { href: '/admin', label: 'Homepage', icon: Home },
         { href: '/admin/about', label: 'About', icon: Info },
-        { href: '/admin/admissions', label: 'Admissions', icon: UserCheck },
+        { href: '/admin/admissions', label: 'Admissions Page', icon: FileText },
         { href: '/admin/contact', label: 'Contact', icon: Phone },
     ];
 
     const managementLinks = [
+        { href: '/admin/applications', label: 'Online Admissions', icon: UserCheck },
         { href: '/admin/messages', label: 'Messages', icon: Mail },
         { href: '/admin/notices', label: 'Notices', icon: Megaphone },
         { href: '/admin/events', label: 'Events', icon: Calendar },

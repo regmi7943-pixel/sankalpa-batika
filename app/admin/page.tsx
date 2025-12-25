@@ -14,6 +14,7 @@ import { EditableText } from '@/components/admin/EditableText';
 import { IconPicker } from '@/components/admin/IconPicker';
 
 // Default content
+// Default content
 const defaultContent = {
     heroTitle: 'Welcome to Sankalpa Vatika',
     heroSubtitle: 'Excellence in Education',
@@ -34,22 +35,37 @@ const defaultContent = {
         { icon: 'Award', title: 'Holistic Development', description: 'Focus on sports, arts, and extracurricular activities.' },
         { icon: 'Shield', title: 'Safe Environment', description: 'Secure campus with modern facilities.' },
     ],
-    testimonialQuote: 'Sankalpa Vatika has been instrumental in shaping my child\'s future. The dedicated faculty and nurturing environment have helped them grow both academically and personally.',
-    testimonialAuthor: 'Parent of Grade 5 Student',
+    // New structure
+    testimonials: [
+        {
+            quote: 'Sankalpa Vatika has been instrumental in shaping my child\'s future. The dedicated faculty and nurturing environment have helped them grow both academically and personally.',
+            author: 'Parent of Grade 5 Student'
+        }
+    ]
 };
 
 export default function AdminHomePage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [content, setContent] = useState(defaultContent);
+    const [content, setContent] = useState<any>(defaultContent);
 
     // Load content on mount
     useEffect(() => {
         async function loadContent() {
             const result = await getPageContent('homepage');
             if (result.success && result.data) {
-                // Merge loaded data with defaults to ensure all fields exist
-                setContent(prev => ({ ...prev, ...result.data }));
+                // Merge loaded data with defaults
+                const loadedData = result.data;
+
+                // Migration for old fields if they exist and testimonials doesn't
+                if (!loadedData.testimonials && loadedData.testimonialQuote) {
+                    loadedData.testimonials = [{
+                        quote: loadedData.testimonialQuote,
+                        author: loadedData.testimonialAuthor || 'Anonymous'
+                    }];
+                }
+
+                setContent((prev: any) => ({ ...prev, ...loadedData }));
             }
             setLoading(false);
         }
@@ -86,7 +102,7 @@ export default function AdminHomePage() {
     }
 
     const handleChange = (key: string, value: any) => {
-        setContent(prev => ({ ...prev, [key]: value }));
+        setContent((prev: any) => ({ ...prev, [key]: value }));
     };
 
     return (
@@ -116,7 +132,7 @@ export default function AdminHomePage() {
                 </div>
 
                 {/* Content Layer */}
-                <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col justify-center pt-20 pb-48 lg:pb-32">
+                <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col justify-center pt-20 pb-20">
                     <div className="max-w-3xl space-y-6 md:space-y-8 animate-fade-in-up">
 
                         {/* Badge with Accent */}
@@ -185,13 +201,13 @@ export default function AdminHomePage() {
                     </div>
 
                     {/* Stats Strip */}
-                    <div className="absolute bottom-0 right-0 left-0 lg:left-auto bg-blue-950/80 backdrop-blur-md border-t border-white/10 p-6 lg:p-10 lg:rounded-tl-3xl">
+                    <div className="mt-12 lg:self-end w-full lg:w-auto bg-blue-950/80 backdrop-blur-md border border-white/10 p-6 lg:p-10 lg:rounded-3xl shadow-xl">
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
-                            {(content.stats || []).map((stat, i) => (
+                            {(content.stats || []).map((stat: any, i: number) => (
                                 <DeletableWrapper
                                     key={i}
                                     onDelete={() => {
-                                        const newStats = content.stats.filter((_, idx) => idx !== i);
+                                        const newStats = content.stats.filter((_: any, idx: number) => idx !== i);
                                         handleChange('stats', newStats);
                                     }}
                                     className="relative group"
@@ -248,13 +264,13 @@ export default function AdminHomePage() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {content.features.map((feature, i) => {
+                        {content.features.map((feature: any, i: number) => {
                             const IconComponent = iconMap[feature.icon] || BookOpen;
                             return (
                                 <DeletableWrapper
                                     key={i}
                                     onDelete={() => {
-                                        const newFeatures = content.features.filter((_, index) => index !== i);
+                                        const newFeatures = content.features.filter((_: any, index: number) => index !== i);
                                         setContent({ ...content, features: newFeatures });
                                     }}
                                 >
@@ -317,18 +333,95 @@ export default function AdminHomePage() {
 
             {/* VISUAL EDITOR - TESTIMONIAL SECTION */}
             <section className="py-20 bg-gradient-to-br from-slate-900 to-slate-800 text-white">
-                <div className="max-w-4xl mx-auto px-4 text-center">
-                    <Quote className="h-16 w-16 text-amber-500/30 mx-auto mb-6" />
-                    <blockquote className="text-xl md:text-2xl text-gray-200 leading-relaxed mb-6">
-                        "<EditableText
-                            value={content.testimonialQuote}
-                            onChange={(val) => setContent({ ...content, testimonialQuote: val })}
-                            multiline
-                        />"
-                    </blockquote>
-                    <p className="text-amber-400 font-semibold">
-                        <EditableText value={content.testimonialAuthor} onChange={(val) => setContent({ ...content, testimonialAuthor: val })} />
-                    </p>
+                <div className="max-w-7xl mx-auto px-4 text-center">
+                    <div className="mb-12">
+                        <h2 className="text-3xl font-bold text-white mb-4">What Parents Say</h2>
+                        <div className="w-20 h-1 bg-amber-500 mx-auto rounded"></div>
+                    </div>
+
+                    <div className={`${(content.testimonials?.length || 0) > 2
+                        ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
+                        : 'flex flex-col gap-8 max-w-4xl mx-auto'
+                        }`}>
+                        {(content.testimonials || []).map((testimonial: any, i: number) => (
+                            <DeletableWrapper
+                                key={i}
+                                onDelete={() => {
+                                    const newTestimonials = content.testimonials.filter((_: any, idx: number) => idx !== i);
+                                    handleChange('testimonials', newTestimonials);
+                                }}
+                                className={`group relative ${(content.testimonials?.length || 0) > 2
+                                    ? 'bg-white/5 p-6 rounded-xl hover:bg-white/10 transition-colors border border-white/10'
+                                    : 'text-center'
+                                    }`}
+                            >
+                                {(content.testimonials?.length || 0) > 2 ? (
+                                    // Card Layout
+                                    <div className="flex flex-col h-full">
+                                        <Quote className="h-8 w-8 text-amber-500/50 mb-4" />
+                                        <blockquote className="text-lg text-gray-300 leading-relaxed mb-6 flex-1 text-left">
+                                            "<EditableText
+                                                value={testimonial.quote}
+                                                onChange={(val) => {
+                                                    const newTestimonials = [...content.testimonials];
+                                                    newTestimonials[i].quote = val;
+                                                    handleChange('testimonials', newTestimonials);
+                                                }}
+                                                multiline
+                                                className="w-full"
+                                            />"
+                                        </blockquote>
+                                        <div className="text-amber-400 font-semibold text-left border-t border-white/10 pt-4 mt-auto">
+                                            <EditableText
+                                                value={testimonial.author}
+                                                onChange={(val) => {
+                                                    const newTestimonials = [...content.testimonials];
+                                                    newTestimonials[i].author = val;
+                                                    handleChange('testimonials', newTestimonials);
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                ) : (
+                                    // Focused Layout (1-2 items)
+                                    <div>
+                                        <Quote className="h-16 w-16 text-amber-500/30 mx-auto mb-6" />
+                                        <blockquote className="text-xl md:text-2xl text-gray-200 leading-relaxed mb-6">
+                                            "<EditableText
+                                                value={testimonial.quote}
+                                                onChange={(val) => {
+                                                    const newTestimonials = [...content.testimonials];
+                                                    newTestimonials[i].quote = val;
+                                                    handleChange('testimonials', newTestimonials);
+                                                }}
+                                                multiline
+                                                className="w-full text-center"
+                                            />"
+                                        </blockquote>
+                                        <p className="text-amber-400 font-semibold">
+                                            <EditableText
+                                                value={testimonial.author}
+                                                onChange={(val) => {
+                                                    const newTestimonials = [...content.testimonials];
+                                                    newTestimonials[i].author = val;
+                                                    handleChange('testimonials', newTestimonials);
+                                                }}
+                                                className="text-center"
+                                            />
+                                        </p>
+                                    </div>
+                                )}
+                            </DeletableWrapper>
+                        ))}
+                    </div>
+
+                    <button
+                        onClick={() => handleChange('testimonials', [...(content.testimonials || []), { quote: 'Add your testimonial here...', author: 'Parent Name' }])}
+                        className="mt-12 inline-flex items-center gap-2 px-6 py-3 rounded-full border border-white/20 hover:bg-white/10 transition-colors text-sm font-medium text-blue-200 hover:text-white"
+                    >
+                        <Plus className="h-4 w-4" />
+                        Add Testimonial
+                    </button>
                 </div>
             </section>
         </div>

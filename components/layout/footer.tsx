@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Facebook, Twitter, Mail, Phone, MapPin, Instagram, Youtube, ArrowRight, GraduationCap } from 'lucide-react';
 import { NewsletterForm } from '@/components/newsletter-form';
 
@@ -15,6 +18,9 @@ interface SiteSettings {
 }
 
 export function Footer({ settings }: { settings: SiteSettings }) {
+    const pathname = usePathname();
+    const showCTA = pathname !== '/admissions/apply';
+
     const quickLinks = [
         { href: '/about', label: 'About Us' },
         { href: '/admissions', label: 'Admissions' },
@@ -35,21 +41,23 @@ export function Footer({ settings }: { settings: SiteSettings }) {
     return (
         <footer className="bg-background text-foreground border-t border-surface-dark/10">
             {/* CTA Section */}
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 py-8 md:py-12">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 text-center md:text-left">
-                    <div>
-                        <h3 className="text-xl md:text-2xl lg:text-3xl font-bold mb-1 md:mb-2 text-white">Ready to Join Our School?</h3>
-                        <p className="text-blue-100 text-sm md:text-base">Admissions are now open for the upcoming academic session.</p>
+            {showCTA && (
+                <div className="bg-gradient-to-r from-blue-600 to-blue-700 py-8 md:py-12">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 text-center md:text-left">
+                        <div>
+                            <h3 className="text-xl md:text-2xl lg:text-3xl font-bold mb-1 md:mb-2 text-white">Ready to Join Our School?</h3>
+                            <p className="text-blue-100 text-sm md:text-base">Admissions are now open for the upcoming academic session.</p>
+                        </div>
+                        <Link
+                            href="/admissions"
+                            className="flex items-center gap-2 bg-white text-blue-600 px-6 md:px-8 py-3 md:py-4 rounded-xl font-semibold hover:bg-blue-50 transition-all duration-300 shadow-lg hover:shadow-xl group text-sm md:text-base"
+                        >
+                            Apply Now
+                            <ArrowRight className="h-4 w-4 md:h-5 md:w-5 group-hover:translate-x-1 transition-transform" />
+                        </Link>
                     </div>
-                    <Link
-                        href="/admissions"
-                        className="flex items-center gap-2 bg-white text-blue-600 px-6 md:px-8 py-3 md:py-4 rounded-xl font-semibold hover:bg-blue-50 transition-all duration-300 shadow-lg hover:shadow-xl group text-sm md:text-base"
-                    >
-                        Apply Now
-                        <ArrowRight className="h-4 w-4 md:h-5 md:w-5 group-hover:translate-x-1 transition-transform" />
-                    </Link>
                 </div>
-            </div>
+            )}
 
             {/* Main Footer */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">

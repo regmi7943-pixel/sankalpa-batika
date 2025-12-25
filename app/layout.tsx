@@ -4,6 +4,7 @@ import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { SiteLayout } from '@/components/layout/site-layout';
 import { LayoutWrapper } from '@/components/layout/layout-wrapper';
+import { Toaster } from 'sonner';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -55,6 +56,7 @@ export default function RootLayout({
           >
             {children}
           </LayoutWrapper>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

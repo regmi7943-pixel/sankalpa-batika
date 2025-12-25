@@ -185,21 +185,82 @@ export default async function HomePage() {
           <div className="absolute top-0 left-1/4 w-64 h-64 bg-blue-400 rounded-full blur-3xl"></div>
         </div>
 
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <Quote className="h-12 w-12 md:h-16 md:w-16 text-amber-500/30 mx-auto mb-6 md:mb-8" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-foreground mb-4">What Parents Say</h2>
+            <div className="w-20 h-1 bg-amber-500 mx-auto rounded"></div>
+          </div>
 
-          <blockquote className="text-lg sm:text-xl md:text-2xl text-foreground/90 leading-relaxed mb-6 md:mb-8 italic">
-            "{content.testimonialQuote}"
-          </blockquote>
+          {/* Testimonial Grid/Focus Layout */}
+          <div className={`${(content.testimonials?.length || 0) > 2
+            ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
+            : 'flex flex-col gap-8 max-w-4xl mx-auto'
+            }`}>
+            {/* Fallback for legacy data */}
+            {(!content.testimonials && content.testimonialQuote) && (
+              <div className="text-center">
+                <Quote className="h-12 w-12 md:h-16 md:w-16 text-amber-500/30 mx-auto mb-6 md:mb-8" />
+                <blockquote className="text-lg sm:text-xl md:text-2xl text-foreground/90 leading-relaxed mb-6 md:mb-8 italic">
+                  "{content.testimonialQuote}"
+                </blockquote>
+                <div className="flex items-center justify-center gap-3 md:gap-4">
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 flex items-center justify-center">
+                    <GraduationCap className="h-5 w-5 md:h-6 md:w-6 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <p className="font-semibold text-foreground text-sm md:text-base">{content.testimonialAuthor}</p>
+                    <p className="text-muted text-xs md:text-sm">Proud Parent</p>
+                  </div>
+                </div>
+              </div>
+            )}
 
-          <div className="flex items-center justify-center gap-3 md:gap-4">
-            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 flex items-center justify-center">
-              <GraduationCap className="h-5 w-5 md:h-6 md:w-6 text-white" />
-            </div>
-            <div className="text-left">
-              <p className="font-semibold text-foreground text-sm md:text-base">{content.testimonialAuthor}</p>
-              <p className="text-muted text-xs md:text-sm">Proud Parent</p>
-            </div>
+            {/* New Array Data */}
+            {(content.testimonials || []).map((testimonial: any, i: number) => (
+              <div
+                key={i}
+                className={`${(content.testimonials?.length || 0) > 2
+                  ? 'bg-surface p-6 rounded-xl hover:shadow-lg transition-all border border-surface-dark/10 flex flex-col h-full'
+                  : 'text-center'
+                  }`}
+              >
+                {(content.testimonials?.length || 0) > 2 ? (
+                  // Card Layout
+                  <>
+                    <Quote className="h-8 w-8 text-amber-500/50 mb-4" />
+                    <blockquote className="text-base text-foreground/80 leading-relaxed mb-6 flex-1 italic">
+                      "{testimonial.quote}"
+                    </blockquote>
+                    <div className="flex items-center gap-3 mt-auto pt-4 border-t border-surface-dark/10">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 flex items-center justify-center flex-shrink-0">
+                        <GraduationCap className="h-4 w-4 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-foreground text-sm">{testimonial.author}</p>
+                        <p className="text-muted text-xs">Parent</p>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  // Focused Layout (1-2 items)
+                  <>
+                    <Quote className="h-12 w-12 md:h-16 md:w-16 text-amber-500/30 mx-auto mb-6 md:mb-8" />
+                    <blockquote className="text-lg sm:text-xl md:text-2xl text-foreground/90 leading-relaxed mb-6 md:mb-8 italic">
+                      "{testimonial.quote}"
+                    </blockquote>
+                    <div className="flex items-center justify-center gap-3 md:gap-4">
+                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 flex items-center justify-center">
+                        <GraduationCap className="h-5 w-5 md:h-6 md:w-6 text-white" />
+                      </div>
+                      <div className="text-left">
+                        <p className="font-semibold text-foreground text-sm md:text-base">{testimonial.author}</p>
+                        <p className="text-muted text-xs md:text-sm">Proud Parent</p>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </section>
