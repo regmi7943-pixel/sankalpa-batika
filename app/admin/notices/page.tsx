@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Loader2, Plus, Calendar, Megaphone, Trash2, X, Edit, FileText } from 'lucide-react';
+import { Loader2, Plus, Calendar, Megaphone, Trash2, X, Edit, FileText, Upload, Paperclip } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { getNotices, createNotice, updateNotice, deleteNotice } from '@/app/actions/notices';
+import { getNotices, createNotice, updateNotice, deleteNotice, uploadNoticeAttachment } from '@/app/actions/notices';
 import { Notice } from '@/types';
+import { toast } from 'sonner';
 
 export default function AdminNoticesPage() {
     const [notices, setNotices] = useState<Notice[]>([]);
@@ -18,7 +19,9 @@ export default function AdminNoticesPage() {
     const [editingNotice, setEditingNotice] = useState<Notice | null>(null);
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
-    const [published, setPublished] = useState(true);
+    const [showPopup, setShowPopup] = useState(false);
+    const [attachmentUrl, setAttachmentUrl] = useState('');
+    const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
 
     // Load notices
     useEffect(() => {
@@ -37,7 +40,9 @@ export default function AdminNoticesPage() {
         setEditingNotice(null);
         setTitle('');
         setContent('');
-        setPublished(true);
+        setShowPopup(false);
+        setAttachmentUrl('');
+        setAttachmentFile(null);
         setIsModalOpen(true);
     };
 
@@ -46,7 +51,9 @@ export default function AdminNoticesPage() {
         setEditingNotice(notice);
         setTitle(notice.title);
         setContent(notice.content);
-        setPublished(notice.published);
+        setShowPopup(notice.showPopup || false);
+        setAttachmentUrl(notice.attachmentUrl || '');
+        setAttachmentFile(null);
         setIsModalOpen(true);
     };
 
@@ -55,39 +62,69 @@ export default function AdminNoticesPage() {
         e.preventDefault();
         setSaving(true);
 
-        if (editingNotice) {
-            // Update
-            const updatedData = { title, content, published };
-            // Optimistic update
-            const oldNotices = [...notices];
-            setNotices(notices.map(n => n.id === editingNotice.id ? { ...n, ...updatedData } : n));
+        try {
+            let currentAttachmentUrl = attachmentUrl;
 
-            const result = await updateNotice(editingNotice.id, updatedData);
-            if (!result.success) {
-                alert('Failed to update notice');
-                // Revert or reload could be done here
+            // Handle File Upload
+            if (attachmentFile) {
+                const formData = new FormData();
+                formData.append('file', attachmentFile);
+                const uploadRes = await uploadNoticeAttachment(formData);
+                if (uploadRes.success && uploadRes.url) {
+                    currentAttachmentUrl = uploadRes.url;
+                } else {
+                    toast.error('Failed to upload attachment');
+                    setSaving(false);
+                    return;
+                }
             }
-        } else {
-            // Create
-            const newNotice = {
-                title: title || 'New Notice',
-                content: content || 'Description...',
-                date: new Date().toISOString(),
-                published: published,
-            };
-            const result = await createNotice(newNotice);
-            if (result.success) {
-                const refresh = await getNotices();
-                if (refresh.success && refresh.data) {
-                    setNotices(refresh.data);
+
+            // Notices are always published by default now
+            const published = true;
+
+            if (editingNotice) {
+                // Update
+                const updatedData = { title, content, published, attachmentUrl: currentAttachmentUrl, showPopup };
+                // Optimistic update
+                const oldNotices = [...notices];
+                setNotices(notices.map(n => n.id === editingNotice.id ? { ...n, ...updatedData } : n));
+
+                const result = await updateNotice(editingNotice.id, updatedData);
+                if (result.success) {
+                    toast.success('Notice updated successfully');
+                } else {
+                    toast.error('Failed to update notice');
+                    setNotices(oldNotices); // Revert
                 }
             } else {
-                alert('Failed to create notice');
+                // Create
+                const newNotice = {
+                    title: title || 'New Notice',
+                    content: content || 'Description...',
+                    date: new Date().toISOString(),
+                    published,
+                    attachmentUrl: currentAttachmentUrl,
+                    showPopup
+                };
+                const result = await createNotice(newNotice); // Note: server action adds createdAt
+                if (result.success) {
+                    toast.success('Notice created successfully');
+                    const refresh = await getNotices();
+                    if (refresh.success && refresh.data) {
+                        setNotices(refresh.data);
+                    }
+                } else {
+                    toast.error('Failed to create notice');
+                }
             }
-        }
 
-        setSaving(false);
-        setIsModalOpen(false);
+            setSaving(false);
+            setIsModalOpen(false);
+        } catch (error) {
+            console.error(error);
+            toast.error('An error occurred');
+            setSaving(false);
+        }
     };
 
     // Delete notice
@@ -96,6 +133,7 @@ export default function AdminNoticesPage() {
 
         setNotices(notices.filter(n => n.id !== id));
         await deleteNotice(id);
+        toast.success('Notice deleted');
     };
 
     if (loading) {
@@ -111,49 +149,105 @@ export default function AdminNoticesPage() {
             {/* Create/Edit Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-surface dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
-                        <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
-                            <h3 className="font-semibold text-lg text-foreground">
+                    <div className="bg-surface dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl w-full max-w-3xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+                        <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
+                            <h3 className="font-bold text-xl text-foreground">
                                 {editingNotice ? 'Edit Notice' : 'Create New Notice'}
                             </h3>
-                            <button onClick={() => setIsModalOpen(false)} className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">
-                                <X className="h-5 w-5" />
+                            <button onClick={() => setIsModalOpen(false)} className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors">
+                                <X className="h-6 w-6" />
                             </button>
                         </div>
-                        <form onSubmit={handleSave} className="p-6 space-y-4">
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-foreground">Title</label>
-                                <Input
-                                    placeholder="e.g. Winter Vacation Announcement"
-                                    value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
-                                    required
-                                />
+                        <form onSubmit={handleSave} className="p-8 space-y-8 overflow-y-auto">
+                            <div className="space-y-6">
+                                <div className="space-y-3">
+                                    <label className="text-base font-semibold text-foreground">Title</label>
+                                    <Input
+                                        placeholder="e.g. Winter Vacation Announcement"
+                                        value={title}
+                                        onChange={(e) => setTitle(e.target.value)}
+                                        required
+                                        className="h-12 text-lg"
+                                    />
+                                </div>
+                                <div className="space-y-3">
+                                    <label className="text-base font-semibold text-foreground">Content</label>
+                                    <textarea
+                                        className="flex w-full rounded-xl border border-input bg-background px-4 py-3 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 min-h-[180px] resize-y"
+                                        placeholder="Enter the details of the notice..."
+                                        value={content}
+                                        onChange={(e) => setContent(e.target.value)}
+                                        required
+                                    />
+                                </div>
+
+                                <div className="p-6 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 space-y-4">
+                                    <label className="text-base font-semibold text-foreground flex items-center gap-2">
+                                        <Paperclip className="h-4 w-4" />
+                                        Attachment (Optional)
+                                    </label>
+
+                                    <div className="flex flex-col gap-4">
+                                        {attachmentUrl ? (
+                                            <div className="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-lg border border-blue-100 dark:border-blue-900/50">
+                                                <div className="flex items-center gap-3 overflow-hidden">
+                                                    <div className="p-2 bg-blue-100 dark:bg-blue-800 rounded-lg">
+                                                        <FileText className="h-5 w-5" />
+                                                    </div>
+                                                    <div className="flex flex-col min-w-0">
+                                                        <span className="text-sm font-medium truncate">Attachment Uploaded</span>
+                                                        <a href={attachmentUrl} target="_blank" rel="noopener noreferrer" className="text-xs hover:underline truncate opacity-80">
+                                                            View file
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                                    onClick={() => setAttachmentUrl('')}
+                                                >
+                                                    <Trash2 className="h-4 w-4 mr-2" />
+                                                    Remove
+                                                </Button>
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center gap-4">
+                                                <Input
+                                                    type="file"
+                                                    accept=".pdf,.png,.jpg,.jpeg"
+                                                    onChange={(e) => setAttachmentFile(e.target.files?.[0] || null)}
+                                                    className="cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/40 dark:file:text-blue-300 h-14 py-2.5"
+                                                />
+                                            </div>
+                                        )}
+                                        <p className="text-sm text-muted-foreground flex items-center gap-2">
+                                            <Upload className="h-4 w-4" />
+                                            Supported files: PDF, PNG, JPG
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-foreground">Content</label>
-                                <textarea
-                                    className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 min-h-[100px]"
-                                    placeholder="Enter the details of the notice..."
-                                    value={content}
-                                    onChange={(e) => setContent(e.target.value)}
-                                    required
-                                />
-                            </div>
-                            <div className="flex items-center gap-2 pt-2">
+
+                            <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800">
                                 <input
                                     type="checkbox"
-                                    id="published"
-                                    checked={published}
-                                    onChange={(e) => setPublished(e.target.checked)}
-                                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                    id="showPopup"
+                                    checked={showPopup}
+                                    onChange={(e) => setShowPopup(e.target.checked)}
+                                    className="h-5 w-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                                 />
-                                <label htmlFor="published" className="text-sm text-foreground cursor-pointer select-none">Publish immediately</label>
+                                <div className="flex flex-col">
+                                    <label htmlFor="showPopup" className="text-sm font-semibold text-foreground cursor-pointer select-none">Show popup on Home Screen</label>
+                                    <p className="text-xs text-muted-foreground">Notice will appear as a daily popup for users</p>
+                                </div>
                             </div>
-                            <div className="pt-4 flex gap-3">
-                                <Button type="button" variant="outline" className="flex-1" onClick={() => setIsModalOpen(false)}>Cancel</Button>
-                                <Button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white" disabled={saving}>
-                                    {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : (editingNotice ? 'Save Changes' : 'Create Notice')}
+
+                            <div className="pt-4 flex gap-4 justify-end border-t border-slate-100 dark:border-slate-800">
+                                <Button type="button" variant="outline" size="lg" onClick={() => setIsModalOpen(false)} className="px-8">Cancel</Button>
+                                <Button type="submit" size="lg" className="bg-blue-600 hover:bg-blue-700 text-white min-w-[150px] px-8" disabled={saving}>
+                                    {saving ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : (editingNotice ? 'Save Changes' : 'Create Notice')}
                                 </Button>
                             </div>
                         </form>
@@ -200,12 +294,28 @@ export default function AdminNoticesPage() {
                                                 <span>{new Date(notice.createdAt || Date.now()).toLocaleDateString()}</span>
                                             </div>
                                             <div className="flex items-center gap-3">
+                                                {notice.attachmentUrl && (
+                                                    <a
+                                                        href={notice.attachmentUrl}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 flex items-center gap-1 hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors"
+                                                    >
+                                                        <Paperclip className="h-3 w-3" />
+                                                        Attachment
+                                                    </a>
+                                                )}
                                                 <div className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide ${notice.published ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-600'}`}>
                                                     {notice.published ? 'Published' : 'Draft'}
                                                 </div>
 
                                                 {/* Action Buttons */}
                                                 <div className="flex items-center gap-1">
+                                                    {notice.showPopup && (
+                                                        <div className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 mr-2">
+                                                            Popup
+                                                        </div>
+                                                    )}
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
@@ -233,7 +343,7 @@ export default function AdminNoticesPage() {
                                             {notice.title}
                                         </h3>
 
-                                        <div className="text-muted leading-relaxed line-clamp-3">
+                                        <div className="text-muted leading-relaxed line-clamp-3 whitespace-pre-wrap">
                                             {notice.content}
                                         </div>
                                     </div>

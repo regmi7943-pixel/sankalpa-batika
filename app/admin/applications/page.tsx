@@ -4,8 +4,9 @@ import { getApplications, updateApplicationStatus } from '@/app/actions/admissio
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Mail, Phone, MapPin, Calendar, Clock, CheckCircle, XCircle, MoreHorizontal, User, School, AlertCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Calendar, Clock, CheckCircle, XCircle, MoreHorizontal, User, School, AlertCircle, Edit3 } from 'lucide-react';
 import { format } from 'date-fns';
+import Link from 'next/link';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -37,6 +38,14 @@ export default async function ApplicationsPage() {
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">Online Applications</h1>
                     <p className="text-muted-foreground mt-1">Manage and review admission requests.</p>
+                    <div className="mt-4">
+                        <Link href="/admin/applications/editor">
+                            <Button variant="outline" size="sm" className="gap-2">
+                                <Edit3 className="h-4 w-4" />
+                                Edit Form Content
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
                 <div className="flex gap-3">
                     <Card className="p-4 flex items-center gap-4 bg-blue-50 dark:bg-blue-900/20 border-blue-100 dark:border-blue-900/30">
@@ -95,9 +104,9 @@ function ApplicationCard({ application }: { application: any }) {
     return (
         <Card className="overflow-hidden transition-all hover:shadow-md border-surface-dark/10">
             <div className={`h-1.5 w-full bg-gradient-to-r ${application.status === 'approved' ? 'from-green-500 to-emerald-600' :
-                    application.status === 'rejected' ? 'from-red-500 to-rose-600' :
-                        application.status === 'contacted' ? 'from-blue-500 to-cyan-600' :
-                            'from-amber-400 to-orange-500' // pending
+                application.status === 'rejected' ? 'from-red-500 to-rose-600' :
+                    application.status === 'contacted' ? 'from-blue-500 to-cyan-600' :
+                        'from-amber-400 to-orange-500' // pending
                 }`} />
             <CardContent className="p-0">
                 <div className="flex flex-col lg:flex-row divide-y lg:divide-y-0 lg:divide-x border-surface-dark/10">

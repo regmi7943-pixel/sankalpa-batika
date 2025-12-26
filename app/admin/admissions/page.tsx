@@ -9,6 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 
 
 import { EditableText } from '@/components/admin/EditableText';
+import { toast } from 'sonner';
 
 
 const defaultContent = {
@@ -59,9 +60,9 @@ export default function AdminAdmissionsPage() {
         setSaving(true);
         const result = await savePageContent('admissions', content);
         if (result.success) {
-            alert('Changes saved successfully!');
+            toast.success('Changes saved successfully!');
         } else {
-            alert('Failed to save changes: ' + result.error);
+            toast.error('Failed to save changes: ' + result.error);
         }
         setSaving(false);
     };
@@ -168,7 +169,7 @@ export default function AdminAdmissionsPage() {
                         {/* Add Step Button */}
                         <Button
                             variant="outline"
-                            className="border-dashed border-blue-200 text-blue-600 hover:bg-blue-50 h-full min-h-[160px] rounded-2xl flex flex-col gap-2 p-6"
+                            className="border-dashed border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10 h-full min-h-[160px] rounded-2xl flex flex-col gap-2 p-6 transition-all"
                             onClick={() => {
                                 setContent({
                                     ...content,
@@ -216,11 +217,11 @@ export default function AdminAdmissionsPage() {
                                     </div>
                                 </DeletableWrapper>
                             ))}
-                            <div className="flex items-center justify-center p-3 border border-dashed border-green-200 bg-green-50/50 rounded-xl">
+                            <div className="flex items-center justify-center p-3 border border-dashed border-blue-200 dark:border-blue-900/50 bg-blue-50/30 dark:bg-blue-900/10 rounded-xl group hover:border-blue-400 transition-colors">
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="text-green-600 hover:text-green-700 hover:bg-green-100 w-full h-8 gap-2"
+                                    className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-transparent w-full h-8 gap-2 font-bold text-sm"
                                     onClick={() => {
                                         setContent({
                                             ...content,
@@ -294,7 +295,7 @@ export default function AdminAdmissionsPage() {
                         {/* Add FAQ Button */}
                         <Button
                             variant="outline"
-                            className="border-dashed border-blue-200 text-blue-600 hover:bg-blue-50 w-full py-8 rounded-xl flex items-center gap-2"
+                            className="border-dashed border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10 w-full py-8 rounded-xl flex items-center gap-2 transition-all"
                             onClick={() => {
                                 setContent({
                                     ...content,

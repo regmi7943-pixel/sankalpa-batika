@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { getSiteSettings, saveSiteSettings, uploadLogo } from '@/app/actions/settings';
 import { useRef } from 'react';
+import { toast } from 'sonner';
 
 export default function AdminSettingsPage() {
     const [loading, setLoading] = useState(true);
@@ -29,6 +30,7 @@ export default function AdminSettingsPage() {
     const [facebook, setFacebook] = useState('');
     const [instagram, setInstagram] = useState('');
     const [youtube, setYoutube] = useState('');
+    const [googleMapsUrl, setGoogleMapsUrl] = useState('');
 
     // Load settings
     useEffect(() => {
@@ -48,6 +50,7 @@ export default function AdminSettingsPage() {
                 if (d.facebook) setFacebook(d.facebook);
                 if (d.instagram) setInstagram(d.instagram);
                 if (d.youtube) setYoutube(d.youtube);
+                if (d.googleMapsUrl) setGoogleMapsUrl(d.googleMapsUrl);
             }
             setLoading(false);
         }
@@ -58,13 +61,13 @@ export default function AdminSettingsPage() {
     const handleSave = async () => {
         setSaving(true);
         const settings = {
-            schoolName, tagline, phone1, phone2, email1, email2, address, hours, facebook, instagram, youtube
+            schoolName, tagline, phone1, phone2, email1, email2, address, hours, facebook, instagram, youtube, googleMapsUrl
         };
         const result = await saveSiteSettings(settings);
         if (result.success) {
-            alert('Settings saved successfully!');
+            toast.success('Settings saved successfully!');
         } else {
-            alert('Failed to save settings: ' + result.error);
+            toast.error('Failed to save settings: ' + result.error);
         }
         setSaving(false);
     };
@@ -74,7 +77,7 @@ export default function AdminSettingsPage() {
         const handleSaveEvent = () => handleSave();
         window.addEventListener('admin-save', handleSaveEvent);
         return () => window.removeEventListener('admin-save', handleSaveEvent);
-    }, [schoolName, tagline, phone1, phone2, email1, email2, address, hours, facebook, instagram, youtube]);
+    }, [schoolName, tagline, phone1, phone2, email1, email2, address, hours, facebook, instagram, youtube, googleMapsUrl]);
 
     if (loading) {
         return (
@@ -170,8 +173,9 @@ export default function AdminSettingsPage() {
                                                 const result = await uploadLogo(formData);
                                                 if (result.success && result.url) {
                                                     setLogoUrl(result.url);
+                                                    toast.success('Logo uploaded successfully');
                                                 } else {
-                                                    alert('Logo upload failed: ' + result.error);
+                                                    toast.error('Logo upload failed: ' + result.error);
                                                 }
                                                 setUploadingLogo(false);
                                             }}
@@ -258,6 +262,16 @@ export default function AdminSettingsPage() {
                                         className="bg-background/50 border-surface-dark/10 focus:ring-blue-500/20 py-6"
                                     />
                                 </div>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">Google Maps Embed/Share URL</label>
+                                <Input
+                                    value={googleMapsUrl}
+                                    onChange={(e) => setGoogleMapsUrl(e.target.value)}
+                                    placeholder="https://www.google.com/maps/..."
+                                    className="bg-background/50 border-surface-dark/10 focus:ring-blue-500/20 py-6"
+                                />
+                                <p className="text-[10px] text-muted-foreground px-1 italic">Optional: Provide a full link for the "View on Google Maps" button.</p>
                             </div>
                         </CardContent>
                     </Card>

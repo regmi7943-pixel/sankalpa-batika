@@ -11,6 +11,7 @@ import { getPageContent, savePageContent } from '@/app/actions/settings';
 
 import { EditableText } from '@/components/admin/EditableText';
 import { IconPicker } from '@/components/admin/IconPicker';
+import { toast } from 'sonner';
 
 
 const defaultContent = {
@@ -46,9 +47,9 @@ export default function AdminContactPage() {
         setSaving(true);
         const result = await savePageContent('contact', content);
         if (result.success) {
-            alert('Changes saved successfully!');
+            toast.success('Contact page changes saved successfully!');
         } else {
-            alert('Failed to save changes: ' + result.error);
+            toast.error('Failed to save changes: ' + result.error);
         }
         setSaving(false);
     };

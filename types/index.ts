@@ -5,6 +5,8 @@ export interface Notice {
     published: boolean;
     createdAt: number;
     expireAt?: number;
+    attachmentUrl?: string;
+    showPopup?: boolean;
 }
 
 export interface Event {

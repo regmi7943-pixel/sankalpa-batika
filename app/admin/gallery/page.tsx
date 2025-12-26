@@ -7,6 +7,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { getGallery, uploadGalleryItem, deleteGalleryItem, getCategories, addCategory, deleteCategory, updateItemCategory } from '@/app/actions/gallery';
 import { GalleryItem } from '@/types';
+import { toast } from 'sonner';
 
 // System Categories
 const SYSTEM_TABS = [
@@ -100,6 +101,9 @@ export default function AdminGalleryPage() {
             await loadData();
             setShowAddCatModal(false);
             setNewCatName('');
+            toast.success('Category created successfully');
+        } else {
+            toast.error('Failed to create category: ' + result.error);
         }
     };
 
@@ -138,8 +142,9 @@ export default function AdminGalleryPage() {
             setStaffName('');
             setStaffPosition('');
             setShowUploadModal(false);
+            toast.success('Upload successful');
         } else {
-            alert('Upload failed: ' + result.error);
+            toast.error('Upload failed: ' + result.error);
         }
         setUploading(false);
     };
@@ -147,7 +152,13 @@ export default function AdminGalleryPage() {
     const handleDeleteItem = async (id: string, publicId: string) => {
         if (!confirm('Delete this image?')) return;
         setItems(prev => prev.filter(item => item.id !== id));
-        await deleteGalleryItem(id, publicId);
+        const result = await deleteGalleryItem(id, publicId);
+        if (result.success) {
+            toast.success('Image deleted');
+        } else {
+            toast.error('Delete failed: ' + result.error);
+            await loadData(); // Reload to restore item if delete failed
+        }
     };
 
     const handleMoveItem = async (itemId: string, newCategory: string) => {
@@ -155,7 +166,13 @@ export default function AdminGalleryPage() {
         setItems(prev => prev.map(item =>
             item.id === itemId ? { ...item, category: newCategory } : item
         ));
-        await updateItemCategory(itemId, newCategory);
+        const result = await updateItemCategory(itemId, newCategory);
+        if (result.success) {
+            toast.success('Moved to ' + categories.find(c => c.id === newCategory)?.name);
+        } else {
+            toast.error('Move failed');
+            await loadData();
+        }
     };
 
     // --- Drag & Drop Helpers ---

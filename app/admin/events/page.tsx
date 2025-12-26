@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { getEvents, createEvent, updateEvent, deleteEvent } from '@/app/actions/events';
 import { Event } from '@/types';
+import { toast } from 'sonner';
 
 export default function AdminEventsPage() {
     const [events, setEvents] = useState<Event[]>([]);
@@ -79,8 +80,10 @@ export default function AdminEventsPage() {
             setEvents(events.map(e => e.id === editingEvent.id ? { ...e, ...updatedData } : e));
 
             const result = await updateEvent(editingEvent.id, updatedData);
-            if (!result.success) {
-                alert('Failed to update event');
+            if (result.success) {
+                toast.success('Event updated successfully');
+            } else {
+                toast.error('Failed to update event');
                 // Revert optimistic update if failed
                 setEvents(oldEvents);
             }
@@ -99,8 +102,9 @@ export default function AdminEventsPage() {
                 if (refresh.success && refresh.data) {
                     setEvents(refresh.data);
                 }
+                toast.success('Event created successfully');
             } else {
-                alert('Failed to create event');
+                toast.error('Failed to create event');
             }
         }
         setSaving(false);
@@ -111,7 +115,12 @@ export default function AdminEventsPage() {
     const handleDelete = async (id: string) => {
         if (!confirm('Are you sure you want to delete this event?')) return;
         setEvents(events.filter(e => e.id !== id));
-        await deleteEvent(id);
+        const result = await deleteEvent(id);
+        if (result.success) {
+            toast.success('Event deleted');
+        } else {
+            toast.error('Failed to delete event');
+        }
     };
 
     if (loading) {

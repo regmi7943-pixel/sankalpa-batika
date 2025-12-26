@@ -9,6 +9,8 @@ import { getEvents } from '@/app/actions/events';
 import { getSlides } from '@/app/actions/gallery';
 import { getPageContent } from '@/app/actions/settings';
 import HeroSlider from '@/components/hero-slider';
+import RecentNotices from '@/components/home/recent-notices';
+import HomeNoticePopup from '@/components/home/home-notice-popup';
 import {
   ArrowRight, GraduationCap, Award, Users, BookOpen, Shield,
   Bell, Calendar, Play, Quote
@@ -55,6 +57,8 @@ export default async function HomePage() {
 
   return (
     <>
+      <HomeNoticePopup notices={notices || []} />
+
       {/* Hero Section */}
       <HeroSlider
         slides={slides || []}
@@ -95,6 +99,8 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
             {/* Notices */}
             <div>
+
+
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2 md:gap-3">
                   <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
@@ -107,31 +113,7 @@ export default async function HomePage() {
                 </Link>
               </div>
 
-              <div className="space-y-3 md:space-y-4">
-                {notices && notices.length > 0 ? notices.slice(0, 3).map((notice) => (
-                  <Card key={notice.id} className="card-hover border border-surface-dark/10 bg-background/50 backdrop-blur-sm shadow-sm">
-                    <CardContent className="p-4 md:p-5">
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <h3 className="font-semibold text-foreground mb-1 text-sm md:text-base line-clamp-1">{notice.title}</h3>
-                          <p className="text-muted text-xs md:text-sm">
-                            {new Date(notice.createdAt).toLocaleDateString()}
-                          </p>
-                        </div>
-                        <Link href={`/notices/${notice.id}`} className="text-blue-600 hover:text-blue-700 flex-shrink-0">
-                          <ArrowRight className="h-4 w-4 md:h-5 md:w-5" />
-                        </Link>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )) : (
-                  <Card className="border-0 shadow-sm bg-surface">
-                    <CardContent className="p-6 md:p-8 text-center text-muted text-sm">
-                      No notices available
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
+              <RecentNotices notices={notices || []} />
             </div>
 
             {/* Events */}

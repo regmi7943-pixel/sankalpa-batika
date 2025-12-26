@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 import { MapPin, Phone, Clock, Send, ArrowRight, MessageSquare, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { getPageContent } from '@/app/actions/settings';
+import { getPageContent, getSiteSettings } from '@/app/actions/settings';
 import ContactForm from '@/components/contact-form';
 
 const defaultContent = {
@@ -21,10 +21,35 @@ const defaultContent = {
 const iconMap: Record<string, any> = { MapPin, Phone, Clock, Mail };
 
 export default async function ContactPage() {
-    const result = await getPageContent('contact');
-    const rawContent = result.success && result.data ? { ...defaultContent, ...result.data } : defaultContent;
+    const pageResult = await getPageContent('contact');
+    const settingsResult = await getSiteSettings();
 
-    const content = rawContent;
+    const settings = settingsResult.success ? settingsResult.data : {};
+    const pageContent = pageResult.success && pageResult.data ? pageResult.data : {};
+
+    // Merge page content with defaults
+    const rawContent = { ...defaultContent, ...pageContent };
+
+    // Dynamically override contact cards if they match default titles
+    // This allows the admin to edit specific cards but keep them synced with global settings by default
+    const dynamicCards = rawContent.contactInfo.map((info: any) => {
+        if (info.title === 'Visit Us' && settings.address) {
+            return { ...info, details: settings.address };
+        }
+        if (info.title === 'Call Us' && settings.phone1) {
+            return { ...info, details: settings.phone1 };
+        }
+        if (info.title === 'Email Us' && settings.email1) {
+            return { ...info, details: settings.email1 };
+        }
+        if (info.title === 'Office Hours' && settings.hours) {
+            return { ...info, details: settings.hours };
+        }
+        return info;
+    });
+
+    const content = { ...rawContent, contactInfo: dynamicCards };
+    const mapUrl = settings.googleMapsUrl || '#';
 
     return (
         <div className="pt-20">
@@ -88,11 +113,13 @@ export default async function ContactPage() {
                                         <MapPin className="h-10 w-10 text-blue-600" />
                                     </div>
                                     <p className="text-foreground font-bold text-xl md:text-2xl mb-2">Our Campus Location</p>
-                                    <p className="text-muted text-sm md:text-base max-w-xs mx-auto">123 Knowledge Marg, Kathmandu, Nepal</p>
-                                    <Button variant="outline" className="mt-8 border-surface-dark/20 text-foreground bg-background/80 backdrop-blur-sm hover:bg-background transition-all">
-                                        View on Google Maps
-                                        <ArrowRight className="ml-2 h-4 w-4" />
-                                    </Button>
+                                    <p className="text-muted text-sm md:text-base max-w-xs mx-auto">{settings.address || 'Kathmandu, Nepal'}</p>
+                                    <a href={mapUrl} target="_blank" rel="noopener noreferrer">
+                                        <Button variant="outline" className="mt-8 border-surface-dark/20 text-foreground bg-background/80 backdrop-blur-sm hover:bg-background transition-all">
+                                            View on Google Maps
+                                            <ArrowRight className="ml-2 h-4 w-4" />
+                                        </Button>
+                                    </a>
                                 </div>
                             </div>
                         </div>

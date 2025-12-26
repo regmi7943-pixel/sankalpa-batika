@@ -14,16 +14,18 @@ async function getNotice(id: string) {
     }
 }
 
-export async function generateMetadata({ params }: { params: { id: string } }) {
-    const notice = await getNotice(params.id);
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
+    const notice = await getNotice(id);
     if (!notice) return { title: 'Notice Not Found' };
     return {
         title: `${notice.title} - Sankalpa Vatika`,
     };
 }
 
-export default async function NoticeDetailPage({ params }: { params: { id: string } }) {
-    const notice = await getNotice(params.id);
+export default async function NoticeDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
+    const notice = await getNotice(id);
 
     if (!notice || !notice.published) {
         notFound();

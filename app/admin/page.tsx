@@ -12,6 +12,7 @@ import link from 'next/link';
 import { DeletableWrapper } from '@/components/admin/deletable-wrapper';
 import { EditableText } from '@/components/admin/EditableText';
 import { IconPicker } from '@/components/admin/IconPicker';
+import { toast } from 'sonner';
 
 // Default content
 // Default content
@@ -77,9 +78,9 @@ export default function AdminHomePage() {
         setSaving(true);
         const result = await savePageContent('homepage', content);
         if (result.success) {
-            alert('Changes saved successfully!');
+            toast.success('Homepage changes saved successfully!');
         } else {
-            alert('Failed to save changes: ' + result.error);
+            toast.error('Failed to save changes: ' + result.error);
         }
         setSaving(false);
     };

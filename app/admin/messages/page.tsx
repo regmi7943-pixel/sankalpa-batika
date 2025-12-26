@@ -10,6 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { getMessages, deleteMessage, markAsRead, sendReply } from '@/app/actions/contact';
+import { toast } from 'sonner';
 
 export default function AdminMessagesPage() {
     const [messages, setMessages] = useState<any[]>([]);
@@ -41,6 +42,9 @@ export default function AdminMessagesPage() {
         if (result.success) {
             setMessages(prev => prev.filter(m => m.id !== id));
             if (selectedMessage?.id === id) setSelectedMessage(null);
+            toast.success('Message deleted');
+        } else {
+            toast.error('Failed to delete message');
         }
     }
 
@@ -76,8 +80,9 @@ export default function AdminMessagesPage() {
                 replyContent: replyContent.trim(),
                 repliedAt: Date.now()
             });
+            toast.success('Reply sent successfully');
         } else {
-            alert(result.error || 'Failed to send reply');
+            toast.error(result.error || 'Failed to send reply');
         }
         setIsSendingReply(false);
     }
@@ -327,7 +332,7 @@ export default function AdminMessagesPage() {
                             <div className="p-6 border-t border-border bg-muted/5 flex items-center justify-between gap-4">
                                 <div className="flex items-center gap-2">
                                     <div className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${selectedMessage.status === 'replied' ? 'bg-green-100 text-green-700' :
-                                            selectedMessage.status === 'unread' ? 'bg-blue-100 text-blue-700' : 'bg-muted text-muted-foreground'
+                                        selectedMessage.status === 'unread' ? 'bg-blue-100 text-blue-700' : 'bg-muted text-muted-foreground'
                                         }`}>
                                         {selectedMessage.status}
                                     </div>

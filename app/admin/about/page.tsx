@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { EditableText } from '@/components/admin/EditableText';
 import { IconPicker } from '@/components/admin/IconPicker';
 import * as LucideIcons from 'lucide-react';
+import { toast } from 'sonner';
 
 
 
@@ -67,9 +68,9 @@ export default function AdminAboutPage() {
         setSaving(true);
         const result = await savePageContent('about', content);
         if (result.success) {
-            alert('Changes saved successfully!');
+            toast.success('Changes saved successfully!');
         } else {
-            alert('Failed to save changes: ' + result.error);
+            toast.error('Failed to save changes: ' + result.error);
         }
         setSaving(false);
     };
