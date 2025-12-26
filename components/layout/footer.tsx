@@ -71,8 +71,8 @@ export function Footer({ settings }: { settings: SiteSettings }) {
                                 className="h-12 w-12 md:h-14 md:w-14 object-contain"
                             />
                             <div>
-                                <h3 className="text-lg md:text-xl font-bold text-foreground">{settings.schoolName}</h3>
-                                <p className="text-xs md:text-sm text-muted">{settings.tagline}</p>
+                                <h3 className="text-base md:text-lg font-bold text-foreground">{settings.schoolName}</h3>
+                                <p className="text-[10px] md:text-sm text-muted">{settings.tagline}</p>
                             </div>
                         </div>
                         <p className="text-muted text-xs md:text-sm leading-relaxed mb-4 md:mb-6">

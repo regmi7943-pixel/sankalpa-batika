@@ -69,11 +69,11 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
                                 />
                             </div>
                             <div>
-                                <span className={`font-bold text-lg tracking-tight transition-colors ${isScrolled ? 'text-foreground' : 'text-white'
+                                <span className={`font-bold text-sm sm:text-base md:text-lg tracking-tight transition-colors ${isScrolled ? 'text-foreground' : 'text-white'
                                     }`}>
                                     {settings.schoolName}
                                 </span>
-                                <p className={`text-xs transition-colors ${isScrolled ? 'text-muted' : 'text-blue-100'
+                                <p className={`text-[10px] md:text-xs transition-colors ${isScrolled ? 'text-muted' : 'text-blue-100'
                                     }`}>
                                     {settings.tagline}
                                 </p>
