@@ -10,7 +10,7 @@ import {
 import { logoutAction } from '@/app/actions/auth';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function AdminLayout({
     children,
@@ -19,6 +19,56 @@ export default function AdminLayout({
 }) {
     const pathname = usePathname();
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const inactivityLimit = 10 * 60 * 1000; // 10 minutes
+
+    const resetTimer = () => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        timeoutRef.current = setTimeout(() => {
+            handleInactivityLogout();
+        }, inactivityLimit);
+    };
+
+    const handleInactivityLogout = async () => {
+        // Use a simple form submit or direct call for logout
+        const form = document.createElement('form');
+        form.action = '/api/auth/logout'; // Fallback if direct call is complex, but let's try direct
+        // Actually, since we have logoutAction which is a server action, 
+        // we can just call it if we were in a form, but here we are in a timer.
+        // The easiest way to trigger the server action is to find the logout form and submit it.
+        const logoutForm = document.querySelector('form[action*="logoutAction"]') as HTMLFormElement;
+        if (logoutForm) {
+            logoutForm.submit();
+        } else {
+            // Fallback: just redirect to login, the middleware/cookie clearance should happen
+            window.location.href = '/khul-ja-sim-sim';
+        }
+    };
+
+    useEffect(() => {
+        // Initial timer setup
+        resetTimer();
+
+        // Activity events to listen for
+        const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+
+        const handleActivity = () => {
+            resetTimer();
+        };
+
+        // Add listeners
+        events.forEach(event => {
+            window.addEventListener(event, handleActivity);
+        });
+
+        // Cleanup
+        return () => {
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+            events.forEach(event => {
+                window.removeEventListener(event, handleActivity);
+            });
+        };
+    }, []);
 
     const pageLinks = [
         { href: '/admin', label: 'Homepage', icon: Home },

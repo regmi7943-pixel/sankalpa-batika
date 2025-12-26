@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Facebook, Twitter, Mail, Phone, MapPin, Instagram, Youtube, ArrowRight, GraduationCap } from 'lucide-react';
+import { Facebook, Mail, Phone, MapPin, Instagram, Youtube, ArrowRight, GraduationCap } from 'lucide-react';
 import { NewsletterForm } from '@/components/newsletter-form';
 
 interface SiteSettings {
@@ -34,7 +34,6 @@ export function Footer({ settings }: { settings: SiteSettings }) {
     const socialLinks = [
         { icon: Facebook, href: settings.facebook ? `https://facebook.com/${settings.facebook}` : '#', color: 'hover:bg-blue-600' },
         { icon: Instagram, href: settings.instagram ? `https://instagram.com/${settings.instagram}` : '#', color: 'hover:bg-pink-600' },
-        { icon: Twitter, href: '#', color: 'hover:bg-sky-500' },
         { icon: Youtube, href: settings.youtube ? `https://youtube.com/${settings.youtube}` : '#', color: 'hover:bg-red-600' },
     ];
 
@@ -168,13 +167,8 @@ export function Footer({ settings }: { settings: SiteSettings }) {
 
             {/* Bottom Bar */}
             <div className="border-t border-surface-dark/10">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-6 flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4 text-xs md:text-sm text-muted">
-                    <p className="text-center md:text-left">© {new Date().getFullYear()} {settings.schoolName}. All rights reserved.</p>
-                    <div className="flex items-center gap-4 md:gap-6">
-                        <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
-                        <Link href="/terms" className="hover:text-foreground transition-colors">Terms</Link>
-                        <Link href="/admin" className="hover:text-foreground transition-colors">Admin</Link>
-                    </div>
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-6 text-center text-xs md:text-sm text-muted">
+                    <p>© {new Date().getFullYear()} {settings.schoolName}. All rights reserved.</p>
                 </div>
             </div>
         </footer>

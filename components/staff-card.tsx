@@ -11,8 +11,8 @@ interface StaffCardProps {
 }
 
 export default function StaffCard({ staff }: StaffCardProps) {
-    // Parse caption: "Name - Position"
-    const [name, position] = (staff.caption || '').split(' - ');
+    // Parse caption: "Name - Department"
+    const [name, department] = (staff.caption || '').split(' - ');
 
     return (
         <div className="group space-y-4 p-4 bg-background dark:bg-surface/50 rounded-3xl border border-surface-dark/10 shadow-sm hover:shadow-xl transition-all animate-fade-in">
@@ -26,7 +26,7 @@ export default function StaffCard({ staff }: StaffCardProps) {
             </div>
             <div className="space-y-1">
                 <h3 className="font-bold text-foreground text-sm md:text-base line-clamp-1">{name || 'Staff Member'}</h3>
-                <p className="text-blue-600 dark:text-blue-400 text-[10px] md:text-xs font-semibold uppercase tracking-wider line-clamp-1">{position || 'Faculty'}</p>
+                <p className="text-blue-600 dark:text-blue-400 text-[10px] md:text-xs font-semibold uppercase tracking-wider line-clamp-1">{department || 'Academic Department'}</p>
             </div>
         </div>
     );

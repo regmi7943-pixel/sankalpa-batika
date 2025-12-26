@@ -15,7 +15,7 @@ export async function middleware(request: NextRequest) {
 
         // If no session, redirect to login
         if (!session) {
-            return NextResponse.redirect(new URL('/login', request.url));
+            return NextResponse.redirect(new URL('/khul-ja-sim-sim', request.url));
         }
     }
 

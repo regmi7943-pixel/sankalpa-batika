@@ -9,11 +9,12 @@ import { loginAction } from '@/app/actions/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { GraduationCap, Mail, Lock, ArrowRight, Shield, AlertCircle } from 'lucide-react';
+import { GraduationCap, Mail, Lock, ArrowRight, Shield, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const router = useRouter();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -107,25 +108,32 @@ export default function LoginPage() {
                                     id="email"
                                     name="email"
                                     type="email"
-                                    placeholder="admin@school.com"
                                     required
-                                    className="bg-slate-50 border-slate-200 focus:bg-white h-12"
+                                    className="bg-white border-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 h-12 rounded-xl text-slate-900 font-medium shadow-sm transition-all"
                                 />
                             </div>
 
                             <div className="space-y-2">
                                 <label htmlFor="password" className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                    <Lock className="h-4 w-4 text-slate-400" />
+                                    <Lock className="h-4 w-4 text-slate-500" />
                                     Password
                                 </label>
-                                <Input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    placeholder="••••••••"
-                                    required
-                                    className="bg-slate-50 border-slate-200 focus:bg-white h-12"
-                                />
+                                <div className="relative group/pass">
+                                    <Input
+                                        id="password"
+                                        name="password"
+                                        type={showPassword ? 'text' : 'password'}
+                                        required
+                                        className="bg-white border-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 h-12 rounded-xl text-slate-900 font-medium shadow-sm pr-12 transition-all"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-slate-500 hover:text-blue-600 transition-colors bg-white rounded-lg hover:bg-slate-50"
+                                    >
+                                        {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                                    </button>
+                                </div>
                             </div>
 
                             <Button

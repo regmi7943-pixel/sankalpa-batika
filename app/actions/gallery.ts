@@ -147,6 +147,7 @@ export async function uploadGalleryItem(formData: FormData) {
         const folderMap: Record<string, string> = {
             'slide': 'sankalpa-batika/slides',
             'staff': 'sankalpa-batika/staff',
+            'glimpses': 'sankalpa-batika/gallery',
             'photos': 'sankalpa-batika/gallery'
         };
 
@@ -211,5 +212,109 @@ export async function deleteGalleryItem(id: string, publicId: string) {
     } catch (error) {
         console.error('Delete failed:', error);
         return { success: false, error: 'Delete failed' };
+    }
+}
+// ADMIN: Replace Gallery Item Photo
+export async function replaceGalleryItemPhoto(itemId: string, oldPublicId: string, formData: FormData) {
+    const session = await getSession();
+    if (!session) return { success: false, error: 'Unauthorized' };
+
+    const file = formData.get('file') as File;
+    if (!file) return { success: false, error: 'No file provided' };
+
+    try {
+        const itemRef = adminDb.ref(`${GALLERY_PATH}/${itemId}`);
+        const snapshot = await itemRef.once('value');
+        if (!snapshot.exists()) return { success: false, error: 'Item not found' };
+
+        const itemData = snapshot.val();
+        const category = itemData.category || 'photos';
+
+        const folderMap: Record<string, string> = {
+            'slide': 'sankalpa-batika/slides',
+            'staff': 'sankalpa-batika/staff',
+            'glimpses': 'sankalpa-batika/gallery',
+            'photos': 'sankalpa-batika/gallery'
+        };
+        const folder = folderMap[category] || 'sankalpa-batika/gallery';
+
+        // 1. Upload new photo to Cloudinary
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+
+        const uploadResult: any = await new Promise((resolve, reject) => {
+            cloudinary.uploader.upload_stream(
+                {
+                    folder: folder,
+                    resource_type: 'auto'
+                },
+                (error, result) => {
+                    if (error) reject(error);
+                    else resolve(result);
+                }
+            ).end(buffer);
+        });
+
+        // 2. Update DB with new URL and PublicID
+        await itemRef.update({
+            url: uploadResult.secure_url,
+            publicId: uploadResult.public_id,
+            type: uploadResult.resource_type === 'image' ? 'image' : 'pdf',
+        });
+
+        // 3. Delete OLD photo from Cloudinary (if it's not a placeholder and has a publicId)
+        if (oldPublicId && oldPublicId !== 'placeholder') {
+            try {
+                await cloudinary.uploader.destroy(oldPublicId);
+            } catch (delError) {
+                console.warn('Failed to delete old photo from Cloudinary:', delError);
+            }
+        }
+
+        revalidatePath('/gallery');
+        revalidatePath('/admin/gallery');
+        return { success: true };
+    } catch (error) {
+        console.error('Replace photo failed:', error);
+        return { success: false, error: 'Replacement failed' };
+    }
+}
+// ADMIN: Reset Gallery (Keep only slides)
+export async function resetGalleryKeepSlides() {
+    const session = await getSession();
+    if (!session) return { success: false, error: 'Unauthorized' };
+
+    try {
+        const galleryRef = adminDb.ref(GALLERY_PATH);
+        const snapshot = await galleryRef.once('value');
+        const items = snapshot.val() || {};
+
+        const deletePromises = Object.keys(items).map(async (key) => {
+            const item = items[key];
+            if (item.category !== 'slide') {
+                // Delete from Cloudinary
+                if (item.publicId && item.publicId !== 'placeholder') {
+                    try {
+                        await cloudinary.uploader.destroy(item.publicId);
+                    } catch (e) {
+                        console.warn('Cloudinary delete failed in reset:', e);
+                    }
+                }
+                // Delete from DB
+                return adminDb.ref(`${GALLERY_PATH}/${key}`).remove();
+            }
+        });
+
+        await Promise.all(deletePromises);
+
+        // Clear all custom categories
+        await adminDb.ref(CATEGORY_PATH).remove();
+
+        revalidatePath('/gallery');
+        revalidatePath('/admin/gallery');
+        return { success: true };
+    } catch (error) {
+        console.error('Reset failed:', error);
+        return { success: false, error: 'Reset operation failed' };
     }
 }

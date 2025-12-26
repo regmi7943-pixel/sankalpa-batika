@@ -12,7 +12,7 @@ export function LayoutWrapper({
     const pathname = usePathname();
 
     // Hide navbar and footer on admin and login pages
-    const isAdminOrLogin = pathname?.startsWith('/admin') || pathname?.startsWith('/login');
+    const isAdminOrLogin = pathname?.startsWith('/admin') || pathname?.startsWith('/khul-ja-sim-sim');
 
     if (isAdminOrLogin) {
         return <>{children}</>;

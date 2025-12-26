@@ -12,6 +12,7 @@ import HeroSlider from '@/components/hero-slider';
 import RecentNotices from '@/components/home/recent-notices';
 import HomeNoticePopup from '@/components/home/home-notice-popup';
 import HomepageGalleryPreview from '@/components/home/homepage-gallery-preview';
+import HomeEvents from '@/components/home/home-events';
 import {
   ArrowRight, GraduationCap, Award, Users, BookOpen, Shield,
   Bell, Calendar, Play, Quote
@@ -58,7 +59,7 @@ export default async function HomePage() {
   const { data: galleryItems } = await getGallery();
 
   const previewPhotos = (galleryItems || [])
-    .filter(item => item.type === 'image')
+    .filter(item => item.type === 'image' && item.category === 'glimpses')
     .slice(0, 4);
 
   return (
@@ -136,32 +137,7 @@ export default async function HomePage() {
                 </Link>
               </div>
 
-              <div className="space-y-3 md:space-y-4">
-                {events && events.length > 0 ? events.slice(0, 3).map((event) => (
-                  <Card key={event.id} className="card-hover border border-surface-dark/10 bg-background/50 backdrop-blur-sm shadow-sm overflow-hidden">
-                    <CardContent className="p-0">
-                      <div className="flex">
-                        <div className="bg-gradient-to-b from-blue-500 to-blue-600 text-white p-3 md:p-4 text-center min-w-[60px] md:min-w-[70px]">
-                          <p className="text-[10px] md:text-xs font-bold uppercase">
-                            {new Date(event.date).toLocaleString('default', { month: 'short' })}
-                          </p>
-                          <p className="text-xl md:text-2xl font-bold">{new Date(event.date).getDate()}</p>
-                        </div>
-                        <div className="p-3 md:p-4 flex-grow">
-                          <h3 className="font-semibold text-foreground text-sm md:text-base line-clamp-1">{event.name}</h3>
-                          <p className="text-muted text-xs md:text-sm line-clamp-1">{event.description}</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )) : (
-                  <Card className="border-0 shadow-sm bg-surface">
-                    <CardContent className="p-6 md:p-8 text-center text-muted text-sm">
-                      No upcoming events
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
+              <HomeEvents events={events || []} />
             </div>
           </div>
         </div>

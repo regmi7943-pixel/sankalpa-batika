@@ -21,7 +21,6 @@ export async function loginAction(idToken: string) {
 
         // 4. Set the cookie
         (await cookies()).set('session', sessionCookie, {
-            maxAge: expiresIn,
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             path: '/',
@@ -37,7 +36,7 @@ export async function loginAction(idToken: string) {
 
 export async function logoutAction() {
     (await cookies()).delete('session');
-    redirect('/login');
+    redirect('/khul-ja-sim-sim');
 }
 
 export async function getSession() {

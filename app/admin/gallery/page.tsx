@@ -1,44 +1,58 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import {
-    Loader2, Plus, Image as ImageIcon, Trash2, Upload, X, MoreVertical
+    Loader2, Plus, Image as ImageIcon, Trash2, Upload, X, MoreVertical,
+    Search, Grid3X3, List, User, Filter, AlertCircle, FileText
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getGallery, uploadGalleryItem, deleteGalleryItem, getCategories, addCategory, deleteCategory, updateItemCategory } from '@/app/actions/gallery';
+import {
+    getGallery,
+    uploadGalleryItem,
+    deleteGalleryItem,
+    getCategories,
+    addCategory,
+    deleteCategory,
+    updateItemCategory,
+    replaceGalleryItemPhoto
+} from '@/app/actions/gallery';
 import { GalleryItem } from '@/types';
 import { toast } from 'sonner';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // System Categories
 const SYSTEM_TABS = [
-    { id: 'photos', name: 'All Photos' },
-    { id: 'slide', name: 'Home Slides' },
-    { id: 'staff', name: 'Staff' }
+    { id: 'glimpses', name: 'Glimpses', icon: ImageIcon },
+    { id: 'slide', name: 'Home Slides', icon: Grid3X3 },
+    { id: 'staff', name: 'Staff Members', icon: User }
 ];
 
-const TabButton = ({ active, onClick, children, onDelete }: { active: boolean; onClick: () => void; children: React.ReactNode; onDelete?: () => void }) => (
-    <div className={`relative group px-6 py-2.5 rounded-full transition-all duration-300 flex items-center gap-2 cursor-pointer ${active
-        ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25'
-        : 'bg-white dark:bg-slate-800 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700'
-        }`}
+const TabButton = ({ active, onClick, children, icon: Icon, onDelete }: { active: boolean; onClick: () => void; children: React.ReactNode; icon?: any; onDelete?: () => void }) => (
+    <button
         onClick={onClick}
+        className={`relative flex items-center gap-2 px-6 py-3 rounded-2xl transition-all duration-300 whitespace-nowrap group ${active
+            ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/20 ring-4 ring-blue-600/10'
+            : 'bg-white dark:bg-slate-800 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700'
+            }`}
     >
-        <span className="text-sm font-medium whitespace-nowrap">{children}</span>
+        {Icon && <Icon className={`h-4 w-4 ${active ? 'text-white' : 'text-slate-400'}`} />}
+        <span className="text-sm font-black tracking-tight">{children}</span>
         {onDelete && (
-            <button
+            <div
                 onClick={(e) => { e.stopPropagation(); onDelete(); }}
-                className="opacity-0 group-hover:opacity-100 p-0.5 hover:bg-red-500 hover:text-white rounded-full transition-all"
+                className="ml-2 p-1 hover:bg-red-500 hover:text-white rounded-lg transition-all"
             >
                 <X className="h-3 w-3" />
-            </button>
+            </div>
         )}
-    </div>
+    </button>
 );
 
 export default function AdminGalleryPage() {
     const [items, setItems] = useState<GalleryItem[]>([]);
     const [categories, setCategories] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState('');
 
     // UI State
     const [uploading, setUploading] = useState(false);
@@ -47,8 +61,8 @@ export default function AdminGalleryPage() {
     const [newCatName, setNewCatName] = useState('');
     const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
-    // Active Tab can be a system ID ('slide') or a custom Category ID
-    const [activeTab, setActiveTab] = useState<string>('photos');
+    // Active Tab
+    const [activeTab, setActiveTab] = useState<string>('glimpses');
 
     // Upload State
     const [dragActive, setDragActive] = useState(false);
@@ -57,6 +71,23 @@ export default function AdminGalleryPage() {
     const [staffName, setStaffName] = useState('');
     const [staffPosition, setStaffPosition] = useState('');
     const inputRef = useRef<HTMLInputElement>(null);
+
+    // --- Helpers ---
+    const handleFiles = (files: FileList) => {
+        const valid = Array.from(files).filter(f => f.type.startsWith('image/'));
+        setSelectedFiles(prev => [...prev, ...valid]);
+    };
+
+    const removeFile = (index: number) => {
+        setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const handleDrag = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.type === 'dragenter' || e.type === 'dragover') setDragActive(true);
+        else if (e.type === 'dragleave') setDragActive(false);
+    };
 
     const loadData = useCallback(async () => {
         setLoading(true);
@@ -75,20 +106,16 @@ export default function AdminGalleryPage() {
         loadData();
     }, [loadData]);
 
-    // Close dropdown when tab changes
-    useEffect(() => {
-        setOpenMenuId(null);
-    }, [activeTab]);
-
     // Derived State
-    const filteredItems = items.filter(item => {
-        if (activeTab === 'slide') return item.category === 'slide';
-        if (activeTab === 'staff') return item.category === 'staff';
-        if (activeTab === 'photos') return true; // Show ALL items
-
-        // Filter by dynamic category ID
-        return item.category === activeTab;
-    });
+    const filteredItems = useMemo(() => {
+        return items.filter(item => {
+            const matchesTab = activeTab === 'glimpses'
+                ? (item.category !== 'staff' && item.category !== 'slide')
+                : item.category === activeTab;
+            const matchesSearch = item.caption?.toLowerCase().includes(searchQuery.toLowerCase());
+            return matchesTab && matchesSearch;
+        });
+    }, [items, activeTab, searchQuery]);
 
     const activeCategoryName = [...SYSTEM_TABS, ...categories].find(c => c.id === activeTab)?.name || 'Gallery';
 
@@ -103,7 +130,7 @@ export default function AdminGalleryPage() {
             setNewCatName('');
             toast.success('Category created successfully');
         } else {
-            toast.error('Failed to create category: ' + result.error);
+            toast.error('Failed to create category');
         }
     };
 
@@ -122,11 +149,8 @@ export default function AdminGalleryPage() {
 
         const formData = new FormData();
         selectedFiles.forEach(file => formData.append('files', file));
-
-        // Use activeTab as category.
         formData.append('category', activeTab);
 
-        // For Staff, combine name and position as caption
         if (activeTab === 'staff') {
             const staffCaption = staffPosition ? `${staffName} - ${staffPosition}` : staffName;
             formData.append('caption', staffCaption);
@@ -144,266 +168,442 @@ export default function AdminGalleryPage() {
             setShowUploadModal(false);
             toast.success('Upload successful');
         } else {
-            toast.error('Upload failed: ' + result.error);
+            toast.error('Upload failed');
         }
         setUploading(false);
     };
 
     const handleDeleteItem = async (id: string, publicId: string) => {
-        if (!confirm('Delete this image?')) return;
+        if (!confirm('Delete this item?')) return;
         setItems(prev => prev.filter(item => item.id !== id));
         const result = await deleteGalleryItem(id, publicId);
-        if (result.success) {
-            toast.success('Image deleted');
+        if (!result.success) {
+            toast.error('Delete failed');
+            await loadData();
         } else {
-            toast.error('Delete failed: ' + result.error);
-            await loadData(); // Reload to restore item if delete failed
+            toast.success('Deleted successfully');
         }
     };
 
     const handleMoveItem = async (itemId: string, newCategory: string) => {
-        // Optimistic UI update
         setItems(prev => prev.map(item =>
             item.id === itemId ? { ...item, category: newCategory } : item
         ));
         const result = await updateItemCategory(itemId, newCategory);
         if (result.success) {
-            toast.success('Moved to ' + categories.find(c => c.id === newCategory)?.name);
+            toast.success('Moved successfully');
         } else {
             toast.error('Move failed');
             await loadData();
         }
     };
 
-    // --- Drag & Drop Helpers ---
-    const handleDrag = (e: React.DragEvent) => {
-        e.preventDefault(); e.stopPropagation();
-        if (e.type === 'dragenter' || e.type === 'dragover') setDragActive(true);
-        else if (e.type === 'dragleave') setDragActive(false);
-    };
-    const handleDrop = (e: React.DragEvent) => {
-        e.preventDefault(); e.stopPropagation(); setDragActive(false);
-        if (e.dataTransfer.files?.[0]) handleFiles(e.dataTransfer.files);
-    };
-    const handleFiles = (files: FileList) => {
-        const valid = Array.from(files).filter(f => f.type.startsWith('image/'));
-        setSelectedFiles(prev => [...prev, ...valid]);
-    };
-    const removeFile = (index: number) => {
-        setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    const handleResetGallery = async () => {
+        if (!confirm('Are you sure you want to delete all photos and staff members? This will keep only Home Slides.')) return;
+
+        setLoading(true);
+        try {
+            const result = await resetGalleryKeepSlides();
+            if (result.success) {
+                toast.success('Gallery reset successfully');
+                await loadData();
+            } else {
+                toast.error('Reset failed');
+            }
+        } catch (err) {
+            toast.error('Reset error');
+        } finally {
+            setLoading(false);
+        }
     };
 
+    // --- Components ---
+
+    const StaffCard = ({ item }: { item: GalleryItem }) => {
+        const [name, department] = (item.caption || '').split(' - ');
+        const [imageError, setImageError] = useState(false);
+        const [isReplacing, setIsReplacing] = useState(false);
+        const fileInputRef = useRef<HTMLInputElement>(null);
+
+        const onReplaceClick = (e: React.MouseEvent) => {
+            e.stopPropagation();
+            fileInputRef.current?.click();
+        };
+
+        const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+
+            setIsReplacing(true);
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const result = await replaceGalleryItemPhoto(item.id, item.publicId || '', formData);
+                if (result.success) {
+                    toast.success('Photo updated successfully');
+                    await loadData();
+                } else {
+                    toast.error('Failed to update photo');
+                }
+            } catch (err) {
+                toast.error('An error occurred during upload');
+            } finally {
+                setIsReplacing(false);
+            }
+        };
+
+        return (
+            <div className="bg-white dark:bg-slate-800 rounded-3xl overflow-hidden border border-slate-100 dark:border-slate-700/50 shadow-sm hover:shadow-xl transition-all group">
+                <div className="aspect-[4/5] relative bg-slate-100 dark:bg-slate-900 border-b dark:border-slate-700/50 overflow-hidden">
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        className="hidden"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                    />
+
+                    {imageError ? (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400 bg-slate-50 dark:bg-slate-900">
+                            <User className="h-12 w-12 mb-2 opacity-20" />
+                            <span className="text-[10px] uppercase font-black tracking-widest opacity-40">Placeholder Image</span>
+                        </div>
+                    ) : (
+                        <img
+                            src={item.url}
+                            alt={name}
+                            className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${isReplacing ? 'opacity-50 blur-sm' : ''}`}
+                            onError={() => setImageError(true)}
+                        />
+                    )}
+
+                    {isReplacing && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-blue-600/10 backdrop-blur-sm">
+                            <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
+                        </div>
+                    )}
+
+                    <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity translate-x-2 group-hover:translate-x-0 transition-transform">
+                        <button
+                            onClick={onReplaceClick}
+                            className="p-2.5 bg-blue-600 text-white rounded-xl shadow-lg hover:bg-blue-700 active:scale-95 transition-all"
+                            title="Replace Photo"
+                        >
+                            <Upload className="h-4 w-4" />
+                        </button>
+                        <button
+                            onClick={() => handleDeleteItem(item.id, item.publicId || '')}
+                            className="p-2.5 bg-red-500 text-white rounded-xl shadow-lg hover:bg-red-600 active:scale-95 transition-all"
+                            title="Delete Staff"
+                        >
+                            <Trash2 className="h-4 w-4" />
+                        </button>
+                    </div>
+                </div>
+                <div className="p-5 space-y-1">
+                    <h3 className="font-bold text-slate-800 dark:text-slate-100 truncate">{name || 'Unknown Name'}</h3>
+                    <p className="text-xs font-black text-blue-600 uppercase tracking-wider truncate">{department || 'No Department'}</p>
+                </div>
+            </div>
+        );
+    };
+
+    const GalleryCard = ({ item }: { item: GalleryItem }) => {
+        const [imageError, setImageError] = useState(false);
+        const isPdf = item.type === 'pdf' || item.url.endsWith('.pdf');
+
+        return (
+            <div className="bg-white dark:bg-slate-800 rounded-3xl overflow-hidden border border-slate-100 dark:border-slate-700/50 shadow-sm hover:shadow-xl transition-all group">
+                <div className="aspect-square relative bg-slate-100 dark:bg-slate-900 border-b dark:border-slate-700/50 overflow-hidden">
+                    {isPdf ? (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-blue-50 dark:bg-blue-900/10 text-blue-600">
+                            <FileText className="h-12 w-12 mb-2" />
+                            <span className="text-[10px] font-black uppercase tracking-widest">PDF Document</span>
+                        </div>
+                    ) : imageError ? (
+                        <div className="absolute inset-0 flex items-center justify-center text-slate-400">
+                            <ImageIcon className="h-10 w-10 opacity-20" />
+                        </div>
+                    ) : (
+                        <img
+                            src={item.url}
+                            alt={item.caption}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            onError={() => setImageError(true)}
+                        />
+                    )}
+
+                    <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity translate-x-2 group-hover:translate-x-0 transition-transform">
+                        {categories.length > 0 && (
+                            <div className="relative">
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === item.id ? null : item.id); }}
+                                    className="p-2.5 bg-white/90 dark:bg-slate-700/90 text-slate-700 dark:text-slate-100 rounded-xl shadow-lg backdrop-blur-md hover:bg-white active:scale-95 transition-all"
+                                >
+                                    <MoreVertical className="h-4 w-4" />
+                                </button>
+                                {openMenuId === item.id && (
+                                    <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden z-50 animate-in fade-in slide-in-from-top-1">
+                                        <div className="px-4 py-3 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] border-b dark:border-slate-700">Move to</div>
+                                        {categories.map(cat => (
+                                            <button
+                                                key={cat.id}
+                                                onClick={(e) => { e.stopPropagation(); handleMoveItem(item.id, cat.id); setOpenMenuId(null); }}
+                                                className="w-full text-left px-4 py-3 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-slate-700/50 hover:text-blue-600 transition-colors flex items-center gap-2"
+                                            >
+                                                <div className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+                                                {cat.name}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        <button
+                            onClick={() => handleDeleteItem(item.id, item.publicId || '')}
+                            className="p-2.5 bg-red-500 text-white rounded-xl shadow-lg hover:bg-red-600 active:scale-95 transition-all"
+                        >
+                            <Trash2 className="h-4 w-4" />
+                        </button>
+                    </div>
+                </div>
+                <div className="p-4">
+                    <p className="text-sm font-bold text-slate-700 dark:text-slate-200 truncate">{item.caption || 'No caption'}</p>
+                    <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mt-1">{item.type || 'image'}</p>
+                </div>
+            </div>
+        );
+    };
 
     return (
-        <div className="min-h-full p-4 md:p-8 space-y-8 animate-fade-in relative">
-
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Gallery Manager</h1>
-                    <p className="text-slate-500 mt-1">Manage photos, slides, and categories.</p>
+        <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0F172A] p-6 md:p-10 space-y-10 animate-fade-in">
+            {/* Header Section */}
+            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+                <div className="space-y-2">
+                    <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 dark:text-white">
+                        Gallery <span className="text-blue-600 underline decoration-blue-500/30 underline-offset-8">Editor</span>
+                    </h1>
+                    <p className="text-slate-500 dark:text-slate-400 font-bold text-lg">Manage photos, staff members, and homepage sliders.</p>
                 </div>
-                <div className="flex gap-2">
-                    {activeTab === 'photos' && (
-                        <Button onClick={() => setShowAddCatModal(true)} variant="outline">
-                            <Plus className="h-4 w-4 mr-2" /> New Category
-                        </Button>
-                    )}
-                    <Button onClick={() => setShowUploadModal(true)} className="bg-blue-600 text-white">
-                        <Upload className="h-4 w-4 mr-2" />
-                        {activeTab === 'staff' ? 'Add New Staff' : `Upload to ${activeCategoryName}`}
+                <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+                    <Button
+                        onClick={() => setShowUploadModal(true)}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-7 rounded-2xl font-black text-lg shadow-xl shadow-blue-600/20 group"
+                    >
+                        <Plus className="h-5 w-5 mr-3 group-hover:rotate-90 transition-transform duration-300" />
+                        {activeTab === 'staff' ? 'Add Staff' : 'Upload New'}
                     </Button>
                 </div>
             </div>
 
-            {/* Scrollable Tabs */}
-            <div className="flex overflow-x-auto pb-4 gap-2 no-scrollbar">
-                {SYSTEM_TABS.map(tab => (
-                    <TabButton
-                        key={tab.id}
-                        active={activeTab === tab.id}
-                        onClick={() => setActiveTab(tab.id)}
+            {/* Navigation Tabs */}
+            <div className="flex flex-col space-y-6">
+                <div className="flex overflow-x-auto pb-2 gap-3 no-scrollbar py-1">
+                    {SYSTEM_TABS.map(tab => (
+                        <TabButton
+                            key={tab.id}
+                            active={activeTab === tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                            icon={tab.icon}
+                        >
+                            {tab.name}
+                        </TabButton>
+                    ))}
+                    <div className="w-px h-8 bg-slate-200 dark:bg-slate-700 mx-2 self-center shrink-0"></div>
+                    {categories.map(cat => (
+                        <TabButton
+                            key={cat.id}
+                            active={activeTab === cat.id}
+                            onClick={() => setActiveTab(cat.id)}
+                            onDelete={() => handleDeleteCategory(cat.id)}
+                            icon={Filter}
+                        >
+                            {cat.name}
+                        </TabButton>
+                    ))}
+                    <button
+                        onClick={() => setShowAddCatModal(true)}
+                        className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all border-2 border-dashed border-slate-300 dark:border-slate-700"
                     >
-                        {tab.name}
-                    </TabButton>
-                ))}
-
-                <div className="w-px h-8 bg-slate-200 dark:bg-slate-700 mx-2 self-center shrink-0"></div>
-
-                {categories.map(cat => (
-                    <TabButton
-                        key={cat.id}
-                        active={activeTab === cat.id}
-                        onClick={() => setActiveTab(cat.id)}
-                        onDelete={() => handleDeleteCategory(cat.id)}
-                    >
-                        {cat.name}
-                    </TabButton>
-                ))}
+                        <Plus className="h-4 w-4" />
+                        <span className="text-sm font-bold uppercase tracking-widest text-[10px]">New Category</span>
+                    </button>
+                </div>
             </div>
 
-            {/* Grid */}
-            <div
-                className="columns-1 sm:columns-2 md:columns-3 xl:columns-4 gap-6 space-y-6 pb-20"
-                onClick={() => setOpenMenuId(null)}
-            >
-                {filteredItems.map(item => (
-                    <div
-                        key={item.id}
-                        className="break-inside-avoid relative group rounded-2xl overflow-hidden bg-slate-900 cursor-pointer"
-                        onMouseLeave={() => setOpenMenuId(null)}
-                    >
-                        <img
-                            src={item.url}
-                            className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-110"
-                            loading="lazy"
-                        />
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-4">
-
-                            {/* Top Actions Row */}
-                            <div className="flex justify-between items-start">
-                                {/* Move To Dropdown (Only show if there are custom categories) */}
-                                {categories.length > 0 && (
-                                    <div className="relative">
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === item.id ? null : item.id); }}
-                                            className="p-2 bg-white/20 hover:bg-white/30 text-white rounded-full backdrop-blur-sm"
-                                        >
-                                            <MoreVertical className="h-4 w-4" />
-                                        </button>
-
-                                        {openMenuId === item.id && (
-                                            <div className="absolute left-0 top-full mt-1 w-44 bg-white dark:bg-slate-800 rounded-lg shadow-xl overflow-hidden z-30 animate-fade-in">
-                                                <div className="p-2 text-xs font-semibold text-slate-500 uppercase tracking-wider border-b dark:border-slate-700">Move to Category</div>
-                                                {categories
-                                                    .filter(cat => cat.id !== item.category)
-                                                    .map(cat => (
-                                                        <button
-                                                            key={cat.id}
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                handleMoveItem(item.id, cat.id);
-                                                                setOpenMenuId(null);
-                                                            }}
-                                                            className="w-full text-left px-3 py-2.5 text-sm hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center gap-2"
-                                                        >
-                                                            <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-                                                            {cat.name}
-                                                        </button>
-                                                    ))
-                                                }
-                                                {categories.filter(cat => cat.id !== item.category).length === 0 && (
-                                                    <p className="px-3 py-2 text-xs text-slate-400">No other categories</p>
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
+            {/* Content Grid */}
+            {loading ? (
+                <div className="flex flex-col items-center justify-center py-40 space-y-4">
+                    <Loader2 className="h-12 w-12 text-blue-600 animate-spin" />
+                    <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Syncing with database...</p>
+                </div>
+            ) : filteredItems.length > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 xl:gap-8 pb-32">
+                    <AnimatePresence mode='popLayout'>
+                        {filteredItems.map(item => (
+                            <motion.div
+                                layout
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.9 }}
+                                key={item.id}
+                            >
+                                {activeTab === 'staff' ? (
+                                    <StaffCard item={item} />
+                                ) : (
+                                    <GalleryCard item={item} />
                                 )}
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
+                </div>
+            ) : (
+                <div className="text-center py-32 bg-white dark:bg-slate-800/50 rounded-[3rem] border-4 border-dashed border-slate-100 dark:border-slate-800">
+                    <div className="max-w-xs mx-auto space-y-4">
+                        <div className="w-20 h-20 bg-slate-50 dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                            <ImageIcon className="h-10 w-10 text-slate-300" />
+                        </div>
+                        <h3 className="text-2xl font-black text-slate-800 dark:text-slate-100">Gallery is Empty</h3>
+                        <p className="text-slate-500 font-medium">There are no items in <span className="text-blue-600 font-bold">{activeCategoryName}</span> yet.</p>
+                        <Button onClick={() => setShowUploadModal(true)} variant="outline" className="mt-4 rounded-xl px-10 border-blue-600 text-blue-600 font-bold">
+                            Add First Item
+                        </Button>
+                    </div>
+                </div>
+            )}
 
-                                {/* Delete Button */}
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); handleDeleteItem(item.id, item.publicId || ''); }}
-                                    className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-full"
-                                >
-                                    <Trash2 className="h-4 w-4" />
+            {/* --- Modals (Keep Existing Logic but Better UI) --- */}
+            {showUploadModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/80 p-4 backdrop-blur-xl animate-in fade-in duration-300">
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        className="bg-white dark:bg-slate-900 w-full max-w-xl rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800"
+                    >
+                        <div className="p-8 md:p-10 space-y-8">
+                            <div className="flex justify-between items-center">
+                                <div className="space-y-1">
+                                    <h2 className="text-2xl font-black tracking-tight">
+                                        {activeTab === 'staff' ? 'Add Staff Member' : 'Upload Content'}
+                                    </h2>
+                                    <p className="text-sm text-slate-500 font-bold">Uploading to {activeCategoryName}</p>
+                                </div>
+                                <button onClick={() => setShowUploadModal(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+                                    <X className="h-6 w-6" />
                                 </button>
                             </div>
 
-                            {/* Bottom Caption */}
-                            <p className="text-white text-sm font-medium truncate">{item.caption}</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
+                            <div
+                                className={`border-4 border-dashed rounded-[2rem] p-10 text-center cursor-pointer transition-all ${dragActive ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/10' : 'border-slate-100 dark:border-slate-800 hover:border-blue-400'}`}
+                                onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
+                                onDragLeave={() => setDragActive(false)}
+                                onDrop={(e) => { e.preventDefault(); setDragActive(false); handleFiles(e.dataTransfer.files); }}
+                                onClick={() => inputRef.current?.click()}
+                            >
+                                <input ref={inputRef} type="file" multiple accept="image/*" className="hidden" onChange={e => e.target.files && handleFiles(e.target.files)} />
+                                <div className="w-16 h-16 bg-blue-600/10 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                    <Upload className="h-8 w-8" />
+                                </div>
+                                <p className="text-slate-900 dark:text-slate-100 font-black text-lg">Click to Browse</p>
+                                <p className="text-sm text-slate-500 font-medium mt-1">or drag and drop images here</p>
+                            </div>
 
-            {/* Upload Modal */}
-            {showUploadModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-fade-in">
-                    <div className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-2xl p-6 shadow-2xl space-y-4">
-                        <div className="flex justify-between items-center">
-                            <h2 className="text-xl font-bold">
-                                {activeTab === 'staff' ? 'Add New Staff Member' : `Upload to ${activeCategoryName}`}
-                            </h2>
-                            <button onClick={() => setShowUploadModal(false)}><X className="h-5 w-5" /></button>
-                        </div>
+                            {selectedFiles.length > 0 && (
+                                <div className="flex gap-3 overflow-x-auto py-2 px-1">
+                                    {selectedFiles.map((f, i) => (
+                                        <div key={i} className="w-20 h-20 shrink-0 relative rounded-2xl overflow-hidden border-2 border-slate-200 group">
+                                            <img src={URL.createObjectURL(f)} className="w-full h-full object-cover" />
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); removeFile(i); }}
+                                                className="absolute inset-0 bg-red-500/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                            >
+                                                <X className="h-6 w-6" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
 
-                        <div
-                            className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${dragActive ? 'border-blue-500 bg-blue-50' : 'border-slate-200 hover:border-blue-400'}`}
-                            onDragOver={handleDrag} onDragLeave={handleDrag} onDrop={handleDrop}
-                            onClick={() => inputRef.current?.click()}
-                        >
-                            <input ref={inputRef} type="file" multiple accept="image/*" className="hidden" onChange={e => e.target.files && handleFiles(e.target.files)} />
-                            <Upload className="h-8 w-8 mx-auto text-blue-500 mb-2" />
-                            <p className="text-sm text-slate-500">Click or Drag images here</p>
-                        </div>
-
-                        {selectedFiles.length > 0 && (
-                            <div className="flex gap-2 overflow-x-auto py-2">
-                                {selectedFiles.map((f, i) => (
-                                    <div key={i} className="w-16 h-16 shrink-0 relative rounded-md overflow-hidden">
-                                        <img src={URL.createObjectURL(f)} className="w-full h-full object-cover" />
+                            <div className="space-y-4">
+                                {activeTab === 'staff' ? (
+                                    <>
+                                        <div className="space-y-1.5">
+                                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Full Name</label>
+                                            <input
+                                                placeholder="e.g. John Doe"
+                                                value={staffName}
+                                                onChange={e => setStaffName(e.target.value)}
+                                                className="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border-0 focus:ring-4 focus:ring-blue-600/10 transition-all font-bold"
+                                            />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Department</label>
+                                            <input
+                                                placeholder="e.g. Maths Teacher"
+                                                value={staffPosition}
+                                                onChange={e => setStaffPosition(e.target.value)}
+                                                className="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border-0 focus:ring-4 focus:ring-blue-600/10 transition-all font-bold"
+                                            />
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Caption (Optional)</label>
+                                        <input
+                                            placeholder="Details about this image..."
+                                            value={caption}
+                                            onChange={e => setCaption(e.target.value)}
+                                            className="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border-0 focus:ring-4 focus:ring-blue-600/10 transition-all font-bold"
+                                        />
                                     </div>
-                                ))}
+                                )}
                             </div>
-                        )}
 
-                        {/* Staff Form: Name + Position */}
-                        {activeTab === 'staff' ? (
-                            <div className="space-y-3">
-                                <input
-                                    placeholder="Staff Name (e.g. John Doe)"
-                                    value={staffName}
-                                    onChange={e => setStaffName(e.target.value)}
-                                    className="w-full p-3 border rounded-lg bg-transparent"
-                                />
-                                <input
-                                    placeholder="Position (e.g. Principal, Teacher)"
-                                    value={staffPosition}
-                                    onChange={e => setStaffPosition(e.target.value)}
-                                    className="w-full p-3 border rounded-lg bg-transparent"
-                                />
-                            </div>
-                        ) : (
-                            <input
-                                placeholder="Caption (Optional)"
-                                value={caption}
-                                onChange={e => setCaption(e.target.value)}
-                                className="w-full p-3 border rounded-lg bg-transparent"
-                            />
-                        )}
-
-                        <div className="flex justify-end gap-2 pt-2">
                             <Button
                                 onClick={handleUploadSubmit}
                                 disabled={!selectedFiles.length || uploading || (activeTab === 'staff' && !staffName.trim())}
+                                className="w-full py-8 rounded-[1.5rem] bg-blue-600 hover:bg-blue-700 text-white font-black text-xl shadow-xl shadow-blue-500/20 disabled:scale-100"
                             >
-                                {uploading ? <Loader2 className="animate-spin" /> : activeTab === 'staff' ? 'Add Staff' : 'Upload'}
+                                {uploading ? <Loader2 className="animate-spin h-6 w-6" /> : activeTab === 'staff' ? 'Register Staff' : 'Begin Upload'}
                             </Button>
                         </div>
-                    </div>
+                    </motion.div>
                 </div>
             )}
 
             {/* Add Category Modal */}
             {showAddCatModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-fade-in">
-                    <div className="bg-white dark:bg-slate-900 w-full max-w-sm rounded-2xl p-6 shadow-2xl space-y-4">
-                        <h2 className="text-xl font-bold">New Category</h2>
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/80 p-4 backdrop-blur-xl animate-in fade-in duration-300">
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        className="bg-white dark:bg-slate-900 w-full max-w-sm rounded-[2.5rem] p-8 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-8"
+                    >
+                        <div className="space-y-2">
+                            <h2 className="text-3xl font-black tracking-tight">New Category</h2>
+                            <p className="text-slate-500 font-bold">Group your photos by events or themes.</p>
+                        </div>
+
                         <input
                             autoFocus
-                            placeholder="Category Name (e.g. Sports)"
+                            placeholder="e.g. Annual Sports Day"
                             value={newCatName}
                             onChange={e => setNewCatName(e.target.value)}
-                            className="w-full p-2 border rounded-lg bg-transparent"
+                            className="w-full p-5 bg-slate-50 dark:bg-slate-800 rounded-2xl border-0 focus:ring-4 focus:ring-blue-600/10 transition-all font-bold text-lg"
                         />
-                        <div className="flex justify-end gap-2">
-                            <Button variant="outline" onClick={() => setShowAddCatModal(false)}>Cancel</Button>
-                            <Button onClick={handleAddCategory} disabled={!newCatName.trim()}>Create</Button>
+
+                        <div className="flex gap-3">
+                            <Button variant="outline" onClick={() => setShowAddCatModal(false)} className="flex-1 py-7 rounded-2xl font-black border-slate-200 dark:border-slate-700">
+                                Cancel
+                            </Button>
+                            <Button onClick={handleAddCategory} disabled={!newCatName.trim()} className="flex-1 py-7 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black shadow-lg shadow-blue-500/20">
+                                Create
+                            </Button>
                         </div>
-                    </div>
+                    </motion.div>
                 </div>
             )}
-
         </div>
     );
 }

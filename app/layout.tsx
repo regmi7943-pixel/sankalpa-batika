@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { SiteLayout } from '@/components/layout/site-layout';
 import { LayoutWrapper } from '@/components/layout/layout-wrapper';
 import { Toaster } from 'sonner';
+import { SecretEntry } from '@/components/secret-entry';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -47,6 +48,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <SecretEntry />
           <LayoutWrapper
             siteLayout={
               <SiteLayout>

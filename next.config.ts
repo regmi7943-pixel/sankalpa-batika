@@ -21,8 +21,10 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value:
               "default-src 'self'; " +
-              "img-src 'self' data: https://res.cloudinary.com; " +
-              "script-src 'self' 'unsafe-inline'; " +
+              "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.google-analytics.com; " +
+              "img-src 'self' data: https://res.cloudinary.com https://www.google-analytics.com https://www.googletagmanager.com; " +
+              "script-src 'self' 'unsafe-inline' https://apis.google.com https://www.googletagmanager.com https://www.google-analytics.com; " +
+              "frame-src 'self' https://*.firebaseapp.com; " +
               "style-src 'self' 'unsafe-inline'; " +
               "font-src 'self' data:;",
           },
