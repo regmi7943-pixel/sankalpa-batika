@@ -198,24 +198,6 @@ export default function AdminGalleryPage() {
         }
     };
 
-    const handleResetGallery = async () => {
-        if (!confirm('Are you sure you want to delete all photos and staff members? This will keep only Home Slides.')) return;
-
-        setLoading(true);
-        try {
-            const result = await resetGalleryKeepSlides();
-            if (result.success) {
-                toast.success('Gallery reset successfully');
-                await loadData();
-            } else {
-                toast.error('Reset failed');
-            }
-        } catch (err) {
-            toast.error('Reset error');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     // --- Components ---
 

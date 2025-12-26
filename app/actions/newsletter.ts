@@ -67,3 +67,31 @@ export async function deleteNewsletterSubscriber(id: string): Promise<{ success:
         return { success: false, error: 'Failed to delete subscriber' };
     }
 }
+// Unsubscribe from newsletter
+export async function unsubscribeNewsletter(email: string): Promise<{ success: boolean; message: string }> {
+    if (!email || !email.includes('@')) {
+        return { success: false, message: 'Please enter a valid email address.' };
+    }
+
+    try {
+        const subscribersRef = adminDb.ref('newsletter/subscribers');
+        const snapshot = await subscribersRef.orderByChild('email').equalTo(email.toLowerCase()).once('value');
+
+        if (!snapshot.exists()) {
+            return { success: false, message: 'Email not found in our subscription list.' };
+        }
+
+        // Remove all occurrences (should be only one, but let's be safe)
+        const updates: any = {};
+        snapshot.forEach((child) => {
+            updates[child.key!] = null;
+        });
+
+        await subscribersRef.update(updates);
+
+        return { success: true, message: 'You have been successfully unsubscribed.' };
+    } catch (error) {
+        console.error('Newsletter unsubscription error:', error);
+        return { success: false, message: 'Something went wrong. Please try again later.' };
+    }
+}
