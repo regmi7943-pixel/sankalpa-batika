@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import Image from 'next/image';
-import { Card, CardContent } from '@/components/ui/card';
 import { FileText, X, ChevronLeft, ChevronRight, Download, ImageIcon, ZoomIn } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface GalleryClientProps {
     items: any[];
@@ -14,37 +14,26 @@ export function GalleryClient({ items, categories }: GalleryClientProps) {
     const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
     const [activeCategory, setActiveCategory] = useState<string>('all');
 
-    // Separate documents (always show at bottom)
-    const documents = items.filter(item => item.type !== 'image');
+    const allImages = useMemo(() => items.filter(item => item.type === 'image'), [items]);
+    const documents = useMemo(() => items.filter(item => item.type !== 'image'), [items]);
 
-    // Get all images
-    const allImages = items.filter(item => item.type === 'image');
+    const filteredImages = useMemo(() => {
+        return allImages.filter(img => {
+            return activeCategory === 'all' || img.category === activeCategory;
+        });
+    }, [allImages, activeCategory]);
 
-    // Filter images for Marquee
-    const displayImages = activeCategory === 'all'
-        ? allImages
-        : allImages.filter(img => img.category === activeCategory);
-
-    // Prepare images for infinite scroll (Duplicate to create seamless loop)
-    // If few images, repeat more times to fill width
-    const marqueeImages = displayImages.length > 0 && displayImages.length < 5
-        ? [...displayImages, ...displayImages, ...displayImages, ...displayImages]
-        : [...displayImages, ...displayImages];
-
-    // Handlers for Lightbox Navigation
-    const handleNext = useCallback((e?: React.MouseEvent) => {
-        e?.stopPropagation();
+    const handleNext = useCallback(() => {
         if (selectedImageIndex === null) return;
-        setSelectedImageIndex((prev) => (prev! + 1) % displayImages.length);
-    }, [selectedImageIndex, displayImages.length]);
+        setSelectedImageIndex((prev) => (prev! + 1) % filteredImages.length);
+    }, [selectedImageIndex, filteredImages.length]);
 
-    const handlePrev = useCallback((e?: React.MouseEvent) => {
-        e?.stopPropagation();
+    const handlePrev = useCallback(() => {
         if (selectedImageIndex === null) return;
-        setSelectedImageIndex((prev) => (prev! - 1 + displayImages.length) % displayImages.length);
-    }, [selectedImageIndex, displayImages.length]);
+        setSelectedImageIndex((prev) => (prev! - 1 + filteredImages.length) % filteredImages.length);
+    }, [selectedImageIndex, filteredImages.length]);
 
-    const handleClose = () => setSelectedImageIndex(null);
+    const handleClose = useCallback(() => setSelectedImageIndex(null), []);
 
     // Keyboard Navigation
     useEffect(() => {
@@ -54,204 +43,194 @@ export function GalleryClient({ items, categories }: GalleryClientProps) {
             if (e.key === 'ArrowLeft') handlePrev();
             if (e.key === 'Escape') handleClose();
         };
-
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [selectedImageIndex, handleNext, handlePrev]);
+    }, [selectedImageIndex, handleNext, handlePrev, handleClose]);
 
     return (
-        <div className="space-y-12">
-
-            {/* --- Category Tabs --- */}
-            {categories.length > 0 && (
-                <div className="flex justify-center flex-wrap gap-2 px-4 animate-fade-in">
+        <div className="space-y-16">
+            {/* --- Premium Filters --- */}
+            <div className="flex justify-center mb-12">
+                <div className="flex flex-wrap items-center justify-center p-1.5 bg-slate-100/50 dark:bg-slate-800/50 backdrop-blur-xl rounded-[2rem] border border-slate-200/50 dark:border-slate-700/50 shadow-inner">
                     <button
                         onClick={() => setActiveCategory('all')}
-                        className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${activeCategory === 'all'
-                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
-                            : 'bg-surface text-muted-foreground hover:bg-surface-dark'
-                            }`}
+                        className={`relative px-6 py-2.5 rounded-full text-sm font-black tracking-tight transition-all duration-300 ${activeCategory === 'all' ? 'text-white' : 'text-muted hover:text-foreground'}`}
                     >
+                        {activeCategory === 'all' && (
+                            <motion.div layoutId="active-cat" className="absolute inset-0 bg-blue-600 rounded-full shadow-lg shadow-blue-600/25 -z-10" />
+                        )}
                         All Photos
                     </button>
                     {categories.map(cat => (
                         <button
                             key={cat.id}
                             onClick={() => setActiveCategory(cat.id)}
-                            className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${activeCategory === cat.id
-                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
-                                : 'bg-surface text-muted-foreground hover:bg-surface-dark'
-                                }`}
+                            className={`relative px-6 py-2.5 rounded-full text-sm font-black tracking-tight transition-all duration-300 ${activeCategory === cat.id ? 'text-white' : 'text-muted hover:text-foreground'}`}
                         >
+                            {activeCategory === cat.id && (
+                                <motion.div layoutId="active-cat" className="absolute inset-0 bg-blue-600 rounded-full shadow-lg shadow-blue-600/25 -z-10" />
+                            )}
                             {cat.name}
                         </button>
                     ))}
                 </div>
-            )}
+            </div>
 
-            {/* --- Gallery Display --- */}
-            {displayImages.length > 0 ? (
-                // Use marquee only when more than 4 images (can't fit in one row)
-                displayImages.length > 4 ? (
-                    // Running Train Marquee
-                    <div className="overflow-hidden relative py-8">
-                        <div className="relative group">
-                            <div className="flex gap-8 animate-scroll-left w-max group-hover:paused">
-                                {marqueeImages.map((item, idx) => (
-                                    <div
-                                        key={`${item.id}-${idx}`}
-                                        className="w-[320px] h-[240px] md:w-[500px] md:h-[350px] flex-shrink-0 relative rounded-2xl overflow-hidden cursor-pointer shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300"
-                                        onClick={() => {
-                                            const index = displayImages.findIndex(img => img.id === item.id);
-                                            setSelectedImageIndex(index);
-                                        }}
-                                    >
-                                        <Image
-                                            src={item.url}
-                                            alt={item.caption || 'Gallery Image'}
-                                            fill
-                                            className="object-cover"
-                                            sizes="(max-width: 768px) 350px, 500px"
-                                            priority={idx < 4}
-                                        />
-                                        <div className="absolute inset-0 bg-black/10 hover:bg-transparent transition-colors" />
-                                        <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300">
-                                            <p className="text-white font-medium truncate">{item.caption}</p>
+            {/* --- Masonry Gallery Grid --- */}
+            {filteredImages.length > 0 ? (
+                <motion.div
+                    layout
+                    className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-8 space-y-8"
+                >
+                    <AnimatePresence mode='popLayout'>
+                        {filteredImages.map((item, idx) => (
+                            <motion.div
+                                layout
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.9 }}
+                                key={item.id}
+                                onClick={() => setSelectedImageIndex(idx)}
+                                className="break-inside-avoid relative group rounded-[1.5rem] overflow-hidden cursor-pointer shadow-sm hover:shadow-2xl transition-all duration-500 border border-slate-100 dark:border-slate-800/50"
+                            >
+                                <div className="relative">
+                                    <Image
+                                        src={item.url}
+                                        alt={item.caption || 'Gallery Image'}
+                                        width={600}
+                                        height={800}
+                                        className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-110"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-8">
+                                        <div className="translate-y-4 group-hover:translate-y-0 transition-transform duration-500 space-y-2">
+                                            <p className="text-white font-black text-lg leading-tight">{item.caption}</p>
+                                            <div className="flex items-center gap-2 text-blue-400 font-bold text-sm">
+                                                <ZoomIn className="h-4 w-4" />
+                                                View Larger
+                                            </div>
                                         </div>
                                     </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                ) : (
-                    // Static Centered Grid for few images
-                    <div className="flex justify-center gap-6 flex-wrap px-4 py-8">
-                        {displayImages.map((item, idx) => (
-                            <div
-                                key={item.id}
-                                className="w-[320px] h-[240px] md:w-[400px] md:h-[280px] relative rounded-2xl overflow-hidden cursor-pointer shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 group"
-                                onClick={() => setSelectedImageIndex(idx)}
-                            >
-                                <Image
-                                    src={item.url}
-                                    alt={item.caption || 'Gallery Image'}
-                                    fill
-                                    className="object-cover"
-                                    sizes="(max-width: 768px) 350px, 400px"
-                                    priority
-                                />
-                                <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
-                                <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    <p className="text-white font-medium truncate">{item.caption}</p>
                                 </div>
-                            </div>
+                            </motion.div>
                         ))}
-                    </div>
-                )
+                    </AnimatePresence>
+                </motion.div>
             ) : (
-                <div className="text-center py-20 bg-surface rounded-2xl border border-surface-dark/10 mx-4">
-                    <ImageIcon className="h-16 w-16 text-muted-light mx-auto mb-4" />
-                    <p className="text-foreground font-medium">No images found in this category.</p>
+                <div className="text-center py-32 bg-slate-50 dark:bg-slate-900/40 rounded-[2.5rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
+                    <ImageIcon className="h-20 w-20 text-muted/30 mx-auto mb-6" />
+                    <p className="text-muted text-xl font-bold">No images match your selection.</p>
                 </div>
             )}
 
-
-            {/* --- Documents Section (Static Grid) --- */}
+            {/* --- Premium Documents Section --- */}
             {documents.length > 0 && (
-                <div className="max-w-6xl mx-auto px-4">
-                    <div className="flex items-center gap-4 mb-8">
-                        <div className="h-1 flex-1 bg-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
-                        <h2 className="text-2xl font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2">
-                            <FileText className="text-red-500" />
-                            Documents
-                        </h2>
-                        <div className="h-1 flex-1 bg-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
+                <div className="pt-24 space-y-12 text-left">
+                    <div className="flex items-center gap-6">
+                        <h2 className="text-3xl font-black text-foreground tracking-tight whitespace-nowrap">Documents</h2>
+                        <div className="h-px flex-1 bg-gradient-to-r from-slate-200 dark:from-slate-800 to-transparent"></div>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                         {documents.map((doc) => (
                             <a
                                 key={doc.id}
                                 href={doc.url}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="group block bg-white border border-slate-200 rounded-xl p-6 hover:shadow-lg transition-all text-center hover:border-blue-400"
+                                className="group relative bg-surface dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 rounded-[2rem] p-10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden"
                             >
-                                <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                                    <FileText className="h-8 w-8 text-red-500" />
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-red-600/5 rounded-full -mr-16 -mt-16 blur-2xl group-hover:bg-red-600/10 transition-colors"></div>
+                                <div className="w-20 h-20 bg-red-600/10 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500">
+                                    <FileText className="h-10 w-10 text-red-600" />
                                 </div>
-                                <p className="font-semibold text-slate-800 truncate">{doc.caption || 'Untitled Document'}</p>
-                                <p className="text-xs text-slate-500 mt-1">PDF Document</p>
+                                <h3 className="font-black text-xl text-foreground leading-tight mb-2 truncate">{doc.caption || 'Untitled Document'}</h3>
+                                <p className="text-sm font-bold text-muted uppercase tracking-widest">PDF Resource</p>
+                                <div className="mt-8 flex items-center gap-2 text-blue-600 font-black text-sm group-hover:translate-x-1 transition-transform">
+                                    Download <Download className="h-4 w-4" />
+                                </div>
                             </a>
                         ))}
                     </div>
                 </div>
             )}
 
-
-            {/* --- Lightbox Modal --- */}
-            {selectedImageIndex !== null && displayImages[selectedImageIndex] && (
-                <div
-                    className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in"
-                    onClick={handleClose}
-                >
-                    {/* Close Button */}
-                    <button
-                        className="absolute top-6 right-6 text-white/50 hover:text-white transition-colors z-50 p-2 hover:bg-white/10 rounded-full"
+            {/* --- Enhanced Lightbox --- */}
+            <AnimatePresence>
+                {selectedImageIndex !== null && filteredImages[selectedImageIndex] && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] bg-black/98 backdrop-blur-3xl flex flex-col items-center justify-center p-4 md:p-8"
                         onClick={handleClose}
                     >
-                        <X className="h-8 w-8" />
-                    </button>
+                        <button
+                            className="absolute top-6 right-6 md:top-10 md:right-10 text-white/40 hover:text-white transition-all z-[110] p-3 bg-white/5 hover:bg-white/10 rounded-full backdrop-blur-md active:scale-90"
+                            onClick={handleClose}
+                        >
+                            <X className="h-6 w-6 md:h-8 md:w-8" />
+                        </button>
 
-                    {/* Navigation Buttons (Desktop) */}
-                    <button
-                        className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white hover:bg-white/10 p-3 rounded-full transition-all hidden md:block"
-                        onClick={handlePrev}
-                    >
-                        <ChevronLeft className="h-10 w-10" />
-                    </button>
-
-                    <button
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white hover:bg-white/10 p-3 rounded-full transition-all hidden md:block"
-                        onClick={handleNext}
-                    >
-                        <ChevronRight className="h-10 w-10" />
-                    </button>
-
-                    {/* Main Image */}
-                    <div className="relative max-w-6xl max-h-[85vh] w-full h-full flex flex-col items-center justify-center" onClick={(e) => e.stopPropagation()}>
-                        <div className="relative w-full h-full">
-                            <Image
-                                src={displayImages[selectedImageIndex].url}
-                                alt="Gallery Image"
-                                fill
-                                className="object-contain"
-                                priority
-                            />
+                        <div className="absolute inset-0 flex items-center justify-between px-4 md:px-10 pointer-events-none z-[105]">
+                            <button
+                                className="pointer-events-auto text-white/40 hover:text-white bg-white/5 hover:bg-white/10 p-4 md:p-6 rounded-full transition-all backdrop-blur-md active:scale-90"
+                                onClick={(e) => { e.stopPropagation(); handlePrev(); }}
+                            >
+                                <ChevronLeft className="h-8 w-8 md:h-12 md:w-12" />
+                            </button>
+                            <button
+                                className="pointer-events-auto text-white/40 hover:text-white bg-white/5 hover:bg-white/10 p-4 md:p-6 rounded-full transition-all backdrop-blur-md active:scale-90"
+                                onClick={(e) => { e.stopPropagation(); handleNext(); }}
+                            >
+                                <ChevronRight className="h-8 w-8 md:h-12 md:w-12" />
+                            </button>
                         </div>
 
-                        {/* Caption & Counter */}
-                        <div className="mt-4 text-center">
-                            <p className="text-white text-lg font-medium">{displayImages[selectedImageIndex].caption}</p>
-                            <p className="text-white/50 text-sm mt-1">
-                                {selectedImageIndex + 1} / {displayImages.length}
-                            </p>
-                        </div>
-                    </div>
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="relative w-full h-full flex flex-col items-center justify-center gap-6 z-[102]"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="relative w-full flex-1 max-w-7xl max-h-[75vh] group shadow-2xl">
+                                <Image
+                                    src={filteredImages[selectedImageIndex].url}
+                                    alt="Gallery Image"
+                                    fill
+                                    className="object-contain"
+                                    priority
+                                />
+                            </div>
 
-                    {/* Download Button */}
-                    <a
-                        href={displayImages[selectedImageIndex].url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="absolute bottom-6 right-6 flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg backdrop-blur-sm transition-all text-sm font-medium"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <Download className="h-4 w-4" />
-                        Original
-                    </a>
-                </div>
-            )}
+                            <div className="w-full max-w-5xl flex flex-col md:flex-row items-end justify-between gap-6 px-4 md:px-8">
+                                <div className="space-y-2 text-left w-full">
+                                    <h3 className="text-white text-2xl md:text-3xl font-black tracking-tight leading-tight">
+                                        {filteredImages[selectedImageIndex].caption}
+                                    </h3>
+                                    <div className="flex items-center gap-4">
+                                        <span className="px-3 py-1 bg-white/10 rounded-lg text-white/50 font-black uppercase tracking-[0.2em] text-[10px]">
+                                            Image {selectedImageIndex + 1} / {filteredImages.length}
+                                        </span>
+                                        <div className="h-px flex-1 bg-white/5" />
+                                    </div>
+                                </div>
+
+                                <a
+                                    href={filteredImages[selectedImageIndex].url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="flex-shrink-0 flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 py-4 rounded-2xl font-black transition-all backdrop-blur-md active:scale-95 text-sm"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    <Download className="h-5 w-5 opacity-70" />
+                                    Download Original
+                                </a>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

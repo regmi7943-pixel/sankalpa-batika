@@ -1,8 +1,12 @@
 // Force dynamic rendering to ensure fresh data on Vercel
 export const dynamic = 'force-dynamic';
 
-import { Target, Eye, Heart, GraduationCap, Award, Shield, Users, Zap } from 'lucide-react';
+import Link from 'next/link';
+import { Target, Eye, Heart, GraduationCap, Award, Shield, Users, Zap, ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { getPageContent } from '@/app/actions/settings';
+import { getGallery } from '@/app/actions/gallery';
+import StaffCard from '@/components/staff-card';
 
 const defaultContent = {
     pageTitle: 'About Sankalpa Vatika',
@@ -38,8 +42,14 @@ const defaultContent = {
 const iconMap: Record<string, any> = { Award, Shield, Users, Zap, Heart };
 
 export default async function AboutPage() {
-    const result = await getPageContent('about');
+    const [result, galleryRes] = await Promise.all([
+        getPageContent('about'),
+        getGallery()
+    ]);
+
     const content = result.success && result.data ? { ...defaultContent, ...result.data } : defaultContent;
+    const allStaff = (galleryRes.data || []).filter((item: any) => item.category === 'staff');
+    const previewStaff = allStaff.slice(0, 3);
 
     return (
         <div className="pt-20">
@@ -164,26 +174,37 @@ export default async function AboutPage() {
 
             {/* Leadership Section Preview */}
             <section className="py-16 md:py-24 bg-surface border-t border-surface-dark/10">
-                <div className="max-w-4xl mx-auto px-4 text-center">
-                    <div className="w-16 h-16 md:w-20 md:h-20 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div className="max-w-6xl mx-auto px-4 text-center">
+                    <div className="w-16 h-16 md:w-20 md:h-20 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-600/20">
                         <GraduationCap className="h-8 w-8 md:h-10 md:w-10 text-white" />
                     </div>
                     <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-6">Met Our Dedicated Team</h2>
-                    <p className="text-muted mb-10 text-sm md:text-lg">
+                    <p className="text-muted mb-12 text-sm md:text-lg max-w-3xl mx-auto">
                         Our faculty members are highly qualified, experienced, and passionate about teaching. They are committed to providing a supportive and challenging learning environment for all students.
                     </p>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                        {/* Simplified placeholders for team members */}
-                        {[1, 2, 3].map((i) => (
-                            <div key={i} className="space-y-3 p-4 bg-background dark:bg-surface/50 rounded-3xl border border-surface-dark/10 shadow-sm animate-fade-in">
-                                <div className="aspect-square bg-surface dark:bg-background rounded-2xl overflow-hidden border border-surface-dark/10 relative">
-                                    <div className="absolute inset-0 bg-blue-600/5"></div>
-                                </div>
-                                <div className="h-4 bg-muted/20 rounded-full w-2/3 mx-auto"></div>
-                                <div className="h-3 bg-muted/10 rounded-full w-1/2 mx-auto"></div>
-                            </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 max-w-5xl mx-auto justify-center">
+                        {previewStaff.map((staff: any) => (
+                            <StaffCard key={staff.id} staff={staff} />
                         ))}
+
+                        {previewStaff.length === 0 && (
+                            <div className="col-span-full py-10 opacity-40">
+                                <p className="italic">No staff members to display.</p>
+                            </div>
+                        )}
                     </div>
+
+                    {allStaff.length > 3 && (
+                        <div className="mt-12">
+                            <Link href="/staff">
+                                <Button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 rounded-full text-sm md:text-base font-bold shadow-lg shadow-blue-500/25 flex items-center gap-2 mx-auto">
+                                    View Our All Staff
+                                    <ArrowRight className="h-4 w-4 md:h-5 md:w-5" />
+                                </Button>
+                            </Link>
+                        </div>
+                    )}
                 </div>
             </section>
         </div>

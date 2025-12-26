@@ -7,22 +7,22 @@ import { Card, CardContent } from '@/components/ui/card';
 import { getPageContent, getSiteSettings } from '@/app/actions/settings';
 import ContactForm from '@/components/contact-form';
 
-const defaultContent = {
-    pageTitle: 'Get In Touch',
-    pageSubtitle: 'Have questions? We\'d love to hear from you.',
-    contactInfo: [
-        { icon: 'MapPin', title: 'Visit Us', details: 'Kathmandu, Nepal' },
-        { icon: 'Phone', title: 'Call Us', details: '+977-1-4XXXXXX' },
-        { icon: 'Mail', title: 'Email Us', details: 'info@sankalpavatika.edu.np' },
-        { icon: 'Clock', title: 'Office Hours', details: 'Sun-Fri: 9AM-4PM' },
-    ],
-};
-
-const iconMap: Record<string, any> = { MapPin, Phone, Clock, Mail };
-
 export default async function ContactPage() {
+    const defaultContent = {
+        pageTitle: 'Get In Touch',
+        pageSubtitle: 'Have questions? We\'d love to hear from you.',
+        contactInfo: [
+            { icon: 'MapPin', title: 'Visit Us', details: 'Kathmandu, Nepal' },
+            { icon: 'Phone', title: 'Call Us', details: '+977-1-4XXXXXX' },
+            { icon: 'Mail', title: 'Email Us', details: 'info@sankalpavatika.edu.np' },
+            { icon: 'Clock', title: 'Office Hours', details: 'Sun-Fri: 9AM-4PM' },
+        ],
+    };
+
     const pageResult = await getPageContent('contact');
     const settingsResult = await getSiteSettings();
+
+    const iconMap: Record<string, any> = { MapPin, Phone, Clock, Mail };
 
     const settings = settingsResult.success ? settingsResult.data : {};
     const pageContent = pageResult.success && pageResult.data ? pageResult.data : {};

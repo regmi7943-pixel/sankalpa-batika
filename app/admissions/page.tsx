@@ -68,7 +68,7 @@ export default async function AdmissionsPage() {
                     <div className="flex flex-wrap justify-center gap-6">
                         {content.steps.map((step: any, i: number) => (
                             <div key={i} className="relative p-6 md:p-8 bg-surface/50 dark:bg-surface/30 backdrop-blur-sm rounded-3xl animate-slide-up flex flex-col items-center text-center border border-surface-dark/20 shadow-sm card-hover w-full sm:w-[calc(50%-12px)] lg:w-[calc(25%-18px)]" style={{ animationDelay: `${i * 0.1}s` }}>
-                                <div className="text-4xl md:text-6xl font-extrabold text-blue-500/20 dark:text-blue-400/20 mb-4">{step.number}</div>
+                                <div className="text-4xl md:text-6xl font-extrabold text-blue-600/30 dark:text-blue-400/40 mb-4">{step.number}</div>
                                 <h3 className="text-lg md:text-xl font-bold text-foreground mb-3">{step.title}</h3>
                                 <p className="text-muted text-sm md:text-base leading-relaxed">{step.description}</p>
                             </div>
@@ -98,18 +98,7 @@ export default async function AdmissionsPage() {
                             ))}
                         </div>
 
-                        <div className="mt-8 md:mt-12 p-4 md:p-6 bg-blue-50 dark:bg-blue-900/20 rounded-2xl border border-blue-100 dark:border-blue-900/30 flex flex-col md:flex-row items-center gap-4 text-center md:text-left">
-                            <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                                <FileText className="h-5 w-5 md:h-6 md:w-6 text-white" />
-                            </div>
-                            <div>
-                                <p className="text-blue-900 dark:text-blue-100 font-bold text-sm md:text-base">Download Application Form</p>
-                                <p className="text-blue-700 dark:text-blue-200 text-xs md:text-sm">You can also download and fill the form offline.</p>
-                            </div>
-                            <Button className="md:ml-auto bg-blue-600 hover:bg-blue-700 text-xs md:text-sm whitespace-nowrap">
-                                Download PDF
-                            </Button>
-                        </div>
+
                     </div>
                 </div>
             </section>
@@ -132,9 +121,7 @@ export default async function AdmissionsPage() {
                                     <ArrowRight className="ml-2 h-5 w-5" />
                                 </Button>
                             </Link>
-                            <Button size="lg" variant="outline" className="w-full sm:w-auto border-white/30 text-white hover:bg-white/10 px-8 py-6 text-lg bg-transparent">
-                                Admission Calendar
-                            </Button>
+
                         </div>
                     </div>
                 </div>

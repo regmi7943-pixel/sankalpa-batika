@@ -13,8 +13,10 @@ export interface Event {
     id: string;
     name: string;
     description: string;
-    date: number; // timestamp
+    date: number; // Start timestamp
+    endDate?: number; // End timestamp (optional)
     location?: string;
+    attachmentUrl?: string; // Photo or PDF link
 }
 
 export interface GalleryItem {

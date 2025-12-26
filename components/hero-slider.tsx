@@ -146,20 +146,7 @@ export default function HeroSlider({ slides, content }: HeroSliderProps) {
                 )}
             </div>
 
-            {/* Dots Pagination (Kept, but arrows removed) */}
-            {activeSlides.length > 1 && (
-                <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-20 hidden md:flex gap-2">
-                    {activeSlides.map((_, i) => (
-                        <button
-                            key={i}
-                            onClick={() => setCurrentSlide(i)}
-                            className={`w-2 h-2 rounded-full transition-all duration-300 ${i === currentSlide ? 'bg-amber-400 w-6' : 'bg-white/50 hover:bg-white/80'
-                                }`}
-                            aria-label={`Go to slide ${i + 1}`}
-                        />
-                    ))}
-                </div>
-            )}
+
 
             {/* Scroll Indicator */}
             <div className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:block z-20">

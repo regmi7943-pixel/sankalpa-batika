@@ -27,7 +27,7 @@ export default function NoticesList({ notices }: NoticesListProps) {
         const term = searchTerm.toLowerCase();
         const filtered = notices.filter(n =>
             n.title.toLowerCase().includes(term) ||
-            n.content.toLowerCase().includes(term)
+            n.content.toLowerCase().replace(/<[^>]*>/g, '').includes(term)
         );
         setFilteredNotices(filtered);
     }, [searchTerm, notices]);

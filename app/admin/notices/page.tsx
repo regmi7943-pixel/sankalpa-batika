@@ -11,6 +11,8 @@ import { toast } from 'sonner';
 
 export default function AdminNoticesPage() {
     const [notices, setNotices] = useState<Notice[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filteredNotices, setFilteredNotices] = useState<Notice[]>([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
 
@@ -29,11 +31,26 @@ export default function AdminNoticesPage() {
             const result = await getNotices();
             if (result.success && result.data) {
                 setNotices(result.data);
+                setFilteredNotices(result.data);
             }
             setLoading(false);
         }
         load();
     }, []);
+
+    // Filter logic
+    useEffect(() => {
+        if (!searchTerm.trim()) {
+            setFilteredNotices(notices);
+            return;
+        }
+        const term = searchTerm.toLowerCase();
+        const filtered = notices.filter(n =>
+            n.title.toLowerCase().includes(term) ||
+            n.content.toLowerCase().includes(term)
+        );
+        setFilteredNotices(filtered);
+    }, [searchTerm, notices]);
 
     // Open Modal for Create
     const openCreateModal = () => {
@@ -277,14 +294,34 @@ export default function AdminNoticesPage() {
                     </Button>
                 </div>
 
+                {/* Search Bar */}
+                <div className="relative">
+                    <Input
+                        placeholder="Search by title or content..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-11 h-12 bg-surface border-surface-dark/20 rounded-xl"
+                    />
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted">
+                        <Loader2 className={`h-4 w-4 animate-spin ${saving || loading ? 'block' : 'hidden'}`} />
+                        {!saving && !loading && (
+                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        )}
+                    </div>
+                </div>
+
                 {/* Notices List */}
                 <div className="space-y-4">
-                    {notices.length === 0 ? (
+                    {filteredNotices.length === 0 ? (
                         <div className="text-center py-20 bg-surface rounded-3xl border border-surface-dark/10">
-                            <p className="text-muted">No notices found. Create one to get started!</p>
+                            <p className="text-muted">
+                                {searchTerm ? 'No notices match your search.' : 'No notices found. Create one to get started!'}
+                            </p>
                         </div>
                     ) : (
-                        notices.map((notice) => (
+                        filteredNotices.map((notice) => (
                             <Card key={notice.id} className="border-0 shadow-md hover:shadow-xl transition-all duration-300 bg-surface group">
                                 <CardContent className="p-6">
                                     <div className="flex flex-col gap-4">

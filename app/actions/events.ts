@@ -93,3 +93,35 @@ export async function deleteEvent(id: string) {
         return { success: false, error: 'Failed to delete event' };
     }
 }
+// ADMIN: Upload Attachment
+export async function uploadEventAttachment(formData: FormData) {
+    const session = await getSession();
+    if (!session) return { success: false, error: 'Unauthorized' };
+
+    const file = formData.get('file') as File;
+    if (!file) return { success: false, error: 'No file provided' };
+
+    try {
+        const cloudinary = (await import('@/lib/cloudinary')).default;
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+
+        const uploadResult: any = await new Promise((resolve, reject) => {
+            cloudinary.uploader.upload_stream(
+                {
+                    folder: 'sankalpa-batika/events',
+                    resource_type: 'auto'
+                },
+                (error, result) => {
+                    if (error) reject(error);
+                    else resolve(result);
+                }
+            ).end(buffer);
+        });
+
+        return { success: true, url: uploadResult.secure_url };
+    } catch (error) {
+        console.error('Upload failed:', error);
+        return { success: false, error: 'Upload failed' };
+    }
+}

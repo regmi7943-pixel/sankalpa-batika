@@ -19,7 +19,7 @@ interface SiteSettings {
 
 export function Footer({ settings }: { settings: SiteSettings }) {
     const pathname = usePathname();
-    const showCTA = pathname !== '/admissions/apply';
+    const showCTA = pathname !== '/admissions/apply' && pathname !== '/admissions';
 
     const quickLinks = [
         { href: '/about', label: 'About Us' },
