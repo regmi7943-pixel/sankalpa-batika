@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { getNotices } from '@/app/actions/notices';
 import { getEvents } from '@/app/actions/events';
-import { getSlides } from '@/app/actions/gallery';
+import { getSlides, getGallery } from '@/app/actions/gallery';
 import { getPageContent } from '@/app/actions/settings';
 import HeroSlider from '@/components/hero-slider';
 import RecentNotices from '@/components/home/recent-notices';
@@ -54,6 +54,11 @@ export default async function HomePage() {
   const { data: notices } = await getNotices();
   const { data: events } = await getEvents();
   const { data: slides } = await getSlides();
+  const { data: galleryItems } = await getGallery();
+
+  const previewPhotos = (galleryItems || [])
+    .filter(item => item.type === 'image')
+    .slice(0, 4);
 
   return (
     <>
@@ -251,19 +256,36 @@ export default async function HomePage() {
       <section className="py-16 md:py-24 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10 md:mb-16">
-            <span className="text-blue-600 font-semibold text-xs md:text-sm uppercase tracking-wider">Our Campus</span>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mt-2 mb-4">Campus Moments</h2>
+            <span className="text-blue-600 font-semibold text-xs md:text-sm uppercase tracking-wider">Our School</span>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mt-2 mb-4">School Moments</h2>
             <div className="w-16 md:w-20 h-1 bg-gradient-to-r from-blue-500 to-amber-500 mx-auto rounded"></div>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="aspect-square bg-surface rounded-xl md:rounded-2xl overflow-hidden group cursor-pointer relative border border-surface-dark/10">
-                <div className="absolute inset-0 bg-blue-900/0 group-hover:bg-blue-900/50 transition-colors flex items-center justify-center">
-                  <Play className="h-10 w-10 md:h-12 md:w-12 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+            {previewPhotos.length > 0 ? (
+              previewPhotos.map((photo: any, i: number) => (
+                <div key={photo.id || i} className="aspect-square bg-surface rounded-xl md:rounded-2xl overflow-hidden group cursor-pointer relative border border-surface-dark/10">
+                  <img
+                    src={photo.url}
+                    alt={photo.caption || 'School Moment'}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-blue-900/0 group-hover:bg-blue-900/40 transition-colors flex items-center justify-center">
+                    <div className="p-2 bg-white/20 backdrop-blur-md rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Play className="h-6 w-6 text-white" />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              [1, 2, 3, 4].map((i) => (
+                <div key={i} className="aspect-square bg-surface rounded-xl md:rounded-2xl overflow-hidden group cursor-pointer relative border border-surface-dark/10">
+                  <div className="absolute inset-0 bg-blue-900/0 group-hover:bg-blue-900/50 transition-colors flex items-center justify-center">
+                    <Play className="h-10 w-10 md:h-12 md:w-12 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                </div>
+              ))
+            )}
           </div>
 
           <div className="text-center mt-8 md:mt-10">
