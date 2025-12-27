@@ -1,15 +1,19 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 export function SecretEntry() {
     const router = useRouter();
+    const pathname = usePathname();
     const buffer = useRef<string[]>([]);
     const sequence = ['1', '2', '3', '1', '2', '3'];
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
+            // Only work on homepage
+            if (pathname !== '/') return;
+
             // Push key to buffer
             buffer.current.push(e.key);
 
@@ -29,7 +33,7 @@ export function SecretEntry() {
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [router]);
+    }, [router, pathname]);
 
     return null; // This component is invisible
 }
