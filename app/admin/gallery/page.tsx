@@ -110,7 +110,7 @@ export default function AdminGalleryPage() {
     const filteredItems = useMemo(() => {
         return items.filter(item => {
             const matchesTab = activeTab === 'glimpses'
-                ? (item.category !== 'staff' && item.category !== 'slide')
+                ? (!item.category || item.category === 'glimpses' || item.category === 'all')
                 : item.category === activeTab;
             const matchesSearch = item.caption?.toLowerCase().includes(searchQuery.toLowerCase());
             return matchesTab && matchesSearch;
@@ -296,12 +296,15 @@ export default function AdminGalleryPage() {
         const isPdf = item.type === 'pdf' || item.url.endsWith('.pdf');
 
         return (
-            <div className="bg-white dark:bg-slate-800 rounded-3xl overflow-hidden border border-slate-100 dark:border-slate-700/50 shadow-sm hover:shadow-xl transition-all group">
-                <div className="aspect-square relative bg-slate-100 dark:bg-slate-900 border-b dark:border-slate-700/50 overflow-hidden">
+            <div
+                onMouseLeave={() => setOpenMenuId(null)}
+                className="relative bg-white dark:bg-slate-800 rounded-[2.5rem] overflow-hidden border-2 border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-2xl transition-all duration-500 group group w-full"
+            >
+                <div className="relative bg-slate-50 dark:bg-slate-900 overflow-hidden">
                     {isPdf ? (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-blue-50 dark:bg-blue-900/10 text-blue-600">
-                            <FileText className="h-12 w-12 mb-2" />
-                            <span className="text-[10px] font-black uppercase tracking-widest">PDF Document</span>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-blue-50/50 dark:bg-blue-900/10 text-blue-600">
+                            <FileText className="h-12 w-12 mb-2 drop-shadow-sm" />
+                            <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Document</span>
                         </div>
                     ) : imageError ? (
                         <div className="absolute inset-0 flex items-center justify-center text-slate-400">
@@ -311,48 +314,74 @@ export default function AdminGalleryPage() {
                         <img
                             src={item.url}
                             alt={item.caption}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            className="w-full h-full object-cover transition-all duration-700 brightness-[0.9] group-hover:brightness-100 group-hover:scale-110"
                             onError={() => setImageError(true)}
                         />
                     )}
 
-                    <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity translate-x-2 group-hover:translate-x-0 transition-transform">
-                        {categories.length > 0 && (
-                            <div className="relative">
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === item.id ? null : item.id); }}
-                                    className="p-2.5 bg-white/90 dark:bg-slate-700/90 text-slate-700 dark:text-slate-100 rounded-xl shadow-lg backdrop-blur-md hover:bg-white active:scale-95 transition-all"
-                                >
-                                    <MoreVertical className="h-4 w-4" />
-                                </button>
-                                {openMenuId === item.id && (
-                                    <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden z-50 animate-in fade-in slide-in-from-top-1">
-                                        <div className="px-4 py-3 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] border-b dark:border-slate-700">Move to</div>
-                                        {categories.map(cat => (
-                                            <button
-                                                key={cat.id}
-                                                onClick={(e) => { e.stopPropagation(); handleMoveItem(item.id, cat.id); setOpenMenuId(null); }}
-                                                className="w-full text-left px-4 py-3 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-slate-700/50 hover:text-blue-600 transition-colors flex items-center gap-2"
-                                            >
-                                                <div className="h-1.5 w-1.5 rounded-full bg-blue-500" />
-                                                {cat.name}
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
+                    {/* Top Overlay: Type Badge */}
+                    <div className="absolute top-4 left-4 z-10">
+                        {isPdf && (
+                            <div className="px-3 py-1 bg-blue-600 text-white text-[9px] font-black uppercase tracking-tighter rounded-full shadow-lg">
+                                PDF
                             </div>
                         )}
-                        <button
-                            onClick={() => handleDeleteItem(item.id, item.publicId || '')}
-                            className="p-2.5 bg-red-500 text-white rounded-xl shadow-lg hover:bg-red-600 active:scale-95 transition-all"
-                        >
-                            <Trash2 className="h-4 w-4" />
-                        </button>
                     </div>
-                </div>
-                <div className="p-4">
-                    <p className="text-sm font-bold text-slate-700 dark:text-slate-200 truncate">{item.caption || 'No caption'}</p>
-                    <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mt-1">{item.type || 'image'}</p>
+
+                    {/* Hover Overlay: Actions & Caption */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-6 translate-y-4 group-hover:translate-y-0">
+                        {item.caption && (
+                            <p className="text-white text-sm font-bold leading-tight mb-4 drop-shadow-md line-clamp-3">
+                                {item.caption}
+                            </p>
+                        )}
+
+                        <div className="flex items-center gap-2">
+                            {categories.length > 0 && (
+                                <div className="relative">
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === item.id ? null : item.id); }}
+                                        className="p-3 bg-white/20 hover:bg-white text-white hover:text-blue-600 rounded-2xl backdrop-blur-xl shadow-lg border border-white/20 transition-all active:scale-90"
+                                    >
+                                        <Plus className="h-4 w-4" />
+                                    </button>
+                                    {openMenuId === item.id && (
+                                        <div className="absolute bottom-full left-0 mb-3 w-48 bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden z-50 animate-in fade-in slide-in-from-bottom-2">
+                                            <div className="px-5 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50">Move to</div>
+                                            {/* Option to move back to Glimpses if not already there */}
+                                            {(item.category && item.category !== 'glimpses' && item.category !== 'all') && (
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); handleMoveItem(item.id, 'glimpses'); setOpenMenuId(null); }}
+                                                    className="w-full text-left px-5 py-4 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white transition-all flex items-center gap-3 group/item"
+                                                >
+                                                    <div className="h-1.5 w-1.5 rounded-full bg-slate-400 group-hover/item:bg-white transition-colors" />
+                                                    Glimpses
+                                                </button>
+                                            )}
+                                            {categories
+                                                .filter(cat => cat.id !== item.category)
+                                                .map(cat => (
+                                                    <button
+                                                        key={cat.id}
+                                                        onClick={(e) => { e.stopPropagation(); handleMoveItem(item.id, cat.id); setOpenMenuId(null); }}
+                                                        className="w-full text-left px-5 py-4 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white transition-all flex items-center gap-3 group/item"
+                                                    >
+                                                        <div className="h-1.5 w-1.5 rounded-full bg-blue-500 group-hover/item:bg-white transition-colors" />
+                                                        {cat.name}
+                                                    </button>
+                                                ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                            <button
+                                onClick={() => handleDeleteItem(item.id, item.publicId || '')}
+                                className="p-3 bg-red-500/80 hover:bg-red-500 text-white rounded-2xl backdrop-blur-xl shadow-lg border border-red-400/20 transition-all active:scale-90"
+                            >
+                                <Trash2 className="h-4 w-4" />
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         );
@@ -421,23 +450,26 @@ export default function AdminGalleryPage() {
                     <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Syncing with database...</p>
                 </div>
             ) : filteredItems.length > 0 ? (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 xl:gap-8 pb-32">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 pb-32">
                     <AnimatePresence mode='popLayout'>
-                        {filteredItems.map(item => (
-                            <motion.div
-                                layout
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.9 }}
-                                key={item.id}
-                            >
-                                {activeTab === 'staff' ? (
-                                    <StaffCard item={item} />
-                                ) : (
-                                    <GalleryCard item={item} />
-                                )}
-                            </motion.div>
-                        ))}
+                        {filteredItems.map((item) => {
+                            return (
+                                <motion.div
+                                    layout
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.95 }}
+                                    key={item.id}
+                                    className="w-full"
+                                >
+                                    {activeTab === 'staff' ? (
+                                        <StaffCard item={item} />
+                                    ) : (
+                                        <GalleryCard item={item} />
+                                    )}
+                                </motion.div>
+                            );
+                        })}
                     </AnimatePresence>
                 </div>
             ) : (

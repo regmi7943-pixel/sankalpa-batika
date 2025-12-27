@@ -20,7 +20,7 @@ export function GalleryClient({ items, categories }: GalleryClientProps) {
     const filteredImages = useMemo(() => {
         return allImages.filter(img => {
             if (activeCategory === 'all') {
-                return img.category !== 'staff' && img.category !== 'slide';
+                return !img.category || img.category === 'glimpses' || img.category === 'all';
             }
             return img.category === activeCategory;
         });
@@ -64,24 +64,18 @@ export function GalleryClient({ items, categories }: GalleryClientProps) {
                         )}
                         Glimpses
                     </button>
-                    <button
-                        onClick={() => setActiveCategory('slide')}
-                        className={`relative px-6 py-2.5 rounded-full text-sm font-black tracking-tight transition-all duration-300 ${activeCategory === 'slide' ? 'text-white' : 'text-muted hover:text-foreground'}`}
-                    >
-                        {activeCategory === 'slide' && (
-                            <motion.div layoutId="active-cat" className="absolute inset-0 bg-blue-600 rounded-full shadow-lg shadow-blue-600/25 -z-10" />
-                        )}
-                        Home Slides
-                    </button>
-                    <button
-                        onClick={() => setActiveCategory('staff')}
-                        className={`relative px-6 py-2.5 rounded-full text-sm font-black tracking-tight transition-all duration-300 ${activeCategory === 'staff' ? 'text-white' : 'text-muted hover:text-foreground'}`}
-                    >
-                        {activeCategory === 'staff' && (
-                            <motion.div layoutId="active-cat" className="absolute inset-0 bg-blue-600 rounded-full shadow-lg shadow-blue-600/25 -z-10" />
-                        )}
-                        Staff Members
-                    </button>
+                    {categories.filter(cat => cat.id !== 'slide' && cat.id !== 'staff').map(cat => (
+                        <button
+                            key={cat.id}
+                            onClick={() => setActiveCategory(cat.id)}
+                            className={`relative px-6 py-2.5 rounded-full text-sm font-black tracking-tight transition-all duration-300 ${activeCategory === cat.id ? 'text-white' : 'text-muted hover:text-foreground'}`}
+                        >
+                            {activeCategory === cat.id && (
+                                <motion.div layoutId="active-cat" className="absolute inset-0 bg-blue-600 rounded-full shadow-lg shadow-blue-600/25 -z-10" />
+                            )}
+                            {cat.name}
+                        </button>
+                    ))}
                 </div>
             </div>
 
