@@ -70,9 +70,9 @@ export default function HeroSlider({ slides, content }: HeroSliderProps) {
                                     />
                                 </div>
 
-                                {/* Professional Dark Overlay - Dimmed Look (Darker as requested) */}
-                                <div className="absolute inset-0 bg-black/70" />
-                                <div className="absolute inset-0 bg-gradient-to-t from-blue-950/90 via-blue-950/60 to-black/40" />
+                                {/* Professional Dark Overlay - Dimmed Look (Made lighter as requested) */}
+                                <div className="absolute inset-0 bg-black/40" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-blue-950/60 via-blue-950/30 to-black/20" />
                             </div>
                         ))}
                     </div>

@@ -59,12 +59,12 @@ export default function HomepageGalleryPreview({ photos }: HomepageGalleryPrevie
 
     return (
         <>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+            <div className="flex flex-wrap justify-center gap-3 md:gap-4">
                 {photos.map((photo, i) => (
                     <div
                         key={photo.id || i}
                         onClick={() => setSelectedIndex(i)}
-                        className="aspect-square bg-surface rounded-xl md:rounded-2xl overflow-hidden group cursor-pointer relative border border-surface-dark/10 shadow-sm hover:shadow-md transition-all duration-300"
+                        className="w-[calc(50%-12px)] sm:w-[calc(33%-12px)] md:w-[calc(25%-16px)] aspect-square bg-surface rounded-xl md:rounded-2xl overflow-hidden group cursor-pointer relative border border-surface-dark/10 shadow-sm hover:shadow-md transition-all duration-300"
                     >
                         <img
                             src={photo.url}

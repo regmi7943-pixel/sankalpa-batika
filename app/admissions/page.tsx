@@ -5,6 +5,7 @@ import { GraduationCap, CheckCircle, FileText, ChevronDown, HelpCircle, ArrowRig
 import { Button } from '@/components/ui/button';
 import { getPageContent } from '@/app/actions/settings';
 import Link from 'next/link';
+import { FaqSection } from './faq-section';
 
 const defaultContent = {
     pageTitle: 'Admissions',
@@ -102,6 +103,11 @@ export default async function AdmissionsPage() {
                     </div>
                 </div>
             </section>
+
+            {/* Required Documents Section ... */}
+
+            {/* FAQ Section */}
+            <FaqSection faqs={content.faqs} />
 
             {/* Digital Application CTA */}
             <section className="py-16 md:py-24 bg-background">
