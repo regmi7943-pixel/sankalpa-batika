@@ -7,28 +7,7 @@ import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import NoticeModal from '@/components/notice-modal';
 import { Badge } from '@/components/ui/badge';
-
-interface Notice {
-    id: string;
-    title: string;
-    content: string;
-    date: any;
-    priority?: string;
-    category?: string;
-    pdfUrl?: string;
-}
-
-interface Event {
-    id: string;
-    title: string;
-    description: string;
-    date: { seconds: number; nanoseconds: number } | any;
-    startTime: string;
-    endTime: string;
-    location: string;
-    category: string;
-    status: string;
-}
+import { Notice, Event } from '@/types';
 
 interface NoticesEventsClientProps {
     notices: Notice[];
@@ -72,8 +51,8 @@ export default function NoticesEventsClient({ notices, events }: NoticesEventsCl
                     <button
                         onClick={() => setActiveTab('notices')}
                         className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold transition-all duration-300 ${activeTab === 'notices'
-                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
-                                : 'text-muted hover:text-foreground'
+                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
+                            : 'text-muted hover:text-foreground'
                             }`}
                     >
                         <Bell className="h-4 w-4" />
@@ -82,8 +61,8 @@ export default function NoticesEventsClient({ notices, events }: NoticesEventsCl
                     <button
                         onClick={() => setActiveTab('events')}
                         className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold transition-all duration-300 ${activeTab === 'events'
-                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
-                                : 'text-muted hover:text-foreground'
+                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
+                            : 'text-muted hover:text-foreground'
                             }`}
                     >
                         <Calendar className="h-4 w-4" />
@@ -120,12 +99,9 @@ export default function NoticesEventsClient({ notices, events }: NoticesEventsCl
                                     >
                                         <div className="space-y-3 flex-1">
                                             <div className="flex items-center gap-3">
-                                                <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 dark:bg-blue-900/20 px-3 py-1 rounded-full">
-                                                    {notice.category || 'General'}
-                                                </span>
                                                 <span className="text-xs text-muted font-medium flex items-center gap-1.5">
                                                     <Clock className="h-3 w-3" />
-                                                    {notice.date?.seconds ? format(new Date(notice.date.seconds * 1000), 'MMM dd, yyyy') : 'Recently'}
+                                                    {notice.createdAt ? format(new Date(notice.createdAt), 'MMM dd, yyyy') : 'Recently'}
                                                 </span>
                                             </div>
                                             <h3 className="text-xl md:text-2xl font-bold text-foreground group-hover:text-blue-600 transition-colors">
@@ -172,17 +148,17 @@ export default function NoticesEventsClient({ notices, events }: NoticesEventsCl
                                         <div className="w-full md:w-64 h-48 md:h-auto rounded-[2rem] bg-gradient-to-br from-blue-600 to-indigo-700 flex flex-col items-center justify-center text-white p-6 shrink-0 shadow-xl overflow-hidden relative">
                                             <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-12 -mt-12 blur-2xl" />
                                             <div className="text-sm uppercase tracking-[0.3em] font-black opacity-80 mb-2">
-                                                {event.date?.seconds ? format(new Date(event.date.seconds * 1000), 'MMMM') : 'Upcoming'}
+                                                {event.date ? format(new Date(event.date), 'MMMM') : 'Upcoming'}
                                             </div>
                                             <div className="text-7xl font-black tracking-tighter">
-                                                {event.date?.seconds ? format(new Date(event.date.seconds * 1000), 'dd') : '??'}
+                                                {event.date ? format(new Date(event.date), 'dd') : '??'}
                                             </div>
                                         </div>
 
                                         <div className="flex-1 p-4 md:p-8 flex flex-col justify-center gap-6">
                                             <div className="space-y-4">
                                                 <h3 className="text-2xl md:text-3xl font-black text-foreground tracking-tight">
-                                                    {event.title}
+                                                    {event.name}
                                                 </h3>
                                                 <p className="text-muted leading-relaxed font-medium">
                                                     {event.description}
@@ -192,11 +168,11 @@ export default function NoticesEventsClient({ notices, events }: NoticesEventsCl
                                             <div className="flex flex-wrap gap-6 items-center pt-4 border-t border-surface-dark/5">
                                                 <div className="flex items-center gap-2.5 text-slate-500 font-bold text-xs uppercase tracking-wider">
                                                     <Clock className="h-4 w-4 text-amber-500" />
-                                                    {event.startTime} - {event.endTime}
+                                                    Events
                                                 </div>
                                                 <div className="flex items-center gap-2.5 text-slate-500 font-bold text-xs uppercase tracking-wider">
                                                     <MapPin className="h-4 w-4 text-blue-500" />
-                                                    {event.location}
+                                                    {event.location || 'Campus'}
                                                 </div>
                                             </div>
                                         </div>
