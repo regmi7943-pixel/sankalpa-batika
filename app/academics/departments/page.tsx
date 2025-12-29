@@ -131,13 +131,13 @@ export default function DepartmentsPage() {
                                         </div>
                                         <div className="text-[10px] font-black text-blue-600/40 uppercase tracking-[0.2em]">Profile Pending</div>
                                     </div>
-                                    <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent z-20">
+                                    <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent z-20 text-center">
                                         <h3 className="text-2xl font-bold text-white mb-1">{dep.name}</h3>
                                         <p className="text-blue-400 font-medium">{dep.role}</p>
                                     </div>
                                 </div>
                                 <div className="space-y-4 px-2">
-                                    <div className="flex items-center gap-3 text-muted group-hover:text-blue-600 transition-colors">
+                                    <div className="flex items-center justify-center gap-3 text-muted group-hover:text-blue-600 transition-colors">
                                         <div className="p-2 rounded-full bg-surface-dark/10 group-hover:bg-blue-600/10 transition-colors">
                                             <Mail className="w-4 h-4" />
                                         </div>

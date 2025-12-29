@@ -494,12 +494,18 @@ export default function AdminAcademicsPage() {
                                                 <div className="space-y-3">
                                                     <label className="text-xs font-bold text-muted uppercase">Bullet Points</label>
                                                     {(level.points || []).map((point, j) => (
-                                                        <DeletableWrapper key={j} onDelete={() => {
-                                                            const newLevels = [...curriculum.levels];
-                                                            newLevels[i].points = level.points.filter((_, idx) => idx !== j);
-                                                            setCurriculum({ ...curriculum, levels: newLevels });
-                                                        }} className="flex items-center gap-2">
-                                                            <div className="flex-grow text-sm">
+                                                        <DeletableWrapper
+                                                            key={j}
+                                                            onDelete={() => {
+                                                                const newLevels = [...curriculum.levels];
+                                                                newLevels[i].points = level.points.filter((_, idx) => idx !== j);
+                                                                setCurriculum({ ...curriculum, levels: newLevels });
+                                                            }}
+                                                            className="flex items-center gap-2 group/item"
+                                                            buttonClassName="right-0 top-0.5"
+                                                            showRing={false}
+                                                        >
+                                                            <div className="flex-grow text-sm py-1 px-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors">
                                                                 <EditableText value={point} onChange={(val) => {
                                                                     const newLevels = [...curriculum.levels];
                                                                     newLevels[i].points[j] = val;

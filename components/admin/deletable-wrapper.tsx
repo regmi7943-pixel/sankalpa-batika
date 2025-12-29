@@ -7,13 +7,15 @@ interface DeletableWrapperProps {
     children: React.ReactNode;
     onDelete: () => void;
     className?: string;
+    buttonClassName?: string;
+    showRing?: boolean;
 }
 
-export function DeletableWrapper({ children, onDelete, className = '' }: DeletableWrapperProps) {
+export function DeletableWrapper({ children, onDelete, className = '', buttonClassName = '', showRing = true }: DeletableWrapperProps) {
     return (
         <div className={`group relative ${className}`}>
             {/* Delete Button - hidden by default, visible on hover */}
-            <div className="absolute -top-3 -right-3 z-50 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className={`absolute -top-2 -right-2 z-50 opacity-0 group-hover:opacity-100 transition-opacity ${buttonClassName}`}>
                 <Button
                     variant="destructive"
                     size="icon"
@@ -31,7 +33,7 @@ export function DeletableWrapper({ children, onDelete, className = '' }: Deletab
             </div>
 
             {/* Wrapped Content */}
-            <div className="group-hover:ring-2 group-hover:ring-red-400 group-hover:ring-offset-2 rounded-xl transition-all">
+            <div className={`${showRing ? 'group-hover:ring-2 group-hover:ring-red-400 group-hover:ring-offset-2' : ''} rounded-xl transition-all`}>
                 {children}
             </div>
         </div>
