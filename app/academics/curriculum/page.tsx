@@ -137,7 +137,7 @@ export default function CurriculumPage() {
                         <div className="w-24 h-1 bg-blue-600 mx-auto mt-4 rounded-full"></div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-center">
                         {content.levels.map((level, i) => (
                             <motion.div
                                 key={i}
@@ -148,8 +148,8 @@ export default function CurriculumPage() {
                                 className="group p-10 rounded-[3rem] bg-surface border border-border hover:border-blue-600/40 hover:shadow-2xl transition-all duration-500 flex flex-col h-full overflow-hidden relative text-center"
                             >
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/5 rounded-bl-[4rem] group-hover:bg-blue-600/10 transition-colors"></div>
-                                <div className="mb-8 relative z-10">
-                                    <div className="text-xs font-black text-blue-600 uppercase tracking-widest mb-2 px-3 py-1 bg-blue-600/5 inline-block rounded-full mx-auto">
+                                <div className="mb-8 relative z-10 flex flex-col items-center">
+                                    <div className="text-xs font-black text-blue-600 uppercase tracking-widest mb-2 px-3 py-1 bg-blue-600/5 inline-block rounded-full">
                                         {level.age}
                                     </div>
                                     <h3 className="text-2xl font-bold text-foreground mt-2">{level.title}</h3>
@@ -157,8 +157,8 @@ export default function CurriculumPage() {
                                 <p className="text-muted leading-relaxed mb-8 grow">
                                     {level.description}
                                 </p>
-                                <div className="space-y-4 pt-8 border-t border-border relative z-10 flex flex-col items-center">
-                                    <div className="space-y-4 w-full max-w-[240px] text-left">
+                                <div className="pt-8 border-t border-border relative z-10">
+                                    <div className="space-y-4 w-fit mx-auto text-left">
                                         {(level.points || []).map((point, j) => (
                                             <div key={j} className="flex items-center gap-3 text-sm font-medium text-foreground/80 group-hover:text-foreground transition-colors">
                                                 <div className="w-1.5 h-1.5 rounded-full bg-blue-600 flex-shrink-0"></div>
