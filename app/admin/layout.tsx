@@ -73,6 +73,7 @@ export default function AdminLayout({
     const pageLinks = [
         { href: '/admin', label: 'Homepage', icon: Home },
         { href: '/admin/about', label: 'About', icon: Info },
+        { href: '/admin/academics', label: 'Academics Page', icon: GraduationCap },
         { href: '/admin/admissions', label: 'Admissions Page', icon: FileText },
         { href: '/admin/clubs', label: 'Clubs & Activities', icon: Calendar },
     ];

@@ -112,3 +112,40 @@ export async function uploadLogo(formData: FormData) {
         return { success: false, error: 'Failed to upload logo' };
     }
 }
+// Generic image upload to Cloudinary
+export async function uploadImage(formData: FormData) {
+    const { getSession } = await import('./auth');
+    const cloudinary = (await import('@/lib/cloudinary')).default;
+
+    const session = await getSession();
+    if (!session) return { success: false, error: 'Unauthorized' };
+
+    try {
+        const file = formData.get('file') as File;
+        const folder = formData.get('folder') as string || 'sankalpa-vatika/general';
+
+        if (!file) return { success: false, error: 'No file provided' };
+
+        const bytes = await file.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+
+        // Upload to Cloudinary
+        const result = await new Promise<any>((resolve, reject) => {
+            cloudinary.uploader.upload_stream(
+                {
+                    folder: folder,
+                    resource_type: 'image'
+                },
+                (error, result) => {
+                    if (error) reject(error);
+                    else resolve(result);
+                }
+            ).end(buffer);
+        });
+
+        return { success: true, url: result.secure_url };
+    } catch (error) {
+        console.error('Image upload failed:', error);
+        return { success: false, error: 'Failed to upload image' };
+    }
+}
