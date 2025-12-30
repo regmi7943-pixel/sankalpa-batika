@@ -3,19 +3,59 @@
 import { useState, useEffect } from 'react';
 import {
     Music, Palette, Trophy, Activity, Clock, ShieldCheck,
-    Star, Users, Plus, Loader2, Edit3, Trash2
+    Star, Users, Plus, Loader2, Edit3, Trash2,
+    BookOpen, Bot, GraduationCap
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getPageContent, savePageContent } from '@/app/actions/settings';
 import { DeletableWrapper } from '@/components/admin/deletable-wrapper';
 import { EditableText } from '@/components/admin/EditableText';
 import { toast } from 'sonner';
+import { motion } from 'framer-motion';
 
 const iconMap: Record<string, any> = {
-    Music, Palette, Trophy, Activity, Clock, ShieldCheck, Star, Users
+    Music, Palette, Trophy, Activity, Clock, ShieldCheck, Star, Users, BookOpen, Bot, GraduationCap
 };
 
-const defaultContent = {
+// --- Interfaces ---
+
+interface OverviewState {
+    pageTitle: string;
+    pageSubtitle: string;
+    houses: { id: string; name: string; color: string; description: string }[];
+    clubs: { id: string; title: string; description: string; icon: string }[];
+    activities: { title: string; time: string; description: string }[];
+}
+
+interface EcaState {
+    hero: { title: string; subtitle: string };
+    sections: { title: string; content: string }[];
+}
+
+interface StemState {
+    hero: { title: string; subtitle: string };
+    projects: { title: string; description: string }[];
+}
+
+interface BookState {
+    hero: { title: string; subtitle: string };
+    reviews: { bookTitle: string; author: string; studentName: string; review: string; }[];
+}
+
+interface ArtsState {
+    hero: { title: string; subtitle: string };
+    events: { title: string; date: string; description: string }[];
+}
+
+interface AlumniState {
+    hero: { title: string; subtitle: string };
+    stories: { name: string; batch: string; achievement: string; quote: string }[];
+}
+
+
+// --- Default States ---
+
+const defaultOverview: OverviewState = {
     pageTitle: 'Clubs & Activities',
     pageSubtitle: 'Holistic development through a wide range of extracurricular engagement.',
     houses: [
@@ -37,316 +77,382 @@ const defaultContent = {
     ]
 };
 
+const defaultEca: EcaState = {
+    hero: { title: 'ECA & CCA', subtitle: 'Extra-Curricular and Co-Curricular Activities' },
+    sections: [
+        { title: 'Debate Club', content: 'Fostering critical thinking and public speaking skills.' },
+        { title: 'Quiz Contest', content: 'Testing general knowledge and awareness.' }
+    ]
+};
+
+const defaultStem: StemState = {
+    hero: { title: 'STEM & Robotics', subtitle: 'Innovating for the future' },
+    projects: [
+        { title: 'Solar Car', description: 'Students built a working prototype of a solar-powered car.' },
+        { title: 'Lego Robotics', description: 'Basic programming and mechanics using Lego Mindstorms.' }
+    ]
+};
+
+const defaultBook: BookState = {
+    hero: { title: 'Book Review Program', subtitle: 'Cultivating the habit of reading' },
+    reviews: [
+        { bookTitle: 'Muna Madan', author: 'Laxmi Prasad Devkota', studentName: 'Aarav Sharma', review: 'A heart-touching story about love and sacrifice.' }
+    ]
+};
+
+const defaultArts: ArtsState = {
+    hero: { title: 'Fine Arts & Music', subtitle: 'Expressing creativity without bounds' },
+    events: [
+        { title: 'Annual Art Exhibition', date: 'Baisakh 15', description: 'Showcasing student artwork from all grades.' }
+    ]
+};
+
+const defaultAlumni: AlumniState = {
+    hero: { title: 'Alumni Association', subtitle: 'Connecting past and present' },
+    stories: [
+        { name: 'Dr. Ram Kumar', batch: '2070', achievement: 'MBBS Gold Medalist', quote: 'Sankalpa Vatika gave me the foundation I needed.' }
+    ]
+};
+
+
 export default function AdminClubsPage() {
+    const [activeTab, setActiveTab] = useState<'overview' | 'eca' | 'stem' | 'book' | 'arts' | 'alumni'>('overview');
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [content, setContent] = useState(defaultContent);
 
-    // Load content
+    const [overview, setOverview] = useState<OverviewState>(defaultOverview);
+    const [eca, setEca] = useState<EcaState>(defaultEca);
+    const [stem, setStem] = useState<StemState>(defaultStem);
+    const [book, setBook] = useState<BookState>(defaultBook);
+    const [arts, setArts] = useState<ArtsState>(defaultArts);
+    const [alumni, setAlumni] = useState<AlumniState>(defaultAlumni);
+
     useEffect(() => {
         async function loadContent() {
-            const result = await getPageContent('clubs');
-            if (result.success && result.data) {
-                setContent({ ...defaultContent, ...result.data });
-            }
+            setLoading(true);
+            const load = async (key: string, setter: any, def: any) => {
+                const res = await getPageContent(key);
+                if (res.success && res.data) setter({ ...def, ...res.data });
+            };
+
+            await Promise.all([
+                load('clubs_overview', setOverview, defaultOverview),
+                load('clubs_eca', setEca, defaultEca),
+                load('clubs_stem', setStem, defaultStem),
+                load('clubs_book', setBook, defaultBook),
+                load('clubs_arts', setArts, defaultArts),
+                load('clubs_alumni', setAlumni, defaultAlumni),
+            ]);
             setLoading(false);
         }
         loadContent();
     }, []);
 
-    // Save content
     const handleSave = async () => {
         setSaving(true);
-        const result = await savePageContent('clubs', content);
-        if (result.success) {
-            toast.success('Clubs & Activities updated successfully!');
-        } else {
-            toast.error('Failed to save changes: ' + result.error);
+        let key = `clubs_${activeTab}`;
+        let data: any = {};
+
+        switch (activeTab) {
+            case 'overview': data = overview; break;
+            case 'eca': data = eca; break;
+            case 'stem': data = stem; break;
+            case 'book': data = book; break;
+            case 'arts': data = arts; break;
+            case 'alumni': data = alumni; break;
         }
+
+        const result = await savePageContent(key, data);
+        if (result.success) toast.success('Saved successfully!');
+        else toast.error('Failed to save: ' + result.error);
         setSaving(false);
     };
 
-    // Listen to toolbar save button
-    useEffect(() => {
-        const handleSaveEvent = () => handleSave();
-        window.addEventListener('admin-save', handleSaveEvent);
-        return () => window.removeEventListener('admin-save', handleSaveEvent);
-    }, [content]);
+    if (loading) return <div className="flex justify-center p-20"><Loader2 className="animate-spin" /></div>;
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-[60vh]">
-                <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-            </div>
-        );
-    }
+    const tabs = [
+        { id: 'overview', label: 'Club', icon: Star },
+        { id: 'eca', label: 'ECA', icon: Activity },
+        { id: 'stem', label: 'STEM', icon: Bot },
+        { id: 'book', label: 'Book Review', icon: BookOpen },
+        { id: 'arts', label: 'Fine Arts', icon: Palette },
+        { id: 'alumni', label: 'Alumni', icon: GraduationCap },
+    ];
 
     return (
-        <div className="relative pb-24">
-            {/* Saving Overlay */}
-            {saving && (
-                <div className="fixed inset-0 z-[60] bg-black/20 backdrop-blur-[2px] flex items-center justify-center">
-                    <div className="bg-surface p-4 rounded-xl shadow-2xl flex items-center gap-3 border border-border">
-                        <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
-                        <span className="font-medium">Saving changes...</span>
-                    </div>
+        <div className="space-y-6 pb-20">
+            {/* Toolbar */}
+            <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-border p-4 flex justify-between items-center -mx-6 px-6 mb-6">
+                <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
+                    {tabs.map((tab) => {
+                        const Icon = tab.icon;
+                        return (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id as any)}
+                                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap ${activeTab === tab.id
+                                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+                                    : 'hover:bg-surface text-muted-foreground hover:text-foreground'
+                                    }`}
+                            >
+                                <Icon className="w-4 h-4" />
+                                {tab.label}
+                            </button>
+                        );
+                    })}
                 </div>
-            )}
+                <Button onClick={handleSave} disabled={saving} className="ml-4 shrink-0 bg-green-600 hover:bg-green-700 text-white">
+                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save Changes'}
+                </Button>
+            </div>
 
-            {/* Hero Section */}
-            <section className="relative py-24 flex items-center justify-center overflow-hidden bg-slate-900 text-white">
-                <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
-                    <h1 className="text-4xl md:text-6xl font-black mb-6 tracking-tight">
-                        <EditableText
-                            value={content.pageTitle}
-                            onChange={(val) => setContent({ ...content, pageTitle: val })}
-                        />
-                    </h1>
-                    <p className="text-lg md:text-xl text-blue-100/80 font-medium max-w-2xl mx-auto">
-                        <EditableText
-                            value={content.pageSubtitle}
-                            onChange={(val) => setContent({ ...content, pageSubtitle: val })}
-                            multiline
-                        />
-                    </p>
-                </div>
-            </section>
+            <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
+                className="max-w-4xl mx-auto"
+            >
+                {/* --- OVERVIEW TAB --- */}
+                {activeTab === 'overview' && (
+                    <div className="space-y-12">
+                        <div className="bg-surface p-8 rounded-3xl border border-border shadow-sm text-center">
+                            <label className="text-xs font-bold text-muted uppercase tracking-wider mb-2 block">Page Title</label>
+                            <h1 className="text-4xl font-black mb-4">
+                                <EditableText value={overview.pageTitle} onChange={v => setOverview({ ...overview, pageTitle: v })} />
+                            </h1>
+                            <label className="text-xs font-bold text-muted uppercase tracking-wider mb-2 block">Subtitle</label>
+                            <p className="text-xl text-muted-foreground">
+                                <EditableText multiline value={overview.pageSubtitle} onChange={v => setOverview({ ...overview, pageSubtitle: v })} />
+                            </p>
+                        </div>
 
-            {/* House System */}
-            <section className="max-w-7xl mx-auto px-4 mt-24">
-                <div className="text-center mb-16">
-                    <h2 className="text-3xl md:text-5xl font-black text-foreground mb-4 italic tracking-tight">The House System</h2>
-                    <div className="w-24 h-1.5 bg-gradient-to-r from-blue-600 to-amber-500 mx-auto rounded-full" />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {content.houses.map((house: any, idx: number) => (
-                        <DeletableWrapper
-                            key={idx}
-                            onDelete={() => {
-                                const newHouses = content.houses.filter((_, i) => i !== idx);
-                                setContent({ ...content, houses: newHouses });
-                            }}
-                        >
-                            <div className="group relative p-8 rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm transition-all duration-500 h-full">
-                                <div className="flex flex-col gap-4">
-                                    <div className="flex items-center gap-4">
-                                        <div
-                                            className="w-12 h-12 rounded-xl flex items-center justify-center shadow-inner"
-                                            style={{ backgroundColor: `${house.color}15` }}
-                                        >
-                                            <ShieldCheck className="h-6 w-6" style={{ color: house.color }} />
+                        {/* House System */}
+                        <div className="space-y-4">
+                            <h3 className="text-2xl font-bold">House System</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {overview.houses.map((house, i) => (
+                                    <div key={i} className="p-6 bg-surface border border-border rounded-xl">
+                                        <div className="flex items-center gap-3 mb-3">
+                                            <input type="color" value={house.color} onChange={e => {
+                                                const newHouses = [...overview.houses]; newHouses[i].color = e.target.value; setOverview({ ...overview, houses: newHouses });
+                                            }} className="w-8 h-8 rounded cursor-pointer" />
+                                            <div className="font-bold flex-1"><EditableText value={house.name} onChange={v => {
+                                                const newHouses = [...overview.houses]; newHouses[i].name = v; setOverview({ ...overview, houses: newHouses });
+                                            }} /></div>
                                         </div>
-                                        <input
-                                            type="color"
-                                            value={house.color}
-                                            onChange={(e) => {
-                                                const newHouses = [...content.houses];
-                                                newHouses[idx].color = e.target.value;
-                                                setContent({ ...content, houses: newHouses });
-                                            }}
-                                            className="w-10 h-10 rounded-lg cursor-pointer border-none bg-transparent"
-                                        />
+                                        <p className="text-sm text-muted"><EditableText multiline value={house.description} onChange={v => {
+                                            const newHouses = [...overview.houses]; newHouses[i].description = v; setOverview({ ...overview, houses: newHouses });
+                                        }} /></p>
                                     </div>
-                                    <h3 className="text-xl font-black text-foreground tracking-tight">
-                                        <EditableText
-                                            value={house.name}
-                                            onChange={(val) => {
-                                                const newHouses = [...content.houses];
-                                                newHouses[idx].name = val;
-                                                setContent({ ...content, houses: newHouses });
-                                            }}
-                                        />
-                                    </h3>
-                                    <p className="text-muted text-sm leading-relaxed font-medium">
-                                        <EditableText
-                                            value={house.description}
-                                            onChange={(val) => {
-                                                const newHouses = [...content.houses];
-                                                newHouses[idx].description = val;
-                                                setContent({ ...content, houses: newHouses });
-                                            }}
-                                            multiline
-                                        />
-                                    </p>
-                                </div>
+                                ))}
                             </div>
-                        </DeletableWrapper>
-                    ))}
-                    {/* Add House */}
-                    <Button
-                        variant="outline"
-                        className="border-dashed border-slate-200 dark:border-slate-800 h-full min-h-[250px] rounded-[2.5rem] flex flex-col gap-2 p-8 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all"
-                        onClick={() => {
-                            setContent({
-                                ...content,
-                                houses: [...content.houses, { id: Date.now().toString(), name: 'New House', color: '#6366f1', description: 'New house description' }]
-                            });
-                        }}
-                    >
-                        <Plus className="h-8 w-8 text-slate-400" />
-                        <span className="font-bold text-slate-500">Add House</span>
-                    </Button>
-                </div>
-            </section>
+                        </div>
 
-            {/* Clubs Grid */}
-            <section className="bg-slate-50 dark:bg-slate-900/50 py-24 mt-24">
-                <div className="max-w-7xl mx-auto px-4">
-                    <div className="text-center md:text-left mb-16">
-                        <h2 className="text-3xl md:text-5xl font-black text-foreground italic tracking-tight">Active Clubs</h2>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {content.clubs.map((club: any, idx: number) => {
-                            const Icon = iconMap[club.icon] || Star;
-                            return (
-                                <DeletableWrapper
-                                    key={idx}
-                                    onDelete={() => {
-                                        const newClubs = content.clubs.filter((_, i) => i !== idx);
-                                        setContent({ ...content, clubs: newClubs });
-                                    }}
-                                >
-                                    <div className="group flex flex-col sm:flex-row gap-8 p-10 bg-white dark:bg-slate-900 rounded-[3rem] border border-slate-100 dark:border-slate-800 shadow-sm h-full">
-                                        <div className="flex flex-col items-center gap-4">
-                                            <div className="w-20 h-20 shrink-0 bg-blue-600/5 dark:bg-blue-600/10 rounded-full flex items-center justify-center">
-                                                <Icon className="h-10 w-10 text-blue-600" />
+                        {/* Active Clubs */}
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-2xl font-bold">Active Clubs</h3>
+                                <Button size="sm" variant="outline" onClick={() => setOverview({ ...overview, clubs: [...overview.clubs, { id: Date.now().toString(), title: 'New Club', description: 'Desc', icon: 'Star' }] })}><Plus className="w-4 h-4 mr-2" />Add Club</Button>
+                            </div>
+                            <div className="grid grid-cols-1 gap-4">
+                                {overview.clubs.map((club, i) => (
+                                    <DeletableWrapper key={i} onDelete={() => {
+                                        const newClubs = overview.clubs.filter((_, idx) => idx !== i); setOverview({ ...overview, clubs: newClubs });
+                                    }}>
+                                        <div className="p-6 bg-surface border border-border rounded-xl flex gap-4">
+                                            <div className="flex-1">
+                                                <div className="font-bold text-lg mb-1"><EditableText value={club.title} onChange={v => {
+                                                    const newClubs = [...overview.clubs]; newClubs[i].title = v; setOverview({ ...overview, clubs: newClubs });
+                                                }} /></div>
+                                                <div className="text-muted"><EditableText multiline value={club.description} onChange={v => {
+                                                    const newClubs = [...overview.clubs]; newClubs[i].description = v; setOverview({ ...overview, clubs: newClubs });
+                                                }} /></div>
                                             </div>
-                                            <select
-                                                value={club.icon}
-                                                onChange={(e) => {
-                                                    const newClubs = [...content.clubs];
-                                                    newClubs[idx].icon = e.target.value;
-                                                    setContent({ ...content, clubs: newClubs });
-                                                }}
-                                                className="text-[10px] bg-slate-100 dark:bg-slate-800 rounded px-2 py-1 border-none font-bold"
-                                            >
-                                                {Object.keys(iconMap).map(iconName => (
-                                                    <option key={iconName} value={iconName}>{iconName}</option>
-                                                ))}
+                                            <select value={club.icon} onChange={e => {
+                                                const newClubs = [...overview.clubs]; newClubs[i].icon = e.target.value; setOverview({ ...overview, clubs: newClubs });
+                                            }} className="bg-transparent border rounded p-1 text-xs h-fit self-start">
+                                                {Object.keys(iconMap).map(k => <option key={k} value={k}>{k}</option>)}
                                             </select>
                                         </div>
-                                        <div className="space-y-4 flex-1">
-                                            <h3 className="text-2xl font-black text-foreground tracking-tight">
-                                                <EditableText
-                                                    value={club.title}
-                                                    onChange={(val) => {
-                                                        const newClubs = [...content.clubs];
-                                                        newClubs[idx].title = val;
-                                                        setContent({ ...content, clubs: newClubs });
-                                                    }}
-                                                />
-                                            </h3>
-                                            <p className="text-muted leading-relaxed font-medium">
-                                                <EditableText
-                                                    value={club.description}
-                                                    onChange={(val) => {
-                                                        const newClubs = [...content.clubs];
-                                                        newClubs[idx].description = val;
-                                                        setContent({ ...content, clubs: newClubs });
-                                                    }}
-                                                    multiline
-                                                />
-                                            </p>
-                                        </div>
+                                    </DeletableWrapper>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* --- ECA TAB --- */}
+                {activeTab === 'eca' && (
+                    <div className="space-y-8">
+                        <div className="bg-surface p-8 rounded-3xl border border-border shadow-sm text-center">
+                            <h2 className="text-3xl font-black mb-2"><EditableText value={eca.hero.title} onChange={v => setEca({ ...eca, hero: { ...eca.hero, title: v } })} /></h2>
+                            <p className="text-muted-foreground"><EditableText value={eca.hero.subtitle} onChange={v => setEca({ ...eca, hero: { ...eca.hero, subtitle: v } })} /></p>
+                        </div>
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-xl font-bold">Sections</h3>
+                                <Button size="sm" onClick={() => setEca({ ...eca, sections: [...eca.sections, { title: 'New Section', content: 'Content' }] })}><Plus className="w-4 h-4 mr-2" />Add Section</Button>
+                            </div>
+                            {eca.sections.map((sec, i) => (
+                                <DeletableWrapper key={i} onDelete={() => {
+                                    const newSec = eca.sections.filter((_, idx) => idx !== i); setEca({ ...eca, sections: newSec });
+                                }}>
+                                    <div className="p-6 bg-surface border border-border rounded-xl space-y-2">
+                                        <h4 className="font-bold text-lg"><EditableText value={sec.title} onChange={v => {
+                                            const newSec = [...eca.sections]; newSec[i].title = v; setEca({ ...eca, sections: newSec });
+                                        }} /></h4>
+                                        <div className="text-muted-foreground"><EditableText multiline value={sec.content} onChange={v => {
+                                            const newSec = [...eca.sections]; newSec[i].content = v; setEca({ ...eca, sections: newSec });
+                                        }} /></div>
                                     </div>
                                 </DeletableWrapper>
-                            );
-                        })}
-                        {/* Add Club */}
-                        <Button
-                            variant="outline"
-                            className="border-dashed border-slate-200 dark:border-slate-800 h-full min-h-[200px] rounded-[3rem] flex flex-col gap-2 p-10 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all"
-                            onClick={() => {
-                                setContent({
-                                    ...content,
-                                    clubs: [...content.clubs, { id: Date.now().toString(), title: 'New Club', description: 'Club description here', icon: 'Star' }]
-                                });
-                            }}
-                        >
-                            <Plus className="h-10 w-10 text-slate-400" />
-                            <span className="font-bold text-slate-500">Add New Club</span>
-                        </Button>
+                            ))}
+                        </div>
                     </div>
-                </div>
-            </section>
+                )}
 
-            {/* Activities Schedule */}
-            <section className="max-w-4xl mx-auto px-4 mt-24">
-                <div className="text-center mb-16 space-y-4">
-                    <h2 className="text-3xl md:text-5xl font-black text-foreground italic tracking-tight">General Activities</h2>
-                </div>
-
-                <div className="space-y-4">
-                    {content.activities.map((activity: any, idx: number) => (
-                        <DeletableWrapper
-                            key={idx}
-                            onDelete={() => {
-                                const newActivities = content.activities.filter((_, i) => i !== idx);
-                                setContent({ ...content, activities: newActivities });
-                            }}
-                        >
-                            <div className="group flex flex-col md:flex-row md:items-center justify-between p-8 bg-surface dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl gap-4">
-                                <div className="flex items-center gap-6 flex-1">
-                                    <div className="h-12 w-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
-                                        <Clock className="h-6 w-6" />
-                                    </div>
-                                    <div className="flex-1">
-                                        <h4 className="font-black text-lg text-foreground mb-1">
-                                            <EditableText
-                                                value={activity.title}
-                                                onChange={(val) => {
-                                                    const newActivities = [...content.activities];
-                                                    newActivities[idx].title = val;
-                                                    setContent({ ...content, activities: newActivities });
-                                                }}
-                                            />
-                                        </h4>
-                                        <p className="text-sm text-muted font-medium">
-                                            <EditableText
-                                                value={activity.description}
-                                                onChange={(val) => {
-                                                    const newActivities = [...content.activities];
-                                                    newActivities[idx].description = val;
-                                                    setContent({ ...content, activities: newActivities });
-                                                }}
-                                                multiline
-                                            />
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-2 bg-blue-100/50 dark:bg-blue-900/20 px-4 py-2 rounded-full">
-                                    <Clock className="h-3 w-3 text-blue-600" />
-                                    <EditableText
-                                        value={activity.time}
-                                        onChange={(val) => {
-                                            const newActivities = [...content.activities];
-                                            newActivities[idx].time = val;
-                                            setContent({ ...content, activities: newActivities });
-                                        }}
-                                        className="text-blue-600 dark:text-blue-400 font-black text-xs"
-                                    />
-                                </div>
+                {/* --- STEM TAB --- */}
+                {activeTab === 'stem' && (
+                    <div className="space-y-8">
+                        <div className="bg-surface p-8 rounded-3xl border border-border shadow-sm text-center">
+                            <h2 className="text-3xl font-black mb-2"><EditableText value={stem.hero.title} onChange={v => setStem({ ...stem, hero: { ...stem.hero, title: v } })} /></h2>
+                            <p className="text-muted-foreground"><EditableText value={stem.hero.subtitle} onChange={v => setStem({ ...stem, hero: { ...stem.hero, subtitle: v } })} /></p>
+                        </div>
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-xl font-bold">Projects</h3>
+                                <Button size="sm" onClick={() => setStem({ ...stem, projects: [...stem.projects, { title: 'New Project', description: 'Desc' }] })}><Plus className="w-4 h-4 mr-2" />Add Project</Button>
                             </div>
-                        </DeletableWrapper>
-                    ))}
-                    {/* Add Activity */}
-                    <Button
-                        variant="outline"
-                        className="border-dashed border-slate-200 dark:border-slate-800 w-full py-8 rounded-3xl flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all font-bold text-slate-500"
-                        onClick={() => {
-                            setContent({
-                                ...content,
-                                activities: [...content.activities, { title: 'New Activity', time: '12:00 PM', description: 'Activity description here' }]
-                            });
-                        }}
-                    >
-                        <Plus className="h-5 w-5" />
-                        <span>Add General Activity</span>
-                    </Button>
-                </div>
-            </section>
+                            {stem.projects.map((proj, i) => (
+                                <DeletableWrapper key={i} onDelete={() => {
+                                    const newProj = stem.projects.filter((_, idx) => idx !== i); setStem({ ...stem, projects: newProj });
+                                }}>
+                                    <div className="p-6 bg-surface border border-border rounded-xl space-y-2">
+                                        <h4 className="font-bold text-lg"><EditableText value={proj.title} onChange={v => {
+                                            const newProj = [...stem.projects]; newProj[i].title = v; setStem({ ...stem, projects: newProj });
+                                        }} /></h4>
+                                        <div className="text-muted-foreground"><EditableText multiline value={proj.description} onChange={v => {
+                                            const newProj = [...stem.projects]; newProj[i].description = v; setStem({ ...stem, projects: newProj });
+                                        }} /></div>
+                                    </div>
+                                </DeletableWrapper>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* --- BOOK TAB --- */}
+                {activeTab === 'book' && (
+                    <div className="space-y-8">
+                        <div className="bg-surface p-8 rounded-3xl border border-border shadow-sm text-center">
+                            <h2 className="text-3xl font-black mb-2"><EditableText value={book.hero.title} onChange={v => setBook({ ...book, hero: { ...book.hero, title: v } })} /></h2>
+                            <p className="text-muted-foreground"><EditableText value={book.hero.subtitle} onChange={v => setBook({ ...book, hero: { ...book.hero, subtitle: v } })} /></p>
+                        </div>
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-xl font-bold">Reviews</h3>
+                                <Button size="sm" onClick={() => setBook({ ...book, reviews: [...book.reviews, { bookTitle: 'Book', author: 'Author', studentName: 'Student', review: 'Review' }] })}><Plus className="w-4 h-4 mr-2" />Add Review</Button>
+                            </div>
+                            {book.reviews.map((rev, i) => (
+                                <DeletableWrapper key={i} onDelete={() => {
+                                    const newRev = book.reviews.filter((_, idx) => idx !== i); setBook({ ...book, reviews: newRev });
+                                }}>
+                                    <div className="p-6 bg-surface border border-border rounded-xl space-y-2">
+                                        <div className="flex gap-4">
+                                            <div className="flex-1 font-bold"><EditableText value={rev.bookTitle} onChange={v => {
+                                                const newRev = [...book.reviews]; newRev[i].bookTitle = v; setBook({ ...book, reviews: newRev });
+                                            }} /></div>
+                                            <div className="flex-1 text-muted"><EditableText value={rev.author} onChange={v => {
+                                                const newRev = [...book.reviews]; newRev[i].author = v; setBook({ ...book, reviews: newRev });
+                                            }} /></div>
+                                        </div>
+                                        <div className="text-sm text-blue-500 font-bold"><EditableText value={rev.studentName} onChange={v => {
+                                            const newRev = [...book.reviews]; newRev[i].studentName = v; setBook({ ...book, reviews: newRev });
+                                        }} /></div>
+                                        <div className="text-muted-foreground"><EditableText multiline value={rev.review} onChange={v => {
+                                            const newRev = [...book.reviews]; newRev[i].review = v; setBook({ ...book, reviews: newRev });
+                                        }} /></div>
+                                    </div>
+                                </DeletableWrapper>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* --- ARTS TAB --- */}
+                {activeTab === 'arts' && (
+                    <div className="space-y-8">
+                        <div className="bg-surface p-8 rounded-3xl border border-border shadow-sm text-center">
+                            <h2 className="text-3xl font-black mb-2"><EditableText value={arts.hero.title} onChange={v => setArts({ ...arts, hero: { ...arts.hero, title: v } })} /></h2>
+                            <p className="text-muted-foreground"><EditableText value={arts.hero.subtitle} onChange={v => setArts({ ...arts, hero: { ...arts.hero, subtitle: v } })} /></p>
+                        </div>
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-xl font-bold">Events</h3>
+                                <Button size="sm" onClick={() => setArts({ ...arts, events: [...arts.events, { title: 'Event', date: 'Date', description: 'Desc' }] })}><Plus className="w-4 h-4 mr-2" />Add Event</Button>
+                            </div>
+                            {arts.events.map((ev, i) => (
+                                <DeletableWrapper key={i} onDelete={() => {
+                                    const newEv = arts.events.filter((_, idx) => idx !== i); setArts({ ...arts, events: newEv });
+                                }}>
+                                    <div className="p-6 bg-surface border border-border rounded-xl space-y-2">
+                                        <div className="flex gap-4">
+                                            <div className="flex-1 font-bold"><EditableText value={ev.title} onChange={v => {
+                                                const newEv = [...arts.events]; newEv[i].title = v; setArts({ ...arts, events: newEv });
+                                            }} /></div>
+                                            <div className="text-sm font-bold bg-blue-100 dark:bg-blue-900 px-2 py-1 rounded"><EditableText value={ev.date} onChange={v => {
+                                                const newEv = [...arts.events]; newEv[i].date = v; setArts({ ...arts, events: newEv });
+                                            }} /></div>
+                                        </div>
+                                        <div className="text-muted-foreground"><EditableText multiline value={ev.description} onChange={v => {
+                                            const newEv = [...arts.events]; newEv[i].description = v; setArts({ ...arts, events: newEv });
+                                        }} /></div>
+                                    </div>
+                                </DeletableWrapper>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* --- ALUMNI TAB --- */}
+                {activeTab === 'alumni' && (
+                    <div className="space-y-8">
+                        <div className="bg-surface p-8 rounded-3xl border border-border shadow-sm text-center">
+                            <h2 className="text-3xl font-black mb-2"><EditableText value={alumni.hero.title} onChange={v => setAlumni({ ...alumni, hero: { ...alumni.hero, title: v } })} /></h2>
+                            <p className="text-muted-foreground"><EditableText value={alumni.hero.subtitle} onChange={v => setAlumni({ ...alumni, hero: { ...alumni.hero, subtitle: v } })} /></p>
+                        </div>
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-xl font-bold">Success Stories</h3>
+                                <Button size="sm" onClick={() => setAlumni({ ...alumni, stories: [...alumni.stories, { name: 'Name', batch: 'Batch', achievement: 'Achievement', quote: 'Quote' }] })}><Plus className="w-4 h-4 mr-2" />Add Story</Button>
+                            </div>
+                            {alumni.stories.map((story, i) => (
+                                <DeletableWrapper key={i} onDelete={() => {
+                                    const newStories = alumni.stories.filter((_, idx) => idx !== i); setAlumni({ ...alumni, stories: newStories });
+                                }}>
+                                    <div className="p-6 bg-surface border border-border rounded-xl space-y-2">
+                                        <div className="flex justify-between">
+                                            <div className="font-bold text-lg"><EditableText value={story.name} onChange={v => {
+                                                const newStories = [...alumni.stories]; newStories[i].name = v; setAlumni({ ...alumni, stories: newStories });
+                                            }} /></div>
+                                            <div className="text-sm bg-green-100 dark:bg-green-900 px-2 py-1 rounded"><EditableText value={story.batch} onChange={v => {
+                                                const newStories = [...alumni.stories]; newStories[i].batch = v; setAlumni({ ...alumni, stories: newStories });
+                                            }} /></div>
+                                        </div>
+                                        <div className="font-medium text-blue-600"><EditableText value={story.achievement} onChange={v => {
+                                            const newStories = [...alumni.stories]; newStories[i].achievement = v; setAlumni({ ...alumni, stories: newStories });
+                                        }} /></div>
+                                        <div className="text-muted-foreground italic"><EditableText multiline value={story.quote} onChange={v => {
+                                            const newStories = [...alumni.stories]; newStories[i].quote = v; setAlumni({ ...alumni, stories: newStories });
+                                        }} /></div>
+                                    </div>
+                                </DeletableWrapper>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </motion.div>
         </div>
     );
 }
