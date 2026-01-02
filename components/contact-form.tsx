@@ -90,6 +90,7 @@ export default function ContactForm() {
                     <select name="subject" className="w-full h-12 rounded-lg border border-surface-dark/20 bg-surface px-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-foreground shadow-sm">
                         <option value="Admission Inquiry" className="bg-background">Admission Inquiry</option>
                         <option value="General Support" className="bg-background">General Support</option>
+                        <option value="Alumni" className="bg-background">Alumni</option>
                         <option value="Careers" className="bg-background">Careers</option>
                         <option value="Others" className="bg-background">Others</option>
                     </select>

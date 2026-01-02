@@ -87,7 +87,7 @@ export default function DepartmentsPage() {
 
                 {/* HOD Profile Section */}
                 <div className="mb-24">
-                    <div className="relative group rounded-[3rem] overflow-hidden mb-20 shadow-2xl h-[300px] md:h-[450px]">
+                    <div className="relative group rounded-[3rem] overflow-hidden mb-20 shadow-2xl h-[250px] md:h-[350px]">
                         <img
                             src={content.heroImage}
                             alt="Academic Team"

@@ -143,9 +143,9 @@ export function Footer({ settings }: { settings: SiteSettings }) {
                                 <div className="bg-surface p-1.5 md:p-2 rounded-lg mt-0.5 flex-shrink-0">
                                     <Mail className="h-3 w-3 md:h-4 md:w-4 text-amber-500" />
                                 </div>
-                                <div>
+                                <div className="min-w-0">
                                     <p className="text-xs md:text-sm font-medium text-foreground">Email</p>
-                                    <p className="text-muted text-xs md:text-sm break-all">{settings.email1}</p>
+                                    <p className="text-muted text-[10px] md:text-xs">{settings.email1}</p>
                                 </div>
                             </li>
                         </ul>

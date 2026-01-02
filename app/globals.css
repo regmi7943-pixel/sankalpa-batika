@@ -36,6 +36,15 @@
   --radius: 0.5rem;
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
+
+  /* UI Components */
+  --popover: #ffffff;
+  --popover-foreground: #1f2937;
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #1e40af;
+  --accent: #f3f4f6;
+  --accent-foreground: #1f2937;
 }
 
 @theme inline {
@@ -45,6 +54,13 @@
   --color-surface-dark: var(--surface-dark);
   --color-card: var(--background);
   --color-card-foreground: var(--foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -58,6 +74,13 @@
   --muted-light: #475569;
   --surface: #1e293b;
   --surface-dark: #334155;
+  --popover: #1e293b;
+  --popover-foreground: #f1f5f9;
+  --border: #334155;
+  --input: #334155;
+  --ring: #3b82f6;
+  --accent: #334155;
+  --accent-foreground: #f1f5f9;
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
   --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.5);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5);

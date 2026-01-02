@@ -1,11 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Music, Palette, Trophy, Activity, Clock, ShieldCheck, Star, Users } from 'lucide-react';
-
-const iconMap: Record<string, any> = {
-    Music, Palette, Trophy, Activity, Clock, ShieldCheck, Star, Users
-};
+import * as LucideIcons from 'lucide-react';
+import { Star, ShieldCheck, Clock } from 'lucide-react';
 
 export function ClubsClient({ content }: { content: any }) {
     return (
@@ -84,7 +81,7 @@ export function ClubsClient({ content }: { content: any }) {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8">
                         {content.clubs.map((club: any, idx: number) => {
-                            const Icon = iconMap[club.icon] || Star;
+                            const Icon = (LucideIcons as any)[club.icon] || Star;
                             return (
                                 <motion.div
                                     key={club.id}

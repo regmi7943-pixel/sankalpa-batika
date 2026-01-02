@@ -12,6 +12,8 @@ import { DeletableWrapper } from '@/components/admin/deletable-wrapper';
 import { EditableText } from '@/components/admin/EditableText';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
+import { IconPicker } from '@/components/admin/IconPicker';
+import * as LucideIcons from 'lucide-react';
 
 const iconMap: Record<string, any> = {
     Music, Palette, Trophy, Activity, Clock, ShieldCheck, Star, Users, BookOpen, Bot, GraduationCap
@@ -182,7 +184,7 @@ export default function AdminClubsPage() {
     return (
         <div className="space-y-6 pb-20">
             {/* Toolbar */}
-            <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-border p-4 flex justify-between items-center -mx-6 px-6 mb-6">
+            <div className="sticky top-12 z-40 bg-background/80 backdrop-blur-md border-b border-border p-4 flex justify-between items-center -mx-6 px-6 mb-6">
                 <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
                     {tabs.map((tab) => {
                         const Icon = tab.icon;
@@ -201,9 +203,6 @@ export default function AdminClubsPage() {
                         );
                     })}
                 </div>
-                <Button onClick={handleSave} disabled={saving} className="ml-4 shrink-0 bg-green-600 hover:bg-green-700 text-white">
-                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save Changes'}
-                </Button>
             </div>
 
             <motion.div
@@ -269,11 +268,54 @@ export default function AdminClubsPage() {
                                                     const newClubs = [...overview.clubs]; newClubs[i].description = v; setOverview({ ...overview, clubs: newClubs });
                                                 }} /></div>
                                             </div>
-                                            <select value={club.icon} onChange={e => {
-                                                const newClubs = [...overview.clubs]; newClubs[i].icon = e.target.value; setOverview({ ...overview, clubs: newClubs });
-                                            }} className="bg-transparent border rounded p-1 text-xs h-fit self-start">
-                                                {Object.keys(iconMap).map(k => <option key={k} value={k}>{k}</option>)}
-                                            </select>
+                                            <IconPicker
+                                                value={club.icon}
+                                                onChange={v => {
+                                                    const newClubs = [...overview.clubs];
+                                                    newClubs[i].icon = v;
+                                                    setOverview({ ...overview, clubs: newClubs });
+                                                }}
+                                                className="w-12 h-12 rounded-2xl bg-background border-2 border-slate-100 dark:border-slate-800 flex items-center justify-center shrink-0 shadow-sm"
+                                            >
+                                                {(() => {
+                                                    const IconComponent = (LucideIcons as any)[club.icon] || Star;
+                                                    return <IconComponent className="w-6 h-6 text-blue-600" />;
+                                                })()}
+                                            </IconPicker>
+                                        </div>
+                                    </DeletableWrapper>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* General Activities */}
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-2xl font-bold">General Activities</h3>
+                                <Button size="sm" variant="outline" onClick={() => setOverview({ ...overview, activities: [...overview.activities, { title: 'New Activity', time: 'Time', description: 'Description' }] })}><Plus className="w-4 h-4 mr-2" />Add Activity</Button>
+                            </div>
+                            <div className="grid grid-cols-1 gap-4">
+                                {overview.activities.map((activity, i) => (
+                                    <DeletableWrapper key={i} onDelete={() => {
+                                        const newActivities = overview.activities.filter((_, idx) => idx !== i); setOverview({ ...overview, activities: newActivities });
+                                    }}>
+                                        <div className="p-6 bg-surface border border-border rounded-xl flex items-center gap-4">
+                                            <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                                                <Clock className="w-6 h-6 text-slate-500" />
+                                            </div>
+                                            <div className="flex-1">
+                                                <div className="flex justify-between items-start mb-1">
+                                                    <div className="font-bold text-lg"><EditableText value={activity.title} onChange={v => {
+                                                        const newActivities = [...overview.activities]; newActivities[i].title = v; setOverview({ ...overview, activities: newActivities });
+                                                    }} /></div>
+                                                    <div className="text-sm font-bold bg-blue-100 dark:bg-blue-900 px-2 py-1 rounded text-blue-600 dark:text-blue-400"><EditableText value={activity.time} onChange={v => {
+                                                        const newActivities = [...overview.activities]; newActivities[i].time = v; setOverview({ ...overview, activities: newActivities });
+                                                    }} /></div>
+                                                </div>
+                                                <div className="text-muted"><EditableText multiline value={activity.description} onChange={v => {
+                                                    const newActivities = [...overview.activities]; newActivities[i].description = v; setOverview({ ...overview, activities: newActivities });
+                                                }} /></div>
+                                            </div>
                                         </div>
                                     </DeletableWrapper>
                                 ))}

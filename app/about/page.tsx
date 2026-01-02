@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { getPageContent } from '@/app/actions/settings';
 import { getGallery } from '@/app/actions/gallery';
 import StaffCard from '@/components/staff-card';
+import DynamicIcon from '@/components/DynamicIcon';
 
 const defaultContent = {
     pageTitle: 'About Sankalpa Vatika',
@@ -75,7 +76,7 @@ export default async function AboutPage() {
                         {/* Mission */}
                         <div className="bg-gradient-to-br from-blue-50/50 dark:from-blue-900/10 to-background p-6 md:p-8 rounded-3xl border border-blue-100 dark:border-blue-900/20 animate-slide-up shadow-sm">
                             <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-blue-600 flex items-center justify-center mb-6 shadow-lg shadow-blue-600/20">
-                                <Target className="h-6 w-6 md:h-8 md:w-8 text-white" />
+                                <DynamicIcon name={content.missionIcon} className="h-6 w-6 md:h-8 md:w-8 text-white" fallback={<Target className="h-6 w-6 md:h-8 md:w-8 text-white" />} />
                             </div>
                             <h2 className="text-xl md:text-2xl font-bold text-foreground mb-4">{content.missionTitle}</h2>
                             <p className="text-muted leading-relaxed mb-4 text-sm md:text-base">
@@ -94,7 +95,7 @@ export default async function AboutPage() {
                         {/* Vision */}
                         <div className="bg-gradient-to-br from-amber-50/50 dark:from-amber-900/10 to-background p-6 md:p-8 rounded-3xl border border-amber-100 dark:border-amber-900/20 animate-slide-up shadow-sm" style={{ animationDelay: '0.1s' }}>
                             <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-amber-500 flex items-center justify-center mb-6 shadow-lg shadow-amber-500/20">
-                                <Eye className="h-6 w-6 md:h-8 md:w-8 text-white" />
+                                <DynamicIcon name={content.visionIcon} className="h-6 w-6 md:h-8 md:w-8 text-white" fallback={<Eye className="h-6 w-6 md:h-8 md:w-8 text-white" />} />
                             </div>
                             <h2 className="text-xl md:text-2xl font-bold text-foreground mb-4">{content.visionTitle}</h2>
                             <p className="text-muted leading-relaxed mb-4 text-sm md:text-base">
@@ -128,7 +129,7 @@ export default async function AboutPage() {
                             return (
                                 <div key={i} className="text-center group animate-fade-in" style={{ animationDelay: `${i * 0.1}s` }}>
                                     <div className="w-16 h-16 md:w-24 md:h-24 rounded-full bg-background dark:bg-surface shadow-md flex items-center justify-center mx-auto mb-6 group-hover:shadow-xl group-hover:scale-105 transition-all border border-surface-dark/10">
-                                        <IconComponent className="h-8 w-8 md:h-12 md:w-12 text-blue-600 dark:text-blue-400" />
+                                        <DynamicIcon name={value.icon} className="h-8 w-8 md:h-12 md:w-12 text-blue-600 dark:text-blue-400" fallback={<Heart className="h-8 w-8 md:h-12 md:w-12 text-blue-600 dark:text-blue-400" />} />
                                     </div>
                                     <h3 className="text-lg md:text-xl font-bold text-foreground mb-2">{value.title}</h3>
                                     <p className="text-muted text-xs md:text-sm max-w-[200px] mx-auto">{value.description}</p>

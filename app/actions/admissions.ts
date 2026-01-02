@@ -16,6 +16,7 @@ export async function submitApplication(formData: FormData) {
         const address = formData.get('address') as string;
 
         const previousSchool = formData.get('previousSchool') as string;
+        const message = formData.get('message') as string;
 
         if (!studentName || !parentName || !phone || !grade) {
             return { success: false, error: 'Please fill in all required fields.' };
@@ -33,7 +34,7 @@ export async function submitApplication(formData: FormData) {
             previousSchool,
             timestamp: Date.now(),
             status: 'pending', // pending, approved, rejected
-            notes: ''
+            notes: message || ''
         };
 
         if (adminDb) {
@@ -81,5 +82,16 @@ export async function updateApplicationStatus(id: string, status: string, notes?
     } catch (error) {
         console.error('Error updating application:', error);
         return { success: false, error: 'Failed to update application.' };
+    }
+}
+
+export async function deleteApplication(id: string) {
+    try {
+        await adminDb.ref(`applications/${id}`).remove();
+        revalidatePath('/admin/applications');
+        return { success: true };
+    } catch (error) {
+        console.error('Error deleting application:', error);
+        return { success: false, error: 'Failed to delete application.' };
     }
 }

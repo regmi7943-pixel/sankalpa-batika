@@ -55,9 +55,9 @@ export default function FormEditorPage() {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
+        <div className="min-h-screen bg-background pb-20">
             {/* Toolbar */}
-            <div className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm">
+            <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border shadow-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <Link href="/admin/applications">
@@ -76,86 +76,108 @@ export default function FormEditorPage() {
             </div>
 
             <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-10">
-                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 p-8 md:p-12 relative overflow-hidden">
-                    <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-500 via-amber-500 to-blue-500"></div>
-
-                    <div className="mb-12 text-center space-y-4">
-                        <h2 className="text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">Form Title</h2>
-                        <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">
-                            <EditableText
-                                value={content.title}
-                                onChange={(val: string) => setContent({ ...content, title: val })}
-                                className="border-dashed border-2 border-transparent hover:border-slate-300 p-1 rounded"
-                            />
-                        </h1>
-
-                        <div className="pt-4">
-                            <h2 className="text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide mb-2">Form Description</h2>
-                            <div className="text-muted-foreground max-w-2xl mx-auto text-lg whitespace-pre-wrap">
-                                <EditableText
-                                    value={content.description}
-                                    onChange={(val: string) => setContent({ ...content, description: val })}
-                                    multiline
-                                    className="border-dashed border-2 border-transparent hover:border-slate-300 p-1 rounded"
-                                />
-                            </div>
-                        </div>
+                {/* Header matching front-end */}
+                <div className="mb-8 text-center">
+                    <div className="inline-block px-4 py-1.5 rounded-full bg-blue-600/10 text-blue-600 text-xs font-bold uppercase tracking-widest mb-4">
+                        Form Setup
                     </div>
+                    <h1 className="text-3xl font-black text-foreground mb-4">
+                        <EditableText
+                            value={content.title}
+                            onChange={(val: string) => setContent({ ...content, title: val })}
+                        />
+                    </h1>
+                    <div className="text-muted leading-relaxed max-w-2xl mx-auto">
+                        <EditableText
+                            value={content.description}
+                            onChange={(val: string) => setContent({ ...content, description: val })}
+                            multiline
+                        />
+                    </div>
+                </div>
 
-                    <div className="space-y-10">
-                        <div className="border-l-4 border-blue-500 pl-4 py-2 bg-blue-50 dark:bg-blue-900/10 rounded-r-lg">
-                            <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                {/* Form Container matching Inquiry Page */}
+                <div className="bg-surface border border-border rounded-[2.5rem] p-8 md:p-12 shadow-xl">
+                    <div className="space-y-8">
+                        <div>
+                            <h2 className="text-2xl font-bold text-foreground mb-8">
                                 <EditableText
                                     value={content.studentInfoTitle}
                                     onChange={(val: string) => setContent({ ...content, studentInfoTitle: val })}
                                 />
-                            </h3>
-                            <p className="text-xs text-muted-foreground mt-1">(Section Header 1)</p>
+                            </h2>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 opacity-60 pointer-events-none filter grayscale-[30%]">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-muted">Student's Full Name *</label>
+                                    <Input placeholder="Enter student's name" className="h-12 rounded-xl bg-background" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-muted">Gender</label>
+                                    <div className="h-12 rounded-xl bg-background border border-input flex items-center px-3 text-muted">Select Gender</div>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-muted">Grade Applying For *</label>
+                                    <div className="h-12 rounded-xl bg-background border border-input flex items-center px-3 text-muted">Select Grade</div>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-muted">Date of Birth (BS)</label>
+                                    <Input placeholder="YYYY-MM-DD" className="h-12 rounded-xl bg-background" />
+                                </div>
+                            </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 opacity-60 pointer-events-none filter grayscale-[50%]">
-                            <Input placeholder="Student Name (Fixed)" />
-                            <Input placeholder="DOB (Fixed)" />
-                        </div>
+                        <div className="h-px bg-border my-8"></div>
 
-                        <div className="border-l-4 border-blue-500 pl-4 py-2 bg-blue-50 dark:bg-blue-900/10 rounded-r-lg">
-                            <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                        <div>
+                            <h2 className="text-2xl font-bold text-foreground mb-8">
                                 <EditableText
                                     value={content.guardianInfoTitle}
                                     onChange={(val: string) => setContent({ ...content, guardianInfoTitle: val })}
                                 />
-                            </h3>
-                            <p className="text-xs text-muted-foreground mt-1">(Section Header 2)</p>
+                            </h2>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 opacity-60 pointer-events-none filter grayscale-[30%]">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-muted">Parent/Guardian Name *</label>
+                                    <Input placeholder="Enter parent's name" className="h-12 rounded-xl bg-background" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-muted">Phone Number *</label>
+                                    <Input placeholder="98XXXXXXXX" type="tel" className="h-12 rounded-xl bg-background" />
+                                </div>
+                                <div className="space-y-2 md:col-span-2">
+                                    <label className="text-sm font-bold text-muted">Email Address (Optional)</label>
+                                    <Input placeholder="Enter email address" type="email" className="h-12 rounded-xl bg-background" />
+                                </div>
+                            </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 opacity-60 pointer-events-none filter grayscale-[50%]">
-                            <Input placeholder="Guardian Name (Fixed)" />
-                            <Input placeholder="Contact (Fixed)" />
-                        </div>
+                        <div className="h-px bg-border my-8"></div>
 
-                        <div className="border-l-4 border-blue-500 pl-4 py-2 bg-blue-50 dark:bg-blue-900/10 rounded-r-lg">
-                            <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                        <div>
+                            <h2 className="text-2xl font-bold text-foreground mb-8">
                                 <EditableText
                                     value={content.academicInfoTitle}
                                     onChange={(val: string) => setContent({ ...content, academicInfoTitle: val })}
                                 />
-                            </h3>
-                            <p className="text-xs text-muted-foreground mt-1">(Section Header 3)</p>
+                            </h2>
+
+                            <div className="space-y-2 opacity-60 pointer-events-none filter grayscale-[30%]">
+                                <label className="text-sm font-bold text-muted">Previous School / Message</label>
+                                <Input placeholder="Enter previous school details..." className="h-12 rounded-xl bg-background" />
+                            </div>
                         </div>
 
-                        <div className="opacity-60 pointer-events-none filter grayscale-[50%]">
-                            <Input placeholder="Previous School (Fixed)" />
+                        <div className="mt-12">
+                            <Button size="lg" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-14 rounded-2xl text-xl shadow-lg shadow-blue-600/20 pointer-events-none">
+                                <EditableText
+                                    value={content.submitButtonText}
+                                    onChange={(val: string) => setContent({ ...content, submitButtonText: val })}
+                                    className="pointer-events-auto"
+                                />
+                            </Button>
                         </div>
-                    </div>
-
-                    <div className="mt-10 pt-10 border-t border-slate-200 dark:border-slate-800 text-center">
-                        <Button size="lg" className="text-lg px-8 pointer-events-none">
-                            <EditableText
-                                value={content.submitButtonText}
-                                onChange={(val: string) => setContent({ ...content, submitButtonText: val })}
-                                className="pointer-events-auto"
-                            />
-                        </Button>
                     </div>
                 </div>
             </div>

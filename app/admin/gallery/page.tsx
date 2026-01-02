@@ -70,6 +70,7 @@ export default function AdminGalleryPage() {
     const [caption, setCaption] = useState('');
     const [staffName, setStaffName] = useState('');
     const [staffPosition, setStaffPosition] = useState('');
+    const [staffBio, setStaffBio] = useState('');
     const inputRef = useRef<HTMLInputElement>(null);
 
     // --- Helpers ---
@@ -152,8 +153,10 @@ export default function AdminGalleryPage() {
         formData.append('category', activeTab);
 
         if (activeTab === 'staff') {
-            const staffCaption = staffPosition ? `${staffName} - ${staffPosition}` : staffName;
-            formData.append('caption', staffCaption);
+            const parts = [staffName];
+            if (staffPosition) parts.push(staffPosition);
+            if (staffBio) parts.push(staffBio);
+            formData.append('caption', parts.join(' - '));
         } else {
             formData.append('caption', caption);
         }
@@ -165,6 +168,7 @@ export default function AdminGalleryPage() {
             setCaption('');
             setStaffName('');
             setStaffPosition('');
+            setStaffBio('');
             setShowUploadModal(false);
             toast.success('Upload successful');
         } else {
@@ -202,7 +206,7 @@ export default function AdminGalleryPage() {
     // --- Components ---
 
     const StaffCard = ({ item }: { item: GalleryItem }) => {
-        const [name, department] = (item.caption || '').split(' - ');
+        const [name, department, bio] = (item.caption || '').split(' - ');
         const [imageError, setImageError] = useState(false);
         const [isReplacing, setIsReplacing] = useState(false);
         const fileInputRef = useRef<HTMLInputElement>(null);
@@ -286,6 +290,7 @@ export default function AdminGalleryPage() {
                 <div className="p-5 space-y-1">
                     <h3 className="font-bold text-slate-800 dark:text-slate-100 truncate">{name || 'Unknown Name'}</h3>
                     <p className="text-xs font-black text-blue-600 uppercase tracking-wider truncate">{department || 'No Department'}</p>
+                    {bio && <p className="text-xs text-slate-500 line-clamp-2 mt-2">{bio}</p>}
                 </div>
             </div>
         );
@@ -493,82 +498,97 @@ export default function AdminGalleryPage() {
                     <motion.div
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
-                        className="bg-white dark:bg-slate-900 w-full max-w-xl rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800"
+                        className="bg-white dark:bg-slate-900 w-full max-w-lg max-h-[95vh] overflow-y-auto rounded-[2.5rem] shadow-2xl border border-slate-200 dark:border-slate-800 custom-scrollbar"
                     >
-                        <div className="p-8 md:p-10 space-y-8">
-                            <div className="flex justify-between items-center">
-                                <div className="space-y-1">
-                                    <h2 className="text-2xl font-black tracking-tight">
+                        <div className="p-5 md:p-8 space-y-4">
+                            <div className="flex justify-between items-center mb-2">
+                                <div className="space-y-0.5">
+                                    <h2 className="text-xl font-black tracking-tight">
                                         {activeTab === 'staff' ? 'Add Staff Member' : 'Upload Content'}
                                     </h2>
-                                    <p className="text-sm text-slate-500 font-bold">Uploading to {activeCategoryName}</p>
+                                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">To: {activeCategoryName}</p>
                                 </div>
                                 <button onClick={() => setShowUploadModal(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
-                                    <X className="h-6 w-6" />
+                                    <X className="h-5 w-5" />
                                 </button>
                             </div>
 
                             <div
-                                className={`border-4 border-dashed rounded-[2rem] p-10 text-center cursor-pointer transition-all ${dragActive ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/10' : 'border-slate-100 dark:border-slate-800 hover:border-blue-400'}`}
+                                className={`border-2 border-dashed rounded-3xl p-4 text-center cursor-pointer transition-all ${dragActive ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/10' : 'border-slate-100 dark:border-slate-200 hover:border-blue-400'}`}
                                 onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
                                 onDragLeave={() => setDragActive(false)}
                                 onDrop={(e) => { e.preventDefault(); setDragActive(false); handleFiles(e.dataTransfer.files); }}
                                 onClick={() => inputRef.current?.click()}
                             >
                                 <input ref={inputRef} type="file" multiple accept="image/*" className="hidden" onChange={e => e.target.files && handleFiles(e.target.files)} />
-                                <div className="w-16 h-16 bg-blue-600/10 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                                    <Upload className="h-8 w-8" />
+                                <div className="flex items-center justify-center gap-3">
+                                    <div className="w-10 h-10 bg-blue-600/10 text-blue-600 rounded-xl flex items-center justify-center">
+                                        <Upload className="h-5 w-5" />
+                                    </div>
+                                    <div className="text-left">
+                                        <p className="text-slate-900 dark:text-slate-100 font-black text-sm">Tap to Browse</p>
+                                        <p className="text-[10px] text-slate-500 font-bold">Standard image formats supported</p>
+                                    </div>
                                 </div>
-                                <p className="text-slate-900 dark:text-slate-100 font-black text-lg">Click to Browse</p>
-                                <p className="text-sm text-slate-500 font-medium mt-1">or drag and drop images here</p>
                             </div>
 
                             {selectedFiles.length > 0 && (
-                                <div className="flex gap-3 overflow-x-auto py-2 px-1">
+                                <div className="flex gap-2 overflow-x-auto py-1 px-1 no-scrollbar">
                                     {selectedFiles.map((f, i) => (
-                                        <div key={i} className="w-20 h-20 shrink-0 relative rounded-2xl overflow-hidden border-2 border-slate-200 group">
+                                        <div key={i} className="w-14 h-14 shrink-0 relative rounded-xl overflow-hidden border-2 border-slate-200 group">
                                             <img src={URL.createObjectURL(f)} className="w-full h-full object-cover" />
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); removeFile(i); }}
                                                 className="absolute inset-0 bg-red-500/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                                             >
-                                                <X className="h-6 w-6" />
+                                                <X className="h-4 w-4" />
                                             </button>
                                         </div>
                                     ))}
                                 </div>
                             )}
 
-                            <div className="space-y-4">
+                            <div className="space-y-3">
                                 {activeTab === 'staff' ? (
                                     <>
-                                        <div className="space-y-1.5">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Full Name</label>
-                                            <input
-                                                placeholder="e.g. John Doe"
-                                                value={staffName}
-                                                onChange={e => setStaffName(e.target.value)}
-                                                className="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border-0 focus:ring-4 focus:ring-blue-600/10 transition-all font-bold"
-                                            />
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                            <div className="space-y-1">
+                                                <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1">Full Name</label>
+                                                <input
+                                                    placeholder="e.g. John Doe"
+                                                    value={staffName}
+                                                    onChange={e => setStaffName(e.target.value)}
+                                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border-0 focus:ring-4 focus:ring-blue-600/10 transition-all font-bold text-sm"
+                                                />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1">Department</label>
+                                                <input
+                                                    placeholder="e.g. Maths Teacher"
+                                                    value={staffPosition}
+                                                    onChange={e => setStaffPosition(e.target.value)}
+                                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border-0 focus:ring-4 focus:ring-blue-600/10 transition-all font-bold text-sm"
+                                                />
+                                            </div>
                                         </div>
-                                        <div className="space-y-1.5">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Department</label>
-                                            <input
-                                                placeholder="e.g. Maths Teacher"
-                                                value={staffPosition}
-                                                onChange={e => setStaffPosition(e.target.value)}
-                                                className="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border-0 focus:ring-4 focus:ring-blue-600/10 transition-all font-bold"
+                                        <div className="space-y-1">
+                                            <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1">Message / Bio</label>
+                                            <textarea
+                                                placeholder="Short description or message..."
+                                                value={staffBio}
+                                                onChange={e => setStaffBio(e.target.value)}
+                                                className="w-full p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border-0 focus:ring-4 focus:ring-blue-600/10 transition-all font-bold text-sm min-h-[80px] resize-none"
                                             />
                                         </div>
                                     </>
                                 ) : (
-                                    <div className="space-y-1.5">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Caption (Optional)</label>
+                                    <div className="space-y-1">
+                                        <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1">Caption (Optional)</label>
                                         <input
                                             placeholder="Details about this image..."
                                             value={caption}
                                             onChange={e => setCaption(e.target.value)}
-                                            className="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border-0 focus:ring-4 focus:ring-blue-600/10 transition-all font-bold"
+                                            className="w-full p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border-0 focus:ring-4 focus:ring-blue-600/10 transition-all font-bold text-sm"
                                         />
                                     </div>
                                 )}
@@ -577,9 +597,9 @@ export default function AdminGalleryPage() {
                             <Button
                                 onClick={handleUploadSubmit}
                                 disabled={!selectedFiles.length || uploading || (activeTab === 'staff' && !staffName.trim())}
-                                className="w-full py-8 rounded-[1.5rem] bg-blue-600 hover:bg-blue-700 text-white font-black text-xl shadow-xl shadow-blue-500/20 disabled:scale-100"
+                                className="w-full py-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black text-lg shadow-xl shadow-blue-500/20 disabled:scale-100"
                             >
-                                {uploading ? <Loader2 className="animate-spin h-6 w-6" /> : activeTab === 'staff' ? 'Register Staff' : 'Begin Upload'}
+                                {uploading ? <Loader2 className="animate-spin h-5 w-5" /> : activeTab === 'staff' ? 'Register Staff Member' : 'Begin Upload'}
                             </Button>
                         </div>
                     </motion.div>

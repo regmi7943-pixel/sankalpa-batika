@@ -13,6 +13,7 @@ import RecentNotices from '@/components/home/recent-notices';
 import HomeNoticePopup from '@/components/home/home-notice-popup';
 import HomepageGalleryPreview from '@/components/home/homepage-gallery-preview';
 import HomeEvents from '@/components/home/home-events';
+import DynamicIcon from '@/components/DynamicIcon';
 import {
   ArrowRight, GraduationCap, Award, Users, BookOpen, Shield,
   Bell, Calendar, Play, Quote
@@ -83,12 +84,11 @@ export default async function HomePage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             {content.features.map((feature: any, i: number) => {
-              const IconComponent = iconMap[feature.icon] || BookOpen;
               return (
                 <Card key={i} className="group card-hover border-0 shadow-md overflow-hidden animate-fade-in" style={{ animationDelay: `${i * 0.1}s` }}>
                   <CardContent className="p-5 md:p-6">
                     <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                      <IconComponent className="h-6 w-6 md:h-7 md:w-7 text-white" />
+                      <DynamicIcon name={feature.icon} className="h-6 w-6 md:h-7 md:w-7 text-white" fallback={<BookOpen className="h-6 w-6 md:h-7 md:w-7 text-white" />} />
                     </div>
                     <h3 className="text-base md:text-lg font-bold text-foreground mb-2">{feature.title}</h3>
                     <p className="text-muted text-xs md:text-sm">{feature.description}</p>

@@ -221,7 +221,7 @@ export default function AdminLayout({
             <main className="flex-1 pt-14 lg:pt-0 overflow-auto flex flex-col bg-background">
                 {/* Editor Toolbar - Only show on Visual Editor pages */}
                 {pageLinks.some(page => page.href === pathname) && (
-                    <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-border px-4 py-2 flex items-center justify-between shadow-sm">
+                    <div className="sticky top-0 z-50 h-12 bg-background/80 backdrop-blur-md border-b border-border px-4 py-2 flex items-center justify-between shadow-sm">
                         <div className="flex items-center gap-2">
                             <Edit3 className="h-4 w-4 text-amber-500" />
                             <span className="text-sm text-muted-foreground">

@@ -112,7 +112,7 @@ export default async function ContactPage() {
                                     <div className="w-20 h-20 bg-background rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl animate-bounce-slow border border-surface-dark/10">
                                         <MapPin className="h-10 w-10 text-blue-600" />
                                     </div>
-                                    <p className="text-foreground font-bold text-xl md:text-2xl mb-2">Our Campus Location</p>
+                                    <p className="text-foreground font-bold text-xl md:text-2xl mb-2">Our School Location</p>
                                     <p className="text-muted text-sm md:text-base max-w-xs mx-auto">{settings.address || 'Kathmandu, Nepal'}</p>
                                     <a href={mapUrl} target="_blank" rel="noopener noreferrer">
                                         <Button variant="outline" className="mt-8 border-surface-dark/20 text-foreground bg-background/80 backdrop-blur-sm hover:bg-background transition-all">

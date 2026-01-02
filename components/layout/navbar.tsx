@@ -107,8 +107,8 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
                 ? 'bg-background shadow-lg border-b border-surface-dark/10'
                 : 'bg-blue-800/90 backdrop-blur-sm'
                 }`}>
-                <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-4">
-                    <div className="flex items-center justify-between h-20 gap-8">
+                <div className="max-w-[1440px] mx-auto px-4">
+                    <div className="flex items-center justify-between h-20">
                         {/* Logo and Brand */}
                         <Link href="/" className="flex items-center gap-3 group flex-shrink-0">
                             <div className="relative w-10 h-10 md:w-12 md:h-12 flex items-center justify-center">
@@ -133,10 +133,9 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
                                 </p>
                             </div>
                         </Link>
-
                         {/* Desktop Navigation */}
-                        <div className="hidden lg:flex items-center justify-end flex-1 gap-1 xl:gap-2">
-                            <div className="flex items-center gap-0.5 xl:gap-1">
+                        <div className="hidden lg:flex items-center justify-end flex-1 gap-1 min-w-0">
+                            <div className="flex items-center gap-0.5">
                                 {navLinks.map((link) => (
                                     link.subLinks ? (
                                         <div
@@ -145,7 +144,7 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
                                             onMouseLeave={handleMouseLeave}
                                             className="relative flex items-center h-full"
                                         >
-                                            <button className={`px-3 xl:px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap transition-all duration-200 flex items-center gap-1 group ${isScrolled
+                                            <button className={`px-2 xl:px-3 py-2 rounded-lg text-xs xl:text-sm font-bold whitespace-nowrap transition-all duration-200 flex items-center gap-1 group ${isScrolled
                                                 ? 'text-foreground hover:text-blue-600 hover:bg-surface'
                                                 : 'text-white hover:bg-white/10'
                                                 }`}>
@@ -187,7 +186,7 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
                                             href={link.href}
                                             onMouseEnter={() => handleMouseEnter('')}
                                             onMouseLeave={handleMouseLeave}
-                                            className={`px-3 xl:px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap transition-all duration-200 ${isScrolled
+                                            className={`px-2 xl:px-3 py-2 rounded-lg text-xs xl:text-sm font-bold whitespace-nowrap transition-all duration-200 ${isScrolled
                                                 ? 'text-foreground hover:text-blue-600 hover:bg-surface'
                                                 : 'text-white hover:bg-white/10'
                                                 }`}
@@ -197,7 +196,7 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
                                     )
                                 ))}
                             </div>
-                            <div className="flex items-center gap-4 pl-4 border-l border-white/20 ml-2">
+                            <div className="flex items-center gap-2 pl-2 border-l border-white/20 ml-1 flex-shrink-0">
                                 <ThemeToggle />
                                 <Link href="/admissions">
                                     <Button className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 whitespace-nowrap">
@@ -225,9 +224,9 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
                 </div>
 
                 {/* Mobile Menu */}
-                <div className={`lg:hidden transition-all duration-300 overflow-hidden ${isOpen ? 'max-h-screen bg-background shadow-xl border-t border-surface-dark/10' : 'max-h-0'
+                <div className={`lg:hidden transition-all duration-300 overflow-hidden ${isOpen ? 'max-h-[calc(100vh-5rem)] bg-background shadow-xl border-t border-surface-dark/10' : 'max-h-0'
                     }`}>
-                    <div className="px-4 py-6 space-y-2">
+                    <div className="px-4 py-6 space-y-2 overflow-y-auto max-h-[calc(100vh-7rem)]">
                         {navLinks.map((link) => (
                             <div key={link.label} className="space-y-1">
                                 {link.subLinks ? (

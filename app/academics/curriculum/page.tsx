@@ -86,7 +86,7 @@ export default function CurriculumPage() {
                         viewport={{ once: true }}
                         className="relative order-2 lg:order-1"
                     >
-                        <div className="relative aspect-square rounded-[4rem] overflow-hidden shadow-2xl">
+                        <div className="relative aspect-video rounded-[3rem] overflow-hidden shadow-2xl">
                             <img
                                 src={content.heroImage}
                                 alt="Students in Classroom"

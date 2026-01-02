@@ -277,6 +277,13 @@ export default function AdminAdmissionsPage() {
         load();
     }, []);
 
+    // Listen to toolbar save button
+    useEffect(() => {
+        const handleSaveEvent = () => handleSave();
+        window.addEventListener('admin-save', handleSaveEvent);
+        return () => window.removeEventListener('admin-save', handleSaveEvent);
+    }, [activeTab, policy, fee, uniform, transport, boarding, inquiry]);
+
     const handleSave = async () => {
         setSaving(true);
         let content: any = {};
@@ -329,7 +336,7 @@ export default function AdminAdmissionsPage() {
     return (
         <div className="space-y-4">
             {/* Admin Controls Header */}
-            <div className="sticky top-14 z-30 bg-background/95 backdrop-blur border-b border-border py-2 px-4 flex items-center justify-between">
+            <div className="sticky top-12 z-40 bg-background/80 backdrop-blur-md border-b border-border py-2 px-4 flex items-center justify-between">
                 <div className="flex bg-surface rounded-xl p-1 shadow-sm overflow-x-auto no-scrollbar">
                     {tabs.map((tab) => (
                         <button
@@ -345,10 +352,6 @@ export default function AdminAdmissionsPage() {
                         </button>
                     ))}
                 </div>
-                <Button onClick={handleSave} disabled={saving} className="bg-green-600 hover:bg-green-700 text-white shadow-md">
-                    {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
-                    Save
-                </Button>
             </div>
 
             <div className="bg-background min-h-screen pb-20">

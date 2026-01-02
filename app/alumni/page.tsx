@@ -60,9 +60,11 @@ export default function AlumniPage() {
                         transition={{ delay: 0.2 }}
                         className="mt-8"
                     >
-                        <Button className="bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-full px-8 py-6 text-lg shadow-lg shadow-amber-500/20">
-                            Join the Network
-                        </Button>
+                        <Link href="/contact">
+                            <Button className="bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-full px-8 py-6 text-lg shadow-lg shadow-amber-500/20">
+                                Join the Network
+                            </Button>
+                        </Link>
                     </motion.div>
                 </div>
             </section>
