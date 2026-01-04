@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Mail, Phone, MapPin, Calendar, Clock, CheckCircle, XCircle, MoreHorizontal, User, School, AlertCircle, Edit3 } from 'lucide-react';
 import { format } from 'date-fns';
+import { formatToNepaliDate } from '@/lib/nepali-date';
 import Link from 'next/link';
 import {
     DropdownMenu,
@@ -199,7 +200,7 @@ function ApplicationCard({ application }: { application: any }) {
                             <div className="flex lg:flex-col items-center gap-1.5">
                                 <Clock className="h-4 w-4 text-muted-foreground" />
                                 <span className="text-sm font-medium">
-                                    {format(new Date(application.timestamp), 'MMM d, yyyy')}
+                                    {formatToNepaliDate(application.timestamp).formatShort}
                                 </span>
                                 <span className="text-xs text-muted-foreground">
                                     {format(new Date(application.timestamp), 'h:mm a')}

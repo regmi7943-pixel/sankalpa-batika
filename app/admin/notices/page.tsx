@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { getNotices, createNotice, updateNotice, deleteNotice, uploadNoticeAttachment } from '@/app/actions/notices';
 import { Notice } from '@/types';
 import { toast } from 'sonner';
+import { formatToNepaliDate } from '@/lib/nepali-date';
 
 export default function AdminNoticesPage() {
     const [notices, setNotices] = useState<Notice[]>([]);
@@ -328,7 +329,7 @@ export default function AdminNoticesPage() {
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-2 text-sm text-blue-500 font-medium bg-blue-50 dark:bg-blue-900/20 px-3 py-1 rounded-full w-fit">
                                                 <Calendar className="h-3.5 w-3.5" />
-                                                <span>{new Date(notice.createdAt || Date.now()).toLocaleDateString()}</span>
+                                                <span>{formatToNepaliDate(notice.createdAt || Date.now()).formatShort}</span>
                                             </div>
                                             <div className="flex items-center gap-3">
                                                 {notice.attachmentUrl && (

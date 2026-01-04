@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { getEvents, createEvent, updateEvent, deleteEvent, uploadEventAttachment } from '@/app/actions/events';
 import { Event } from '@/types';
 import { toast } from 'sonner';
+import { formatToNepaliDate } from '@/lib/nepali-date';
 
 export default function AdminEventsPage() {
     const [events, setEvents] = useState<Event[]>([]);
@@ -332,29 +333,29 @@ export default function AdminEventsPage() {
                                                 <div className="flex md:flex-col items-center gap-2">
                                                     <div className="text-center">
                                                         <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                                                            {new Date(event.date).getDate()}
+                                                            {formatToNepaliDate(event.date).day}
                                                         </span>
                                                         <span className="text-[10px] font-bold uppercase text-blue-400 dark:text-blue-300 block">
-                                                            {new Date(event.date).toLocaleString('default', { month: 'short' })}
+                                                            {formatToNepaliDate(event.date).monthShort}
                                                         </span>
                                                     </div>
                                                     <div className="h-px w-4 md:h-4 md:w-px bg-blue-200 dark:bg-blue-800"></div>
                                                     <div className="text-center">
                                                         <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                                                            {new Date(event.endDate).getDate()}
+                                                            {formatToNepaliDate(event.endDate).day}
                                                         </span>
                                                         <span className="text-[10px] font-bold uppercase text-blue-400 dark:text-blue-300 block">
-                                                            {new Date(event.endDate).toLocaleString('default', { month: 'short' })}
+                                                            {formatToNepaliDate(event.endDate).monthShort}
                                                         </span>
                                                     </div>
                                                 </div>
                                             ) : (
                                                 <>
                                                     <span className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-                                                        {new Date(event.date).getDate()}
+                                                        {formatToNepaliDate(event.date).day}
                                                     </span>
                                                     <span className="text-sm font-bold uppercase text-blue-400 dark:text-blue-300 ml-2 md:ml-0">
-                                                        {new Date(event.date).toLocaleString('default', { month: 'short' })}
+                                                        {formatToNepaliDate(event.date).monthShort}
                                                     </span>
                                                 </>
                                             )}
@@ -411,7 +412,7 @@ export default function AdminEventsPage() {
                                                 {event.endDate && (
                                                     <div className="flex items-center gap-2">
                                                         <Calendar className="h-4 w-4 text-blue-500" />
-                                                        <span>{new Date(event.date).toLocaleDateString()} - {new Date(event.endDate).toLocaleDateString()}</span>
+                                                        <span>{formatToNepaliDate(event.date).formatShort} - {formatToNepaliDate(event.endDate).formatShort}</span>
                                                     </div>
                                                 )}
                                             </div>

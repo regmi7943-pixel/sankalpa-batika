@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Calendar, Download, Paperclip, X } from 'lucide-react';
 import { Notice } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
+import { formatToNepaliDate } from '@/lib/nepali-date';
 
 interface NoticeModalProps {
     isOpen: boolean;
@@ -41,12 +42,7 @@ export default function NoticeModal({ isOpen, onClose, notice }: NoticeModalProp
                                 <div className="flex items-center gap-2 mt-3 text-sm text-muted">
                                     <Calendar className="h-4 w-4" />
                                     <span>
-                                        {new Date(notice.createdAt).toLocaleDateString(undefined, {
-                                            weekday: 'long',
-                                            year: 'numeric',
-                                            month: 'long',
-                                            day: 'numeric'
-                                        })}
+                                        {formatToNepaliDate(notice.createdAt).formatFull}
                                     </span>
                                 </div>
                             </div>

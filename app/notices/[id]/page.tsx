@@ -3,6 +3,7 @@ import { adminDb } from '@/lib/firebase/server';
 import { Notice } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar } from 'lucide-react';
+import { formatToNepaliDate } from '@/lib/nepali-date';
 
 async function getNotice(id: string) {
     try {
@@ -38,12 +39,7 @@ export default async function NoticeDetailPage({ params }: { params: Promise<{ i
                     <CardTitle className="text-3xl font-bold">{notice.title}</CardTitle>
                     <div className="flex items-center text-gray-500 text-sm mt-2">
                         <Calendar className="h-4 w-4 mr-1" />
-                        {new Date(notice.createdAt).toLocaleDateString(undefined, {
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                        })}
+                        {formatToNepaliDate(notice.createdAt).formatFull}
                     </div>
                 </CardHeader>
                 <CardContent className="p-8 prose max-w-none">

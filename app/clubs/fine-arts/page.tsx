@@ -24,7 +24,7 @@ export default function FineArtsPage() {
     }, []);
 
     return (
-        <div className="pt-20 pb-16 min-h-screen bg-neutral-50">
+        <div className="pt-20 pb-16 min-h-screen bg-neutral-50 dark:bg-slate-950 transition-colors duration-300">
             {/* Hero Section */}
             <section className="relative py-24 overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-pink-500 via-red-500 to-yellow-500"></div>
@@ -80,21 +80,21 @@ export default function FineArtsPage() {
                             whileInView={{ opacity: 1, scale: 1 }}
                             viewport={{ once: true }}
                             transition={{ delay: idx * 0.1 }}
-                            className="bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all group"
+                            className="bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all group border border-transparent dark:border-slate-800"
                         >
-                            <div className="h-48 bg-slate-100 relative overflow-hidden flex items-center justify-center">
+                            <div className="h-48 bg-slate-100 dark:bg-slate-800 relative overflow-hidden flex items-center justify-center">
                                 {/* Placeholder Pattern */}
-                                <div className="absolute inset-0 bg-neutral-100 flex items-center justify-center text-neutral-300">
+                                <div className="absolute inset-0 bg-neutral-100 dark:bg-slate-800 flex items-center justify-center text-neutral-300 dark:text-slate-700">
                                     <Palette className="w-16 h-16" />
                                 </div>
-                                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-neutral-600 flex items-center gap-1 shadow-sm">
+                                <div className="absolute top-4 left-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-neutral-600 dark:text-slate-400 flex items-center gap-1 shadow-sm">
                                     <Calendar className="w-3 h-3" />
                                     {event.date}
                                 </div>
                             </div>
                             <div className="p-8">
-                                <h3 className="text-2xl font-bold mb-3 text-neutral-800">{event.title}</h3>
-                                <p className="text-neutral-600 leading-relaxed">
+                                <h3 className="text-2xl font-bold mb-3 text-neutral-800 dark:text-slate-100 group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">{event.title}</h3>
+                                <p className="text-neutral-600 dark:text-slate-400 leading-relaxed">
                                     {event.description}
                                 </p>
                             </div>

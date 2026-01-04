@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Mail, Loader2, Award, Zap, Info, Shield } from 'lucide-react';
 import { getPageContent } from '@/app/actions/settings';
+import Link from 'next/link';
 
 const defaultDepartments = {
     title: 'HODs & Academic Departments',
@@ -166,9 +167,11 @@ export default function DepartmentsPage() {
                                 Our departments work collaboratively to ensure a synchronized curriculum across all grades. Each HOD brings years of pedagogical expertise to lead their respective teams towards student success.
                             </p>
                         </div>
-                        <button className="whitespace-nowrap px-10 py-5 rounded-2xl bg-blue-600 text-white font-bold shadow-lg shadow-blue-600/20 hover:bg-blue-700 hover:-translate-y-1 active:scale-95 transition-all duration-300">
-                            Meet Our Full Faculty
-                        </button>
+                        <Link href="/staff">
+                            <button className="whitespace-nowrap px-10 py-5 rounded-2xl bg-blue-600 text-white font-bold shadow-lg shadow-blue-600/20 hover:bg-blue-700 hover:-translate-y-1 active:scale-95 transition-all duration-300">
+                                Meet Our Full Faculty
+                            </button>
+                        </Link>
                     </div>
                 </motion.div>
             </div>

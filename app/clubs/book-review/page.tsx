@@ -24,10 +24,10 @@ export default function BookReviewPage() {
     }, []);
 
     return (
-        <div className="pt-20 pb-16 min-h-screen bg-[#fdfbf7]">
+        <div className="pt-20 pb-16 min-h-screen bg-[#fdfbf7] dark:bg-slate-950 transition-colors duration-300">
             {/* Hero Section */}
-            <section className="relative py-24 bg-amber-900 text-amber-50 overflow-hidden">
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] opacity-30"></div>
+            <section className="relative py-24 bg-amber-900 dark:bg-amber-950 text-amber-50 overflow-hidden">
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] opacity-30 dark:opacity-10"></div>
                 <div className="max-w-7xl mx-auto px-4 relative z-10 text-center">
                     <motion.div
                         initial={{ rotate: -10, opacity: 0 }}
@@ -64,35 +64,35 @@ export default function BookReviewPage() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: idx * 0.1 }}
-                            className="bg-white border border-stone-200 rounded-t-lg rounded-br-3xl shadow-sm hover:shadow-xl transition-all p-8 flex flex-col relative group"
+                            className="bg-white dark:bg-slate-900 border border-stone-200 dark:border-slate-800 rounded-t-lg rounded-br-3xl shadow-sm hover:shadow-xl transition-all p-8 flex flex-col relative group"
                         >
                             {/* Decorative Tape */}
-                            <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-8 bg-amber-100/50 rotate-[-2deg] backdrop-blur-sm shadow-sm"></div>
+                            <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-8 bg-amber-100/50 dark:bg-amber-900/30 rotate-[-2deg] backdrop-blur-sm shadow-sm"></div>
 
                             <div className="mb-6">
-                                <h3 className="text-2xl font-serif font-bold text-stone-800 leading-tight mb-1 group-hover:text-amber-700 transition-colors">
+                                <h3 className="text-2xl font-serif font-bold text-stone-800 dark:text-stone-100 leading-tight mb-1 group-hover:text-amber-700 dark:group-hover:text-amber-500 transition-colors">
                                     {review.bookTitle}
                                 </h3>
-                                <p className="text-sm text-stone-500 font-medium uppercase tracking-wide">
+                                <p className="text-sm text-stone-500 dark:text-stone-400 font-medium uppercase tracking-wide">
                                     by {review.author}
                                 </p>
                             </div>
 
                             <div className="flex-1">
-                                <Quote className="w-8 h-8 text-amber-200 mb-2" />
-                                <p className="text-stone-600 leading-relaxed italic font-serif">
+                                <Quote className="w-8 h-8 text-amber-200 dark:text-amber-900/40 mb-2" />
+                                <p className="text-stone-600 dark:text-stone-400 leading-relaxed italic font-serif">
                                     {review.review}
                                 </p>
                             </div>
 
-                            <div className="mt-8 pt-6 border-t border-stone-100 flex items-center justify-between">
+                            <div className="mt-8 pt-6 border-t border-stone-100 dark:border-slate-800 flex items-center justify-between">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center">
-                                        <User className="w-5 h-5 text-stone-400" />
+                                    <div className="w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
+                                        <User className="w-5 h-5 text-stone-400 dark:text-stone-500" />
                                     </div>
                                     <div>
-                                        <div className="text-sm font-bold text-stone-700">{review.studentName}</div>
-                                        <div className="text-xs text-stone-500">Student Reviewer</div>
+                                        <div className="text-sm font-bold text-stone-700 dark:text-stone-200">{review.studentName}</div>
+                                        <div className="text-xs text-stone-500 dark:text-stone-400">Student Reviewer</div>
                                     </div>
                                 </div>
                                 <div className="flex">

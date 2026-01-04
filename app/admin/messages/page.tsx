@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { getMessages, deleteMessage, markAsRead, sendReply } from '@/app/actions/contact';
 import { toast } from 'sonner';
+import { formatToNepaliDate } from '@/lib/nepali-date';
 
 export default function AdminMessagesPage() {
     const [messages, setMessages] = useState<any[]>([]);
@@ -95,12 +96,7 @@ export default function AdminMessagesPage() {
     );
 
     const formatDate = (timestamp: number) => {
-        return new Intl.DateTimeFormat('en-US', {
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        }).format(new Date(timestamp));
+        return formatToNepaliDate(timestamp).formatShort;
     };
 
     return (

@@ -59,7 +59,7 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
             ]
         },
         {
-            href: '/admissions',
+            href: '/admissions/policy',
             label: 'Admissions',
             subLinks: [
                 { href: '/admissions/policy', label: 'Our Policy' },
@@ -94,7 +94,7 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
                 <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-4 flex justify-between items-center text-sm">
                     <div className="flex items-center gap-4">
                         <span>📞 {settings.phone1}</span>
-                        <span className="hidden sm:inline">✉️ {settings.email1}</span>
+                        <a href={`mailto:${settings.email1}`} className="hidden sm:inline hover:text-blue-200 transition-colors">✉️ {settings.email1}</a>
                     </div>
                     <div className="hidden md:flex items-center gap-4">
                         <span>🕐 {settings.hours}</span>
@@ -198,7 +198,7 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
                             </div>
                             <div className="flex items-center gap-2 pl-2 border-l border-white/20 ml-1 flex-shrink-0">
                                 <ThemeToggle />
-                                <Link href="/admissions">
+                                <Link href="/admissions/policy">
                                     <Button className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 whitespace-nowrap">
                                         Apply Now
                                     </Button>
@@ -274,7 +274,7 @@ export function Navbar({ settings }: { settings: SiteSettings }) {
                             </div>
                         ))}
                         <div className="pt-4">
-                            <Link href="/admissions" onClick={() => setIsOpen(false)}>
+                            <Link href="/admissions/policy" onClick={() => setIsOpen(false)}>
                                 <Button className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white">
                                     Apply Now
                                 </Button>

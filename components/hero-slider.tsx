@@ -117,7 +117,7 @@ export default function HeroSlider({ slides, content }: HeroSliderProps) {
 
                     {/* CTAs */}
                     <div className="flex flex-col sm:flex-row gap-3 md:gap-4 pt-2 md:pt-4">
-                        <Link href="/admissions">
+                        <Link href="/admissions/policy">
                             <Button size="lg" className="w-full sm:w-auto bg-red-700 hover:bg-red-800 text-white px-6 py-6 md:px-8 md:py-7 text-base md:text-lg uppercase tracking-wider font-bold rounded-none shadow-2xl hover:shadow-red-900/50 transition-all border-l-4 border-red-500">
                                 {content.ctaText}
                                 <ArrowRight className="ml-3 h-5 w-5" />

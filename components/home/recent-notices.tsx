@@ -6,6 +6,7 @@ import { ArrowRight, Bell } from 'lucide-react';
 import { Notice } from '@/types';
 import Link from 'next/link';
 import NoticeModal from '@/components/notice-modal';
+import { formatToNepaliDate } from '@/lib/nepali-date';
 
 interface RecentNoticesProps {
     notices: Notice[];
@@ -29,7 +30,7 @@ export default function RecentNotices({ notices }: RecentNoticesProps) {
                                     {notice.title}
                                 </h3>
                                 <p className="text-muted text-xs md:text-sm">
-                                    {new Date(notice.createdAt).toLocaleDateString()}
+                                    {formatToNepaliDate(notice.createdAt).formatShort}
                                 </p>
                             </div>
                             <div className="text-blue-600 hover:text-blue-700 flex-shrink-0">

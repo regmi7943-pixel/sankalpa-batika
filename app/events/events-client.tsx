@@ -5,6 +5,7 @@ import { Calendar, MapPin, Clock, Paperclip, X, ExternalLink, CalendarDays } fro
 import { Button } from '@/components/ui/button';
 import { Event } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
+import { formatToNepaliDate } from '@/lib/nepali-date';
 
 export default function EventsClient({ events }: { events: Event[] }) {
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -32,9 +33,9 @@ export default function EventsClient({ events }: { events: Event[] }) {
     }).sort((a, b) => b.date - a.date);
 
     const EventCard = ({ event, isPast = false, isOngoing = false }: { event: Event, isPast?: boolean, isOngoing?: boolean }) => {
-        const startDate = new Date(event.date);
-        const endDate = event.endDate ? new Date(event.endDate) : null;
-        const hasRange = endDate && endDate.getTime() !== startDate.getTime();
+        const nepaliStart = formatToNepaliDate(event.date);
+        const nepaliEnd = event.endDate ? formatToNepaliDate(event.endDate) : null;
+        const hasRange = nepaliEnd && event.endDate !== event.date;
 
         return (
             <motion.div
@@ -50,10 +51,10 @@ export default function EventsClient({ events }: { events: Event[] }) {
                     <div className="flex-shrink-0 flex md:flex-col items-center justify-center gap-1 min-w-[100px]">
                         <div className={`p-4 rounded-2xl flex flex-col items-center justify-center min-w-[90px] ${isOngoing ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-foreground'}`}>
                             <span className="text-sm font-bold uppercase tracking-wider opacity-80">
-                                {startDate.toLocaleString('default', { month: 'short' })}
+                                {nepaliStart.monthShort}
                             </span>
                             <span className="text-3xl font-black">
-                                {startDate.getDate()}
+                                {nepaliStart.day}
                             </span>
                         </div>
 
@@ -62,10 +63,10 @@ export default function EventsClient({ events }: { events: Event[] }) {
                                 <div className="w-1 h-3 md:h-1 md:w-3 bg-slate-200 dark:bg-slate-700 rounded-full my-0.5 opacity-50"></div>
                                 <div className={`p-4 rounded-2xl flex flex-col items-center justify-center min-w-[90px] ${isOngoing ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400' : 'bg-slate-50 dark:bg-slate-800/50 text-foreground/70'}`}>
                                     <span className="text-xs font-bold uppercase tracking-wider opacity-70">
-                                        {endDate.toLocaleString('default', { month: 'short' })}
+                                        {nepaliEnd?.monthShort}
                                     </span>
                                     <span className="text-2xl font-black">
-                                        {endDate.getDate()}
+                                        {nepaliEnd?.day}
                                     </span>
                                 </div>
                             </>
@@ -231,7 +232,7 @@ export default function EventsClient({ events }: { events: Event[] }) {
                                     <div className="space-y-4 pt-4">
                                         <div className="flex flex-wrap gap-2">
                                             <span className="px-4 py-1.5 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-full">
-                                                {new Date(selectedEvent.date).getFullYear()} EVENT
+                                                {formatToNepaliDate(selectedEvent.date).year} EVENT
                                             </span>
                                         </div>
                                         <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-foreground leading-[1.1]">
@@ -246,8 +247,8 @@ export default function EventsClient({ events }: { events: Event[] }) {
                                             <div className="flex items-center gap-3 text-foreground font-bold text-lg">
                                                 <Calendar className="h-6 w-6 text-blue-600" />
                                                 <span>
-                                                    {new Date(selectedEvent.date).toLocaleDateString(undefined, { day: 'numeric', month: 'long' })}
-                                                    {selectedEvent.endDate && selectedEvent.endDate !== selectedEvent.date && ` - ${new Date(selectedEvent.endDate).toLocaleDateString(undefined, { day: 'numeric', month: 'long' })}`}
+                                                    {formatToNepaliDate(selectedEvent.date).formatFull}
+                                                    {selectedEvent.endDate && selectedEvent.endDate !== selectedEvent.date && ` - ${formatToNepaliDate(selectedEvent.endDate).formatFull}`}
                                                 </span>
                                             </div>
                                         </div>

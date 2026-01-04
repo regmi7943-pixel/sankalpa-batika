@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, MapPin, X, ExternalLink } from 'lucide-react';
 import { Event } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
+import { formatToNepaliDate } from '@/lib/nepali-date';
 
 export default function HomeEvents({ events }: { events: Event[] }) {
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -33,9 +34,9 @@ export default function HomeEvents({ events }: { events: Event[] }) {
                                 <div className="flex">
                                     <div className="bg-gradient-to-b from-blue-500 to-blue-600 text-white p-3 md:p-4 text-center min-w-[60px] md:min-w-[70px] group-hover:scale-105 transition-transform duration-500">
                                         <p className="text-[10px] md:text-xs font-bold uppercase opacity-80">
-                                            {startDate.toLocaleString('default', { month: 'short' })}
+                                            {formatToNepaliDate(event.date).monthShort}
                                         </p>
-                                        <p className="text-xl md:text-2xl font-black">{startDate.getDate()}</p>
+                                        <p className="text-xl md:text-2xl font-black">{formatToNepaliDate(event.date).day}</p>
                                     </div>
                                     <div className="p-3 md:p-4 flex-grow">
                                         <h3 className="font-bold text-foreground text-sm md:text-base line-clamp-1 group-hover:text-blue-600 transition-colors">{event.name}</h3>
@@ -85,7 +86,7 @@ export default function HomeEvents({ events }: { events: Event[] }) {
                                     <div className="space-y-3 pt-4">
                                         <div className="flex flex-wrap gap-2">
                                             <span className="px-3 py-1 bg-blue-600 text-white text-[9px] font-black uppercase tracking-widest rounded-full">
-                                                {new Date(selectedEvent.date).getFullYear()} EVENT
+                                                {formatToNepaliDate(selectedEvent.date).year} EVENT
                                             </span>
                                         </div>
                                         <h2 className="text-3xl md:text-4xl font-black tracking-tight text-foreground leading-[1.2]">
@@ -100,8 +101,8 @@ export default function HomeEvents({ events }: { events: Event[] }) {
                                             <div className="flex items-center gap-2.5 text-foreground font-bold text-base">
                                                 <Calendar className="h-5 w-5 text-blue-600 flex-shrink-0" />
                                                 <span>
-                                                    {new Date(selectedEvent.date).toLocaleDateString(undefined, { day: 'numeric', month: 'long' })}
-                                                    {selectedEvent.endDate && selectedEvent.endDate !== selectedEvent.date && ` - ${new Date(selectedEvent.endDate).toLocaleDateString(undefined, { day: 'numeric', month: 'long' })}`}
+                                                    {formatToNepaliDate(selectedEvent.date).formatFull}
+                                                    {selectedEvent.endDate && selectedEvent.endDate !== selectedEvent.date && ` - ${formatToNepaliDate(selectedEvent.endDate).formatFull}`}
                                                 </span>
                                             </div>
                                         </div>

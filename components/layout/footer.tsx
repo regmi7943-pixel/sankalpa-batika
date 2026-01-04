@@ -19,11 +19,11 @@ interface SiteSettings {
 
 export function Footer({ settings }: { settings: SiteSettings }) {
     const pathname = usePathname();
-    const showCTA = pathname !== '/admissions/apply' && pathname !== '/admissions';
+    const showCTA = pathname !== '/admissions/apply' && pathname !== '/admissions' && pathname !== '/admissions/policy';
 
     const quickLinks = [
         { href: '/about', label: 'About Us' },
-        { href: '/admissions', label: 'Admissions' },
+        { href: '/admissions/policy', label: 'Admissions' },
         { href: '/notices', label: 'Notice Board' },
         { href: '/events', label: 'Events' },
         { href: '/gallery', label: 'Gallery' },
@@ -48,7 +48,7 @@ export function Footer({ settings }: { settings: SiteSettings }) {
                             <p className="text-blue-100 text-sm md:text-base">Admissions are now open for the upcoming academic session.</p>
                         </div>
                         <Link
-                            href="/admissions"
+                            href="/admissions/policy"
                             className="flex items-center gap-2 bg-white text-blue-600 px-6 md:px-8 py-3 md:py-4 rounded-xl font-semibold hover:bg-blue-50 transition-all duration-300 shadow-lg hover:shadow-xl group text-sm md:text-base"
                         >
                             Apply Now
@@ -145,7 +145,7 @@ export function Footer({ settings }: { settings: SiteSettings }) {
                                 </div>
                                 <div className="min-w-0">
                                     <p className="text-xs md:text-sm font-medium text-foreground">Email</p>
-                                    <p className="text-muted text-[10px] md:text-xs">{settings.email1}</p>
+                                    <a href={`mailto:${settings.email1}`} className="text-muted text-[10px] md:text-xs hover:text-blue-600 transition-colors break-all">{settings.email1}</a>
                                 </div>
                             </li>
                         </ul>

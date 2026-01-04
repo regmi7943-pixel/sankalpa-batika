@@ -9,6 +9,7 @@ import { Notice } from '@/types';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import NoticeModal from '@/components/notice-modal';
+import { formatToNepaliDate } from '@/lib/nepali-date';
 
 interface NoticesListProps {
     notices: Notice[];
@@ -62,10 +63,10 @@ export default function NoticesList({ notices }: NoticesListProps) {
                                     {/* Date Badge */}
                                     <div className="bg-gradient-to-b from-amber-500 to-orange-500 text-white p-4 md:p-6 flex sm:flex-col items-center justify-center gap-2 sm:gap-0 sm:min-w-[100px] md:min-w-[120px]">
                                         <span className="text-xs md:text-sm font-bold uppercase">
-                                            {new Date(notice.createdAt).toLocaleString('default', { month: 'short' })}
+                                            {formatToNepaliDate(notice.createdAt).monthShort}
                                         </span>
-                                        <span className="text-2xl md:text-3xl font-bold">{new Date(notice.createdAt).getDate()}</span>
-                                        <span className="text-xs md:text-sm opacity-80">{new Date(notice.createdAt).getFullYear()}</span>
+                                        <span className="text-2xl md:text-3xl font-bold">{formatToNepaliDate(notice.createdAt).day}</span>
+                                        <span className="text-xs md:text-sm opacity-80">{formatToNepaliDate(notice.createdAt).year}</span>
                                     </div>
 
                                     {/* Content */}
