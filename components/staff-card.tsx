@@ -20,8 +20,8 @@ export default function StaffCard({ staff }: StaffCardProps) {
     return (
         <>
             <div
-                className={`group space-y-4 p-4 bg-background dark:bg-surface/50 rounded-3xl border border-surface-dark/10 shadow-sm hover:shadow-xl transition-all animate-fade-in relative ${bio ? 'cursor-pointer' : 'cursor-default'}`}
-                onClick={() => bio && setShowModal(true)}
+                className="group space-y-4 p-4 bg-background dark:bg-surface/50 rounded-3xl border border-surface-dark/10 shadow-sm hover:shadow-xl transition-all animate-fade-in relative cursor-pointer"
+                onClick={() => setShowModal(true)}
             >
                 <div className="aspect-square bg-surface dark:bg-background rounded-2xl overflow-hidden border border-surface-dark/10 relative">
                     <img
@@ -32,14 +32,12 @@ export default function StaffCard({ staff }: StaffCardProps) {
                     <div className="absolute inset-0 bg-blue-600/5 group-hover:bg-transparent transition-colors"></div>
 
                     {/* Hover Show Message Indicator */}
-                    {bio && (
-                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black/40 backdrop-blur-[2px]">
-                            <div className="bg-white text-blue-600 px-4 py-2 rounded-full text-xs font-black flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform">
-                                <MessageSquare className="w-3.5 h-3.5" />
-                                Show Message
-                            </div>
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black/40 backdrop-blur-[2px]">
+                        <div className="bg-white text-blue-600 px-4 py-2 rounded-full text-xs font-black flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform">
+                            {bio ? <MessageSquare className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
+                            {bio ? 'Show Message' : 'View Profile'}
                         </div>
-                    )}
+                    </div>
                 </div>
                 <div className="space-y-1">
                     <h3 className="font-bold text-foreground text-sm md:text-base line-clamp-1">{name || 'Staff Member'}</h3>
@@ -96,11 +94,11 @@ export default function StaffCard({ staff }: StaffCardProps) {
 
                                 <div className="space-y-4">
                                     <div className="flex items-center gap-2 text-slate-400">
-                                        <MessageSquare className="w-4 h-4" />
-                                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">Message from Teacher</span>
+                                        {bio ? <MessageSquare className="w-4 h-4" /> : <User className="w-4 h-4" />}
+                                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">{bio ? 'Message from Teacher' : 'Teacher Profile'}</span>
                                     </div>
                                     <p className="text-slate-600 dark:text-slate-300 text-lg leading-relaxed italic">
-                                        "{bio}"
+                                        {bio ? `"${bio}"` : `Dedicated to excellence in education and nurturing the next generation of leaders at Sankalpa Vatika.`}
                                     </p>
                                 </div>
                             </div>
